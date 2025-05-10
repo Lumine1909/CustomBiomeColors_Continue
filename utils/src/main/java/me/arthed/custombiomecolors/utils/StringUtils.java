@@ -9,7 +9,7 @@ public class StringUtils {
 
     public static String randomString(int length) {
         StringBuilder stringBuilder = new StringBuilder(length);
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             stringBuilder.append(RANDOM_STRING_CHARACTERS[random.nextInt(RANDOM_STRING_CHARACTERS.length)]);
         }
         return stringBuilder.toString();

@@ -24,9 +24,8 @@ public class DataManager {
     private final CustomBiomeColors plugin = CustomBiomeColors.getInstance();
 
     private final Gson gson = new GsonBuilder().create();
-    private Map<String, int[]> map = new HashMap<>();
-
     private final File file;
+    private Map<String, int[]> map = new HashMap<>();
 
     public DataManager(String fileName) {
         this.file = new File(this.plugin.getDataFolder(), fileName);

@@ -8,35 +8,39 @@ import java.util.Optional;
 public class ReflectionUtils {
 
     @Nullable
-    public static Object getPrivateObject(Object object, String fieldName) throws NoSuchFieldException {
-        Field field = object.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
+    public static <T> T getPrivateObject(Object object, String fieldName) {
         try {
-            return field.get(object);
-        } catch(IllegalAccessException ignore) {}
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return (T) field.get(object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
-    public static int getPrivateInteger(Object object, String fieldName) throws NoSuchFieldException {
-        Field field = object.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
+    public static int getPrivateInteger(Object object, String fieldName) {
         try {
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
             return field.getInt(object);
-        } catch(IllegalAccessException ignore) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
-    public static int getPrivateOptionalInteger(Object object, String fieldName) throws NoSuchFieldException {
-        Field field = object.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
+    public static int getPrivateOptionalInteger(Object object, String fieldName) {
         try {
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
             Optional<?> value = (Optional<?>) field.get(object);
-            if(value.isPresent()) {
+            if (value.isPresent()) {
                 return ((Optional<Integer>) field.get(object)).get().intValue();
             }
-        } catch(IllegalAccessException ignore) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
-
-
 }

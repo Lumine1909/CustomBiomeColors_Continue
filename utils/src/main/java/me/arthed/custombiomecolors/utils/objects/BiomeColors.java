@@ -9,36 +9,6 @@ public class BiomeColors {
     private int skyColor;
     private int fogColor;
 
-    public BiomeColors setGrassColor(int grassColor) {
-        this.grassColor = grassColor;
-        return this;
-    }
-
-    public BiomeColors setFoliageColor(int foliageColor) {
-        this.foliageColor = foliageColor;
-        return this;
-    }
-
-    public BiomeColors setWaterColor(int waterColor) {
-        this.waterColor = waterColor;
-        return this;
-    }
-
-    public BiomeColors setWaterFogColor(int waterFogColor) {
-        this.waterFogColor = waterFogColor;
-        return this;
-    }
-
-    public BiomeColors setSkyColor(int skyColor) {
-        this.skyColor = skyColor;
-        return this;
-    }
-
-    public BiomeColors setFogColor(int fogColor) {
-        this.fogColor = fogColor;
-        return this;
-    }
-
     public void setColor(BiomeColorType colorType, int color) {
         if (colorType.equals(BiomeColorType.GRASS)) {
             this.setGrassColor(color);
@@ -59,23 +29,53 @@ public class BiomeColors {
         return grassColor;
     }
 
+    public BiomeColors setGrassColor(int grassColor) {
+        this.grassColor = grassColor;
+        return this;
+    }
+
     public int getFoliageColor() {
         return foliageColor;
+    }
+
+    public BiomeColors setFoliageColor(int foliageColor) {
+        this.foliageColor = foliageColor;
+        return this;
     }
 
     public int getWaterColor() {
         return waterColor;
     }
 
+    public BiomeColors setWaterColor(int waterColor) {
+        this.waterColor = waterColor;
+        return this;
+    }
+
     public int getWaterFogColor() {
         return waterFogColor;
+    }
+
+    public BiomeColors setWaterFogColor(int waterFogColor) {
+        this.waterFogColor = waterFogColor;
+        return this;
     }
 
     public int getSkyColor() {
         return skyColor;
     }
 
+    public BiomeColors setSkyColor(int skyColor) {
+        this.skyColor = skyColor;
+        return this;
+    }
+
     public int getFogColor() {
         return fogColor;
+    }
+
+    public BiomeColors setFogColor(int fogColor) {
+        this.fogColor = fogColor;
+        return this;
     }
 }

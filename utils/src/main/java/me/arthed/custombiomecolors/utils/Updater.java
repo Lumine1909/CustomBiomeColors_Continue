@@ -17,10 +17,10 @@ import java.net.URLConnection;
 
 public class Updater implements Listener {
 
-    public boolean update;
     private final String currentVersion;
     private final int pluginId;
     private final String message;
+    public boolean update;
 
     public Updater(JavaPlugin plugin, int pluginId) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -37,12 +37,14 @@ public class Updater implements Listener {
             URL url = null;
             try {
                 url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.pluginId);
-            } catch (MalformedURLException ignored) {}
+            } catch (MalformedURLException ignored) {
+            }
             URLConnection conn = null;
             try {
                 assert url != null;
                 conn = url.openConnection();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
             try {
                 assert conn != null;
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -51,13 +53,14 @@ public class Updater implements Listener {
                 } else {
                     update = Boolean.TRUE;
                     Bukkit.getConsoleSender().sendMessage(this.message);
-                    for(Player p : Bukkit.getOnlinePlayers()) {
-                        if(p.isOp()) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.isOp()) {
                             p.sendMessage(this.message);
                         }
                     }
                 }
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         });
 
         thread.start();
@@ -67,7 +70,7 @@ public class Updater implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if(p.isOp() && update) {
+        if (p.isOp() && update) {
             p.sendMessage(this.message);
         }
     }
