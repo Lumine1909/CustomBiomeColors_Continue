@@ -19,6 +19,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public class DataManager {
 
     private final CustomBiomeColors plugin = CustomBiomeColors.getInstance();
@@ -78,7 +79,7 @@ public class DataManager {
     public void loadBiomes() {
         for (String biomeKeyString : this.map.keySet()) {
             int[] colors = map.get(biomeKeyString);
-            plugin.getNmsServer().loadBiome(
+            plugin.getNmsServer().createCustomBiome(
                 new BiomeKey(biomeKeyString),
                 new BiomeColors()
                     .setGrassColor(colors[0])

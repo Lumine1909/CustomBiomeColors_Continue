@@ -8,7 +8,6 @@ import me.arthed.custombiomecolors.utils.objects.BiomeKey;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
-public class SetBiomeColorCommand implements CommandExecutor, TabExecutor {
+@SuppressWarnings({"rawtypes", "deprecation"})
+public class SetBiomeColorCommand implements TabExecutor {
 
     private static final WorldEditHandler worldEditHandler = CustomBiomeColors.getInstance().getWorldEditHandler();
     private static final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();

@@ -4,21 +4,21 @@ import me.arthed.custombiomecolors.utils.objects.BiomeColors;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
 import org.bukkit.block.Block;
 
-public interface NmsServer {
+public interface NmsServer<Biome, Holder, ResourceKey> {
 
-    NmsBiome getBiomeFromBiomeKey(BiomeKey biomeKey);
+    NmsBiome<Biome, Holder, ResourceKey> getBiomeFromBiomeKey(BiomeKey biomeKey);
 
-    NmsBiome getBiomeFromBiomeBase(Object biomeBase);
+    NmsBiome<Biome, Holder, ResourceKey> getWrappedBiomeHolder(Holder biomeBase);
 
     boolean doesBiomeExist(BiomeKey biomeKey);
 
-    void loadBiome(BiomeKey biomeKey, BiomeColors biomeColors);
+    Holder createCustomBiome(BiomeKey biomeKey, BiomeColors biomeColors);
 
-    void setBlocksBiome(Block block, NmsBiome nmsBiome);
+    void setBlockBiome(Block block, NmsBiome<Biome, Holder, ResourceKey> nmsBiome);
 
-    Object getBlocksBiomeBase(Block block);
+    Holder getBlocksBiome(Block block);
 
-    void registerBiome(Object biomeBase, Object biomeMinecraftKey);
+    Holder registerBiome(Biome biome, ResourceKey resourceKey);
 
-    String getBiomeString(NmsBiome nmsBiome);
+    String getBiomeString(NmsBiome<Biome, Holder, ResourceKey> nmsBiome);
 }

@@ -19,27 +19,27 @@ import org.bukkit.craftbukkit.CraftWorld;
 import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
 
-public class NmsServer_1_21_3 implements NmsServer {
+public class NmsServer_1_21_3 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
     private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
 
-    public NmsBiome getBiomeFromBiomeKey(BiomeKey biomeKey) {
-        return new NmsBiome_1_21_3(this.biomeRegistry.getValueOrThrow(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))));
+    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
+        return new NmsBiome_1_21_3(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))).orElseThrow());
     }
 
-    public NmsBiome getBiomeFromBiomeBase(Object biomeBase) {
-        return new NmsBiome_1_21_3(((Holder<Biome>) biomeBase).value());
+    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getWrappedBiomeHolder(Holder<Biome> biomeBase) {
+        return new NmsBiome_1_21_3(biomeBase);
     }
 
     public boolean doesBiomeExist(BiomeKey biomeKey) {
-        return this.biomeRegistry.getValue(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))) != null;
+        return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))).isPresent();
     }
 
-    public void loadBiome(BiomeKey biomeKey, BiomeColors biomeColors) {
-        Biome biomeBase = this.biomeRegistry.getValueOrThrow(ResourceKey.create(
+    public Holder<Biome> createCustomBiome(BiomeKey biomeKey, BiomeColors biomeColors) {
+        Biome biomeBase = this.biomeRegistry.getOptional(ResourceKey.create(
             Registries.BIOME,
             ResourceLocation.fromNamespaceAndPath("minecraft", "plains")
-        ));
+        )).orElseThrow();
 
         ResourceKey<Biome> customBiomeKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value));
         Biome.BiomeBuilder customBiomeBuilder = new Biome.BiomeBuilder()
@@ -65,18 +65,18 @@ public class NmsServer_1_21_3 implements NmsServer {
 
         customBiomeBuilder.specialEffects(customBiomeColors.build());
         Biome customBiome = customBiomeBuilder.build();
-        this.registerBiome(customBiome, customBiomeKey);
+        return this.registerBiome(customBiome, customBiomeKey);
     }
 
-    public void setBlocksBiome(Block block, NmsBiome nmsBiome) {
+    public void setBlockBiome(Block block, NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
         BlockPos blockPosition = new BlockPos(block.getX(), block.getY(), block.getZ());
         Level nmsWorld = ((CraftWorld) block.getWorld()).getHandle();
 
         net.minecraft.world.level.chunk.LevelChunk chunk = nmsWorld.getChunkAt(blockPosition);
-        chunk.setBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2, Holder.direct(nmsBiome.getBiomeBase()));
+        chunk.setBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2, nmsBiome.getBiomeHolder());
     }
 
-    public Object getBlocksBiomeBase(Block block) {
+    public Holder<Biome> getBlocksBiome(Block block) {
         BlockPos blockPosition = new BlockPos(block.getX(), block.getY(), block.getZ());
         Level nmsWorld = ((CraftWorld) block.getWorld()).getHandle();
 
@@ -84,7 +84,7 @@ public class NmsServer_1_21_3 implements NmsServer {
         return chunk.getNoiseBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2);
     }
 
-    public void registerBiome(Object biomeBase, Object biomeMinecraftKey) {
+    public Holder<Biome> registerBiome(Biome biome, ResourceKey<Biome> resourceKey) {
         try {
             Field frozen = MappedRegistry.class.getDeclaredField("frozen");
             frozen.setAccessible(true);
@@ -94,25 +94,25 @@ public class NmsServer_1_21_3 implements NmsServer {
             unregisteredIntrusiveHolders.setAccessible(true);
             unregisteredIntrusiveHolders.set(this.biomeRegistry, new IdentityHashMap<>());
 
+            Holder<Biome> holder;
             //biome is the BiomeBase that you're registering
             //f is createIntrusiveHolder
-            this.biomeRegistry.createIntrusiveHolder((Biome) biomeBase);
+            this.biomeRegistry.createIntrusiveHolder(biome);
             //a is RegistryMaterials.register
-            this.biomeRegistry.register((ResourceKey<Biome>) biomeMinecraftKey, (Biome) biomeBase, RegistrationInfo.BUILT_IN);
+            holder = this.biomeRegistry.register(resourceKey, biome, RegistrationInfo.BUILT_IN);
 
             //Make unregisteredIntrusiveHolders null again to remove potential for undefined behaviour
             unregisteredIntrusiveHolders.set(this.biomeRegistry, null);
-
             frozen.set(this.biomeRegistry, true);
+            return holder;
         } catch (Exception error) {
             error.printStackTrace();
         }
+        return null;
     }
 
-    public String getBiomeString(NmsBiome nmsBiome) {
-        ResourceLocation minecraftKey = this.biomeRegistry.getKey(nmsBiome.getBiomeBase());
-        if (minecraftKey != null)
-            return minecraftKey.toString();
-        return "minecraft:forest";
+    public String getBiomeString(NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
+        ResourceLocation resourceLocation = this.biomeRegistry.getKey(nmsBiome.getBiome());
+        return resourceLocation == null ? "minecraft:plain" : resourceLocation.toString();
     }
 }

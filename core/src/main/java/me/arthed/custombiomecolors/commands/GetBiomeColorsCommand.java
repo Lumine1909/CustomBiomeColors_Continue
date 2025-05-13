@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public class GetBiomeColorsCommand implements CommandExecutor {
 
     private static final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
@@ -19,7 +20,7 @@ public class GetBiomeColorsCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("/getbiomecolors")) {
             if (sender instanceof Player player) {
-                NmsBiome biome = nmsServer.getBiomeFromBiomeBase(nmsServer.getBlocksBiomeBase(player.getLocation().getBlock()));
+                NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBlocksBiome(player.getLocation().getBlock()));
                 BiomeColors biomeColors = biome.getBiomeColors();
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aColors of the biome you're in:"));
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7 - Grass: &7&l" + ColorUtils.intToHex(biomeColors.getGrassColor())));

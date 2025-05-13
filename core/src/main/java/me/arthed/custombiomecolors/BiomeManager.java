@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class BiomeManager {
 
     private final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
@@ -34,7 +35,7 @@ public class BiomeManager {
 
             for (Block block : blocks) {
                 boolean added = false;
-                Object blocksBiomeBase = nmsServer.getBlocksBiomeBase(block);
+                Object blocksBiomeBase = nmsServer.getBlocksBiome(block);
                 for (Object biomeBase : blocksInEachBiome.keySet()) {
                     if (blocksBiomeBase.equals(biomeBase)) {
                         blocksInEachBiome.get(biomeBase).add(block);
@@ -54,7 +55,7 @@ public class BiomeManager {
             BiomeKey individualBiomeKey = biomeKey;
             int i = 0;
             for (Object biomeBase : blocksInEachBiome.keySet()) {
-                NmsBiome biome = nmsServer.getBiomeFromBiomeBase(biomeBase);
+                NmsBiome biome = nmsServer.getWrappedBiomeHolder(biomeBase);
                 BiomeColors biomeColors = biome.getBiomeColors();
                 biomeColors.setColor(colorType, color);
 
@@ -68,7 +69,7 @@ public class BiomeManager {
                 }
 
                 for (Block block : blocksInEachBiome.get(biomeBase)) {
-                    nmsServer.setBlocksBiome(block, newBiome);
+                    nmsServer.setBlockBiome(block, newBiome);
                 }
             }
             runWhenDone.run();

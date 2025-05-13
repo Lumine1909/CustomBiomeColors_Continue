@@ -9,7 +9,7 @@ import me.arthed.custombiomecolors.nms.NmsServer_1_20_5;
 import me.arthed.custombiomecolors.nms.NmsServer_1_21;
 import me.arthed.custombiomecolors.nms.NmsServer_1_21_3;
 import me.arthed.custombiomecolors.utils.BStats;
-import me.arthed.custombiomecolors.utils.Updater;
+import me.arthed.custombiomecolors.utils.UpdateChecker;
 import me.arthed.custombiomecolors.utils.objects.BiomeColorType;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Objects;
 
+@SuppressWarnings("rawtypes")
 public final class CustomBiomeColors extends JavaPlugin {
 
     private static CustomBiomeColors instance;
@@ -28,6 +29,19 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     public static CustomBiomeColors getInstance() {
         return instance;
+    }
+
+    public static int obtainVersion() {
+        try {
+            String[] versions = Bukkit.getMinecraftVersion().split("\\.");
+            if (versions.length == 2) {
+                return Integer.parseInt(versions[1]) * 100;
+            } else if (versions.length == 3) {
+                return Integer.parseInt(versions[1]) * 100 + Integer.parseInt(versions[2]);
+            }
+        } catch (Exception ignored) {
+        }
+        return -1;
     }
 
     @NotNull
@@ -82,8 +96,7 @@ public final class CustomBiomeColors extends JavaPlugin {
         Objects.requireNonNull(this.getCommand("/setfogcolor")).setExecutor(new SetBiomeColorCommand("/setfogcolor", BiomeColorType.FOG));
         Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
 
-        new Updater(this, 95858);
-
+        new UpdateChecker(this);
     }
 
     @Override
@@ -92,18 +105,5 @@ public final class CustomBiomeColors extends JavaPlugin {
             this.dataManager.save();
         } catch (IOException ignore) {
         }
-    }
-
-    public static int obtainVersion() {
-        try {
-            String[] versions = Bukkit.getMinecraftVersion().split("\\.");
-            if (versions.length == 2) {
-                return Integer.parseInt(versions[1]) * 100;
-            } else if (versions.length == 3) {
-                return Integer.parseInt(versions[1]) * 100 + Integer.parseInt(versions[2]);
-            }
-        } catch (Exception ignored) {
-        }
-        return -1;
     }
 }

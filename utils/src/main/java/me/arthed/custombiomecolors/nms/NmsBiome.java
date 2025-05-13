@@ -2,13 +2,14 @@ package me.arthed.custombiomecolors.nms;
 
 import me.arthed.custombiomecolors.utils.objects.BiomeColors;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
-import net.minecraft.world.level.biome.Biome;
 
-public interface NmsBiome {
+public interface NmsBiome<Biome, Holder, ResourceKey> {
 
-    Biome getBiomeBase();
+    Holder getBiomeHolder();
+
+    Biome getBiome();
 
     BiomeColors getBiomeColors();
 
-    NmsBiome cloneWithDifferentColors(NmsServer nmsServer, BiomeKey newBiomeKey, BiomeColors biomeColors);
+    NmsBiome<Biome, Holder, ResourceKey> cloneWithDifferentColors(NmsServer<Biome, Holder, ResourceKey> nmsServer, BiomeKey newBiomeKey, BiomeColors biomeColors);
 }

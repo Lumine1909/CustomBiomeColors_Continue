@@ -18,7 +18,7 @@ Requires [WorldEdit](https://dev.bukkit.org/projects/worldedit).
 
 ❗ Due to the way biomes work in minecraft, selections, especially small ones, might not be precise.
 
-❗ Only the exact following versions are supported: 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20.1, 1.20.2 
+❗ Supported version: 1.20.5 - 1.21.5
 
 
 # Commands
@@ -47,6 +47,3 @@ biome:name - (Optional) the biome name that shows up when you press F3<br>
 
 - - - -
 [**Statistics**](https://bstats.org/plugin/bukkit/CustomBiomeColors/12660)
-
-
-[![Discord](https://i.imgur.com/xGgAO7c.png)](https://discord.gg/MPKVEcX)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Spigot Page](https://i.imgur.com/idUVHgU.png)](https://www.spigotmc.org/resources/custombiomecolors-no-resourcepack.95858/)
