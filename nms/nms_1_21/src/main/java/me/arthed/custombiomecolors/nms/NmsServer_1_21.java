@@ -17,11 +17,30 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 
 public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
     private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
+
+    private static final Field MappedRegistry$frozen;
+    private static final Field MappedRegistry$unregisteredIntrusiveHolders;
+    private static final Method Holder$bindTags;
+
+    static {
+        try {
+            MappedRegistry$frozen = MappedRegistry.class.getDeclaredField("frozen");
+            MappedRegistry$frozen.setAccessible(true);
+            MappedRegistry$unregisteredIntrusiveHolders = MappedRegistry.class.getDeclaredField("unregisteredIntrusiveHolders");
+            MappedRegistry$unregisteredIntrusiveHolders.setAccessible(true);
+            Holder$bindTags = Holder.Reference.class.getDeclaredMethod("bindTags", Collection.class);
+            Holder$bindTags.setAccessible(true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
         return new NmsBiome_1_21(this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))).orElseThrow());
@@ -32,14 +51,16 @@ public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceK
     }
 
     public boolean doesBiomeExist(BiomeKey biomeKey) {
-        return this.biomeRegistry.getOptional(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))).isPresent();
+        return this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))).isPresent();
     }
 
     public Holder<Biome> createCustomBiome(BiomeKey biomeKey, BiomeColors biomeColors) {
-        Biome biomeBase = this.biomeRegistry.getOptional(ResourceKey.create(
+        Holder<Biome> biomeHolder = this.biomeRegistry.getHolder(ResourceKey.create(
             Registries.BIOME,
             ResourceLocation.fromNamespaceAndPath("minecraft", "plains")
         )).orElseThrow();
+
+        Biome biomeBase = biomeHolder.value();
 
         ResourceKey<Biome> customBiomeKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value));
         Biome.BiomeBuilder customBiomeBuilder = new Biome.BiomeBuilder()
@@ -65,7 +86,7 @@ public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceK
 
         customBiomeBuilder.specialEffects(customBiomeColors.build());
         Biome customBiome = customBiomeBuilder.build();
-        return this.registerBiome(customBiome, customBiomeKey);
+        return this.registerBiome(biomeHolder, customBiome, customBiomeKey);
     }
 
     public void setBlockBiome(Block block, NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
@@ -84,26 +105,18 @@ public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceK
         return chunk.getNoiseBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2);
     }
 
-    public Holder<Biome> registerBiome(Biome biome, ResourceKey<Biome> resourceKey) {
+    public Holder<Biome> registerBiome(Holder<Biome> original, Biome biome, ResourceKey<Biome> resourceKey) {
         try {
-            Field frozen = MappedRegistry.class.getDeclaredField("frozen");
-            frozen.setAccessible(true);
-            frozen.set(this.biomeRegistry, false);
+            MappedRegistry$frozen.set(this.biomeRegistry, false);
+            MappedRegistry$unregisteredIntrusiveHolders.set(this.biomeRegistry, new IdentityHashMap<>());
 
-            Field unregisteredIntrusiveHolders = MappedRegistry.class.getDeclaredField("unregisteredIntrusiveHolders");
-            unregisteredIntrusiveHolders.setAccessible(true);
-            unregisteredIntrusiveHolders.set(this.biomeRegistry, new IdentityHashMap<>());
-
-            Holder<Biome> holder;
-            //biome is the BiomeBase that you're registering
-            //f is createIntrusiveHolder
             this.biomeRegistry.createIntrusiveHolder(biome);
-            //a is RegistryMaterials.register
-            holder = this.biomeRegistry.register(resourceKey, biome, RegistrationInfo.BUILT_IN);
+            Holder<Biome> holder = this.biomeRegistry.register(resourceKey, biome, RegistrationInfo.BUILT_IN);
+            Holder$bindTags.invoke(holder, original.tags().toList());
 
-            //Make unregisteredIntrusiveHolders null again to remove potential for undefined behaviour
-            unregisteredIntrusiveHolders.set(this.biomeRegistry, null);
-            frozen.set(this.biomeRegistry, true);
+            MappedRegistry$unregisteredIntrusiveHolders.set(this.biomeRegistry, null);
+            MappedRegistry$frozen.set(this.biomeRegistry, true);
+
             return holder;
         } catch (Exception error) {
             error.printStackTrace();

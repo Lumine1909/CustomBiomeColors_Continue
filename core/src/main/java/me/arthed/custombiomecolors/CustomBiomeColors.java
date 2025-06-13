@@ -83,7 +83,7 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        new BStats(this, 12660);
+        new BStats(this, 26161);
 
         this.biomeManager = new BiomeManager();
         this.worldEditHandler = new WorldEditHandler();

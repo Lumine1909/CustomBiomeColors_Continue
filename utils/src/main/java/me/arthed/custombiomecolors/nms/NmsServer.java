@@ -18,7 +18,7 @@ public interface NmsServer<Biome, Holder, ResourceKey> {
 
     Holder getBlocksBiome(Block block);
 
-    Holder registerBiome(Biome biome, ResourceKey resourceKey);
+    Holder registerBiome(Holder original, Biome biome, ResourceKey resourceKey);
 
     String getBiomeString(NmsBiome<Biome, Holder, ResourceKey> nmsBiome);
 }

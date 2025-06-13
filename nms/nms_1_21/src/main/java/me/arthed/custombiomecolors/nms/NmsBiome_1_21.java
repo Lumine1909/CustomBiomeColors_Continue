@@ -64,7 +64,7 @@ public class NmsBiome_1_21 implements NmsBiome<Biome, Holder<Biome>, ResourceKey
 
         customBiomeBuilder.specialEffects(customBiomeColors.build());
         Biome customBiome = customBiomeBuilder.build();
-        Holder<Biome> holder = nmsServer.registerBiome(customBiome, customBiomeKey);
+        Holder<Biome> holder = nmsServer.registerBiome(getBiomeHolder(), customBiome, customBiomeKey);
 
         return new NmsBiome_1_21(holder);
     }

@@ -3,16 +3,12 @@ plugins {
     id("com.gradleup.shadow") version "9.0.0-beta11"
 }
 
-group = "me.arthed"
-version = "1.4.0"
+group = "io.github.lumine1909"
+version = "1.4.1"
 
 repositories {
     mavenCentral()
-    mavenLocal()
-    maven {
-        name = "worldedit-repo"
-        url = uri("https://maven.enginehub.org/repo/")
-    }
+    maven("https://maven.enginehub.org/repo/")
     maven("https://repo.papermc.io/repository/maven-public/")
     gradlePluginPortal()
 }
