@@ -18,35 +18,37 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 
 @SuppressWarnings("rawtypes")
 public class DataManager {
 
     private final CustomBiomeColors plugin = CustomBiomeColors.getInstance();
-
-    private final Gson gson = new GsonBuilder().create();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final File file;
-    private Map<String, int[]> map = new HashMap<>();
+    private final ExecutorService saveExecutor = Executors.newSingleThreadExecutor();
+    private Map<String, int[]> map = new ConcurrentHashMap<>();
 
     public DataManager(String fileName) {
         this.file = new File(this.plugin.getDataFolder(), fileName);
         if (!this.file.exists()) {
             this.plugin.saveResource(fileName, false);
         }
-
         try {
             Type typeToken = new TypeToken<Map<String, int[]>>() {
             }.getType();
             this.map = gson.fromJson(new FileReader(this.file), typeToken);
+            if (this.map == null) {
+                this.map = new HashMap<>();
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public void save() throws IOException {
+    private void save0() throws IOException {
         final String json = gson.toJson(map);
-        this.file.delete();
-        Files.write(this.file.toPath(), json.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        Files.write(this.file.toPath(), json.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     public void saveBiome(BiomeKey biomeKey, BiomeColors biomeColors) {
@@ -58,36 +60,61 @@ public class DataManager {
             biomeColors.getSkyColor(),
             biomeColors.getFogColor()
         });
+        scheduleSave();
+    }
+
+    private Future<?> scheduleSave() {
+        return saveExecutor.submit(() -> {
+            try {
+                save0();
+            } catch (IOException e) {
+                plugin.getSLF4JLogger().error("Failed to save data", e);
+            }
+        });
     }
 
     @Nullable
     public NmsBiome getBiomeWithSpecificColors(BiomeColors biomeColors) {
-        for (String biomeKeyString : this.map.keySet()) {
-            int[] colors = map.get(biomeKeyString);
+        for (Map.Entry<String, int[]> entry : this.map.entrySet()) {
+            int[] colors = entry.getValue();
             if (colors[0] == biomeColors.getGrassColor() &&
                 colors[1] == biomeColors.getFoliageColor() &&
                 colors[2] == biomeColors.getWaterColor() &&
                 colors[3] == biomeColors.getWaterFogColor() &&
                 colors[4] == biomeColors.getSkyColor() &&
                 colors[5] == biomeColors.getFogColor()) {
-                return plugin.getNmsServer().getBiomeFromBiomeKey(new BiomeKey(biomeKeyString));
+                return plugin.getNmsServer().getBiomeFromBiomeKey(new BiomeKey(entry.getKey()));
             }
         }
         return null;
     }
 
     public void loadBiomes() {
-        for (String biomeKeyString : this.map.keySet()) {
-            int[] colors = map.get(biomeKeyString);
+        for (Map.Entry<String, int[]> entry : this.map.entrySet()) {
+            int[] colors = entry.getValue();
             plugin.getNmsServer().createCustomBiome(
-                new BiomeKey(biomeKeyString),
+                new BiomeKey(entry.getKey()),
                 new BiomeColors()
                     .setGrassColor(colors[0])
                     .setFoliageColor(colors[1])
                     .setWaterColor(colors[2])
                     .setWaterFogColor(colors[3])
                     .setSkyColor(colors[4])
-                    .setFogColor(colors[5]));
+                    .setFogColor(colors[5])
+            );
+        }
+    }
+
+    public void saveOnClose() {
+        Future<?> future = scheduleSave();
+        saveExecutor.shutdown();
+        try {
+            future.get(30, TimeUnit.SECONDS);
+            if (!saveExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+                plugin.getSLF4JLogger().warn("Data save executor did not shut down cleanly");
+            }
+        } catch (Exception e) {
+            plugin.getSLF4JLogger().error("Failed during shutdown save process", e);
         }
     }
 }

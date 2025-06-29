@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Objects;
 
 @SuppressWarnings("rawtypes")
@@ -101,9 +100,6 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        try {
-            this.dataManager.save();
-        } catch (IOException ignore) {
-        }
+        this.dataManager.saveOnClose();
     }
 }

@@ -23,8 +23,6 @@ import java.util.IdentityHashMap;
 
 public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
-
     private static final Field MappedRegistry$frozen;
     private static final Field MappedRegistry$unregisteredIntrusiveHolders;
     private static final Method Holder$bindTags;
@@ -41,6 +39,8 @@ public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, Resourc
             throw new RuntimeException(e);
         }
     }
+
+    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
 
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
         return new NmsBiome_1_20_5(this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key, biomeKey.value))).orElseThrow());
