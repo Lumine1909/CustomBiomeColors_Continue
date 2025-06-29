@@ -33,7 +33,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        archiveFileName.set("CustomBiomeColors-${version}-(MC-1.20.5-1.21.6).jar")
+        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.6.jar")
         minimize()
     }
 }
