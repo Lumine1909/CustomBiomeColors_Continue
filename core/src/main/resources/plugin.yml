@@ -1,5 +1,5 @@
 name: CustomBiomeColors
-version: '1.4.1'
+version: $version
 main: me.arthed.custombiomecolors.CustomBiomeColors
 api-version: 1.13
 authors: [ Arthed, Lumine1909 ]
@@ -16,6 +16,11 @@ commands:
   /setfoliagecolor:
     description: Change the color of the foliage in a region
     permission: custombiomecolors.foliage
+    permission-message: You do not have access to that command.
+    usage: "Usage: /<command> <hex-color> [biome:name]"
+  /setdryfoliagecolor:
+    description: Change the color of the dry foliage in a region
+    permission: custombiomecolors.dryfoliage
     permission-message: You do not have access to that command.
     usage: "Usage: /<command> <hex-color> [biome:name]"
   /setwatercolor:
@@ -61,6 +66,9 @@ permissions:
     default: op
   custombiomecolors.foliage:
     description: Gives access to //setfoliagecolor
+    default: op
+  custombiomecolors.dryfoliage:
+    description: Gives access to //setdryfoliagecolor
     default: op
   custombiomecolors.water:
     description: Gives access to //setwatercolor

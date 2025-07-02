@@ -1,15 +1,45 @@
 package me.arthed.custombiomecolors.nms;
 
-import me.arthed.custombiomecolors.utils.objects.BiomeColors;
+import me.arthed.custombiomecolors.utils.objects.BiomeData;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
+import me.arthed.custombiomecolors.utils.objects.ColorData;
 
-public interface NmsBiome<Biome, Holder, ResourceKey> {
+public abstract class NmsBiome<Biome, Holder, ResourceKey> {
 
-    Holder getBiomeHolder();
+    protected final Holder biomeHolder;
+    protected final Biome biomeBase;
+    protected final BiomeData cachedData;
 
-    Biome getBiome();
+    public NmsBiome(Holder biomeHolder, Biome biome, BiomeData cachedData) {
+        this.biomeHolder = biomeHolder;
+        this.biomeBase = biome;
+        this.cachedData = cachedData;
+        BiomeData.updateBiome(cachedData.colorData(), this);
+    }
 
-    BiomeColors getBiomeColors();
+    public Holder getBiomeHolder() {
+        return biomeHolder;
+    }
 
-    NmsBiome<Biome, Holder, ResourceKey> cloneWithDifferentColors(NmsServer<Biome, Holder, ResourceKey> nmsServer, BiomeKey newBiomeKey, BiomeColors biomeColors);
+    public Biome getBiome() {
+        return biomeBase;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NmsBiome that = (NmsBiome) o;
+        return that.biomeHolder.equals(this.biomeHolder) && that.cachedData.equals(this.cachedData);
+    }
+
+    public BiomeData getBiomeData() {
+        return cachedData;
+    }
+
+    public abstract float getTemperature();
+
+    public abstract float getHumidity();
+
+    public abstract NmsBiome<Biome, Holder, ResourceKey> cloneWithDifferentColor(NmsServer<Biome, Holder, ResourceKey> nmsServer, BiomeKey newBiomeKey, ColorData newColor);
 }

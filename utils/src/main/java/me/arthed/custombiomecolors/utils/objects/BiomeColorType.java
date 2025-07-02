@@ -6,5 +6,7 @@ public enum BiomeColorType {
     WATER,
     WATER_FOG,
     SKY,
-    FOG
+    FOG,
+    // 1.21.5 +
+    DRY_FOLIAGE
 }

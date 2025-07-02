@@ -2,13 +2,12 @@ package me.arthed.custombiomecolors;
 
 import me.arthed.custombiomecolors.commands.GetBiomeColorsCommand;
 import me.arthed.custombiomecolors.commands.SetBiomeColorCommand;
+import me.arthed.custombiomecolors.commands.UnsupportedCommand;
 import me.arthed.custombiomecolors.data.DataManager;
 import me.arthed.custombiomecolors.integration.WorldEditHandler;
-import me.arthed.custombiomecolors.nms.NmsServer;
-import me.arthed.custombiomecolors.nms.NmsServer_1_20_5;
-import me.arthed.custombiomecolors.nms.NmsServer_1_21;
-import me.arthed.custombiomecolors.nms.NmsServer_1_21_3;
+import me.arthed.custombiomecolors.nms.*;
 import me.arthed.custombiomecolors.utils.BStats;
+import me.arthed.custombiomecolors.utils.BiomeColorUtil;
 import me.arthed.custombiomecolors.utils.UpdateChecker;
 import me.arthed.custombiomecolors.utils.objects.BiomeColorType;
 import org.bukkit.Bukkit;
@@ -66,14 +65,16 @@ public final class CustomBiomeColors extends JavaPlugin {
         instance = this;
 
         int version = obtainVersion();
-        if (version >= 2103) {
+        if (version >= 2105) {
+            nmsServer = new NmsServer_1_21_5();
+        } else if (version >= 2103) {
             nmsServer = new NmsServer_1_21_3();
         } else if (version >= 2100) {
             nmsServer = new NmsServer_1_21();
         } else if (version >= 2005) {
             nmsServer = new NmsServer_1_20_5();
         } else {
-            throw new IllegalStateException("This plugin only support MC 1.20.5 - 1.21.5, for other versions, please contact author at https://github.com/Lumine1909/CustomBiomeColors_Continue/issues");
+            throw new IllegalStateException("This plugin only support MC 1.20.5 - 1.21.7, for other versions, please contact author at https://github.com/Lumine1909/CustomBiomeColors_Continue/issues");
         }
 
         this.dataManager = new DataManager("data.json");
@@ -86,6 +87,7 @@ public final class CustomBiomeColors extends JavaPlugin {
 
         this.biomeManager = new BiomeManager();
         this.worldEditHandler = new WorldEditHandler();
+        BiomeColorUtil.loadColorMaps();
 
         Objects.requireNonNull(this.getCommand("/setgrasscolor")).setExecutor(new SetBiomeColorCommand("/setgrasscolor", BiomeColorType.GRASS));
         Objects.requireNonNull(this.getCommand("/setfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setfoliagecolor", BiomeColorType.FOLIAGE));
@@ -94,6 +96,12 @@ public final class CustomBiomeColors extends JavaPlugin {
         Objects.requireNonNull(this.getCommand("/setskycolor")).setExecutor(new SetBiomeColorCommand("/setskycolor", BiomeColorType.SKY));
         Objects.requireNonNull(this.getCommand("/setfogcolor")).setExecutor(new SetBiomeColorCommand("/setfogcolor", BiomeColorType.FOG));
         Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
+
+        if (obtainVersion() >= 2105) {
+            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setdryfoliagecolor", BiomeColorType.DRY_FOLIAGE));
+        } else {
+            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new UnsupportedCommand("1.21.5"));
+        }
 
         new UpdateChecker(this);
     }

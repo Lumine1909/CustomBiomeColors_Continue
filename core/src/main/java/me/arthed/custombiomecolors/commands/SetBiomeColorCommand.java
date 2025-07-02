@@ -1,19 +1,21 @@
 package me.arthed.custombiomecolors.commands;
 
+import com.sk89q.worldedit.regions.Region;
 import me.arthed.custombiomecolors.CustomBiomeColors;
 import me.arthed.custombiomecolors.integration.WorldEditHandler;
 import me.arthed.custombiomecolors.nms.NmsServer;
 import me.arthed.custombiomecolors.utils.objects.BiomeColorType;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings({"rawtypes", "deprecation"})
 public class SetBiomeColorCommand implements TabExecutor {
@@ -29,16 +31,20 @@ public class SetBiomeColorCommand implements TabExecutor {
         this.colorType = colorType;
     }
 
-    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
-
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String @NotNull [] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            return true;
+        }
         if (cmd.getName().equalsIgnoreCase(this.command)) {
             if (args.length > 0) {
-                Block[] blocks = worldEditHandler.getSelectedBlocks(sender.getName());
-                if (blocks.length == 0) {
+                Optional<Region> optionalRegion = worldEditHandler.getSelectedRegion(sender.getName());
+                if (optionalRegion.isEmpty()) {
                     sender.sendMessage(ChatColor.RED + "Make a region selection first.");
                     return true;
                 }
 
+                Region selectedRegion = optionalRegion.get();
                 int color;
                 try {
                     color = Integer.parseInt(args[0].replace("#", ""), 16);
@@ -47,9 +53,8 @@ public class SetBiomeColorCommand implements TabExecutor {
                     return true;
                 }
 
-
                 Runnable runWhenDone = () -> {
-                    sender.sendMessage(ChatColor.GREEN + "Biome color was changed for approximately " + blocks.length + " blocks.");
+                    sender.sendMessage(ChatColor.GREEN + "Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks.");
                     sender.sendMessage(ChatColor.GREEN + "You must re-join to see the changes.");
                 };
 
@@ -58,19 +63,19 @@ public class SetBiomeColorCommand implements TabExecutor {
                         sender.sendMessage(ChatColor.RED + "The biome name must contain a colon. ( : )");
                         return true;
                     }
-                    BiomeKey biomeKey = new BiomeKey(args[1]);
+                    BiomeKey biomeKey = BiomeKey.fromString(args[1]);
                     if (nmsServer.doesBiomeExist(biomeKey)) {
                         sender.sendMessage(ChatColor.RED + "There already exists a biome with that name. Please use another one");
                         return true;
                     }
 
-                    CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(blocks, this.colorType, color, biomeKey, runWhenDone);
+                    CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, true, runWhenDone);
                 } else {
-                    CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(blocks, this.colorType, color, runWhenDone);
+                    CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, false, runWhenDone);
                 }
 
-                sender.sendMessage(ChatColor.GRAY + "Changing the biome of " + blocks.length + " blocks...");
-                if (blocks.length > 200000)
+                sender.sendMessage(ChatColor.GRAY + "Changing the biome of " + optionalRegion.orElseThrow().getVolume() + " blocks...");
+                if (optionalRegion.orElseThrow().getVolume() > 200000)
                     sender.sendMessage(ChatColor.GRAY + "This might take a while.");
                 return true;
             }

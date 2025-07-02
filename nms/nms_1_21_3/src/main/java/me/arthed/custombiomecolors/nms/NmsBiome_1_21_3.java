@@ -1,8 +1,9 @@
 package me.arthed.custombiomecolors.nms;
 
-import me.arthed.custombiomecolors.utils.ReflectionUtils;
-import me.arthed.custombiomecolors.utils.objects.BiomeColors;
+import me.arthed.custombiomecolors.utils.ReflectionUtil;
+import me.arthed.custombiomecolors.utils.objects.BiomeData;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
+import me.arthed.custombiomecolors.utils.objects.ColorData;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -10,37 +11,33 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 
-public class NmsBiome_1_21_3 implements NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> {
+public class NmsBiome_1_21_3 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    private final Holder<Biome> biomeHolder;
-
-    public NmsBiome_1_21_3(Holder<Biome> biomeBase) {
-        this.biomeHolder = biomeBase;
+    public NmsBiome_1_21_3(Holder<Biome> biomeHolder) {
+        this(biomeHolder, fetchNmsBiomeData(biomeHolder));
     }
 
-    @Override
-    public Holder<Biome> getBiomeHolder() {
-        return biomeHolder;
+    public NmsBiome_1_21_3(Holder<Biome> biomeHolder, BiomeData cachedData) {
+        super(biomeHolder, biomeHolder.value(), cachedData);
     }
 
-    public Biome getBiome() {
-        return getBiomeHolder().value();
-    }
-
-    public BiomeColors getBiomeColors() {
-        BiomeSpecialEffects biomeFog = ReflectionUtils.getPrivateObject(getBiome(), "specialEffects");
+    private static BiomeData fetchNmsBiomeData(Holder<Biome> nmsBiome) {
+        BiomeSpecialEffects biomeFog = ReflectionUtil.getPrivateObject(nmsBiome.value(), "specialEffects");
         assert biomeFog != null;
-        return new BiomeColors()
-            .setGrassColor(ReflectionUtils.getPrivateOptionalInteger(biomeFog, "grassColorOverride"))
-            .setFoliageColor(ReflectionUtils.getPrivateOptionalInteger(biomeFog, "foliageColorOverride"))
-            .setWaterColor(ReflectionUtils.getPrivateInteger(biomeFog, "waterColor"))
-            .setWaterFogColor(ReflectionUtils.getPrivateInteger(biomeFog, "waterFogColor"))
-            .setSkyColor(ReflectionUtils.getPrivateInteger(biomeFog, "skyColor"))
-            .setFogColor(ReflectionUtils.getPrivateInteger(biomeFog, "fogColor"));
+        ColorData colorData = new ColorData.Mutable()
+            .grass(biomeFog.getGrassColorOverride())
+            .foliage(biomeFog.getFoliageColorOverride())
+            .water(biomeFog.getWaterColor())
+            .waterFog(biomeFog.getWaterFogColor())
+            .sky(biomeFog.getSkyColor())
+            .fog(biomeFog.getFogColor())
+            .build();
+        BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
+        return new BiomeData(biomeKey, biomeKey, colorData);
     }
 
-    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> cloneWithDifferentColors(NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> nmsServer, BiomeKey newBiomeKey, BiomeColors biomeColors) {
-        ResourceKey<Biome> customBiomeKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(newBiomeKey.key, newBiomeKey.value));
+    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> cloneWithDifferentColor(NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> nmsServer, BiomeKey newBiomeKey, ColorData colorData) {
+        ResourceKey<Biome> customBiomeKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(newBiomeKey.key(), newBiomeKey.value()));
         Biome.BiomeBuilder customBiomeBuilder = new Biome.BiomeBuilder()
             .generationSettings(getBiome().getGenerationSettings())
             .mobSpawnSettings(getBiome().getMobSettings())
@@ -51,25 +48,31 @@ public class NmsBiome_1_21_3 implements NmsBiome<Biome, Holder<Biome>, ResourceK
 
         BiomeSpecialEffects.Builder customBiomeColors = new BiomeSpecialEffects.Builder();
         customBiomeColors.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE)
-            .waterColor(biomeColors.getWaterColor())
-            .waterFogColor(biomeColors.getWaterFogColor())
-            .skyColor(biomeColors.getSkyColor())
-            .fogColor(biomeColors.getFogColor());
-        if (biomeColors.getGrassColor() != 0) {
-            customBiomeColors.grassColorOverride(biomeColors.getGrassColor());
+            .waterColor(colorData.waterColor())
+            .waterFogColor(colorData.waterFogColor())
+            .skyColor(colorData.skyColor())
+            .fogColor(colorData.fogColor());
+        if (colorData.grassColor().isPresent()) {
+            customBiomeColors.grassColorOverride(colorData.grassColor().get());
         }
-        if (biomeColors.getFoliageColor() != 0) {
-            customBiomeColors.foliageColorOverride(biomeColors.getFoliageColor());
+        if (colorData.foliageColor().isPresent()) {
+            customBiomeColors.foliageColorOverride(colorData.foliageColor().get());
         }
 
         customBiomeBuilder.specialEffects(customBiomeColors.build());
         Biome customBiome = customBiomeBuilder.build();
         Holder<Biome> holder = nmsServer.registerBiome(getBiomeHolder(), customBiome, customBiomeKey);
 
-        return new NmsBiome_1_21_3(holder);
+        return new NmsBiome_1_21_3(holder, new BiomeData(newBiomeKey, this.cachedData.baseBiomeKey(), colorData));
     }
 
-    public boolean equals(Object object) {
-        return object instanceof NmsBiome_1_21_3 && ((NmsBiome_1_21_3) object).getBiome().equals(getBiome());
+    @Override
+    public float getTemperature() {
+        return biomeBase.climateSettings.temperature();
+    }
+
+    @Override
+    public float getHumidity() {
+        return biomeBase.climateSettings.downfall();
     }
 }

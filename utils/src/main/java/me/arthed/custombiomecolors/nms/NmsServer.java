@@ -1,8 +1,8 @@
 package me.arthed.custombiomecolors.nms;
 
-import me.arthed.custombiomecolors.utils.objects.BiomeColors;
+import me.arthed.custombiomecolors.utils.objects.BiomeData;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 
 public interface NmsServer<Biome, Holder, ResourceKey> {
 
@@ -12,11 +12,11 @@ public interface NmsServer<Biome, Holder, ResourceKey> {
 
     boolean doesBiomeExist(BiomeKey biomeKey);
 
-    Holder createCustomBiome(BiomeKey biomeKey, BiomeColors biomeColors);
+    NmsBiome<Biome, Holder, ResourceKey> createCustomBiome(BiomeData biomeData);
 
-    void setBlockBiome(Block block, NmsBiome<Biome, Holder, ResourceKey> nmsBiome);
+    void setBiomeAt(Location location, NmsBiome<Biome, Holder, ResourceKey> nmsBiome);
 
-    Holder getBlocksBiome(Block block);
+    Holder getBiomeAt(Location location);
 
     Holder registerBiome(Holder original, Biome biome, ResourceKey resourceKey);
 

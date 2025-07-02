@@ -1,7 +1,8 @@
 package me.arthed.custombiomecolors.nms;
 
-import me.arthed.custombiomecolors.utils.objects.BiomeColors;
+import me.arthed.custombiomecolors.utils.objects.BiomeData;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
+import me.arthed.custombiomecolors.utils.objects.ColorData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -13,7 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
 
 import java.lang.reflect.Field;
@@ -42,27 +43,39 @@ public class NmsServer_1_21_3 implements NmsServer<Biome, Holder<Biome>, Resourc
 
     private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
 
+    @SuppressWarnings("unchecked")
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
-        return new NmsBiome_1_21_3(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))).orElseThrow());
+        NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
+        if ((biome = BiomeData.getBiome(biomeKey)) != null) {
+            return biome;
+        }
+        return new NmsBiome_1_21_3(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
     }
 
+    @SuppressWarnings("unchecked")
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getWrappedBiomeHolder(Holder<Biome> biomeBase) {
+        NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
+        if ((biome = BiomeData.getBiomeFromHolder(biomeBase)) != null) {
+            return biome;
+        }
         return new NmsBiome_1_21_3(biomeBase);
     }
 
     public boolean doesBiomeExist(BiomeKey biomeKey) {
-        return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value))).isPresent();
+        return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
-    public Holder<Biome> createCustomBiome(BiomeKey biomeKey, BiomeColors biomeColors) {
+    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
         Holder<Biome> biomeHolder = this.biomeRegistry.get(ResourceKey.create(
             Registries.BIOME,
-            ResourceLocation.fromNamespaceAndPath("minecraft", "plains")
+            ResourceLocation.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
         )).orElseThrow();
 
         Biome biomeBase = biomeHolder.value();
+        ColorData colorData = biomeData.colorData();
+        BiomeKey biomeKey = biomeData.biomeKey();
 
-        ResourceKey<Biome> customBiomeKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key, biomeKey.value));
+        ResourceKey<Biome> customBiomeKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()));
         Biome.BiomeBuilder customBiomeBuilder = new Biome.BiomeBuilder()
             .generationSettings(biomeBase.getGenerationSettings())
             .mobSpawnSettings(biomeBase.getMobSettings())
@@ -73,36 +86,37 @@ public class NmsServer_1_21_3 implements NmsServer<Biome, Holder<Biome>, Resourc
 
         BiomeSpecialEffects.Builder customBiomeColors = new BiomeSpecialEffects.Builder();
         customBiomeColors.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE)
-            .waterColor(biomeColors.getWaterColor())
-            .waterFogColor(biomeColors.getWaterFogColor())
-            .skyColor(biomeColors.getSkyColor())
-            .fogColor(biomeColors.getFogColor());
-        if (biomeColors.getGrassColor() != 0) {
-            customBiomeColors.grassColorOverride(biomeColors.getGrassColor());
+            .waterColor(colorData.waterColor())
+            .waterFogColor(colorData.waterFogColor())
+            .skyColor(colorData.skyColor())
+            .fogColor(colorData.fogColor());
+
+        if (colorData.grassColor().isPresent()) {
+            customBiomeColors.grassColorOverride(colorData.grassColor().get());
         }
-        if (biomeColors.getFoliageColor() != 0) {
-            customBiomeColors.foliageColorOverride(biomeColors.getFoliageColor());
+        if (colorData.foliageColor().isPresent()) {
+            customBiomeColors.foliageColorOverride(colorData.foliageColor().get());
         }
 
         customBiomeBuilder.specialEffects(customBiomeColors.build());
         Biome customBiome = customBiomeBuilder.build();
-        return this.registerBiome(biomeHolder, customBiome, customBiomeKey);
+        return new NmsBiome_1_21_3(this.registerBiome(biomeHolder, customBiome, customBiomeKey), biomeData);
     }
 
-    public void setBlockBiome(Block block, NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
-        BlockPos blockPosition = new BlockPos(block.getX(), block.getY(), block.getZ());
-        Level nmsWorld = ((CraftWorld) block.getWorld()).getHandle();
+    public void setBiomeAt(Location location, NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
+        BlockPos blockPosition = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        Level nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
 
         net.minecraft.world.level.chunk.LevelChunk chunk = nmsWorld.getChunkAt(blockPosition);
-        chunk.setBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2, nmsBiome.getBiomeHolder());
+        chunk.setBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2, nmsBiome.getBiomeHolder());
     }
 
-    public Holder<Biome> getBlocksBiome(Block block) {
-        BlockPos blockPosition = new BlockPos(block.getX(), block.getY(), block.getZ());
-        Level nmsWorld = ((CraftWorld) block.getWorld()).getHandle();
+    public Holder<Biome> getBiomeAt(Location location) {
+        BlockPos blockPosition = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        Level nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
 
         net.minecraft.world.level.chunk.LevelChunk chunk = nmsWorld.getChunkAt(blockPosition);
-        return chunk.getNoiseBiome(block.getX() >> 2, block.getY() >> 2, block.getZ() >> 2);
+        return chunk.getNoiseBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2);
     }
 
     public Holder<Biome> registerBiome(Holder<Biome> original, Biome biome, ResourceKey<Biome> resourceKey) {

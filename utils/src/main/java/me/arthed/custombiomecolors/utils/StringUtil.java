@@ -2,7 +2,7 @@ package me.arthed.custombiomecolors.utils;
 
 import java.util.Random;
 
-public class StringUtils {
+public class StringUtil {
 
     private final static char[] RANDOM_STRING_CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
     private final static Random random = new Random();

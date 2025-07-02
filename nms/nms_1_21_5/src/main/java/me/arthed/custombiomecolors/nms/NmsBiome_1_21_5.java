@@ -11,13 +11,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 
-public class NmsBiome_1_21 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> {
+public class NmsBiome_1_21_5 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    public NmsBiome_1_21(Holder<Biome> biomeHolder) {
+    public NmsBiome_1_21_5(Holder<Biome> biomeHolder) {
         this(biomeHolder, fetchNmsBiomeData(biomeHolder));
     }
 
-    public NmsBiome_1_21(Holder<Biome> biomeHolder, BiomeData cachedData) {
+    public NmsBiome_1_21_5(Holder<Biome> biomeHolder, BiomeData cachedData) {
         super(biomeHolder, biomeHolder.value(), cachedData);
     }
 
@@ -27,6 +27,7 @@ public class NmsBiome_1_21 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<Bi
         ColorData colorData = new ColorData.Mutable()
             .grass(biomeFog.getGrassColorOverride())
             .foliage(biomeFog.getFoliageColorOverride())
+            .dryFoliage(biomeFog.getDryFoliageColorOverride())
             .water(biomeFog.getWaterColor())
             .waterFog(biomeFog.getWaterFogColor())
             .sky(biomeFog.getSkyColor())
@@ -63,7 +64,7 @@ public class NmsBiome_1_21 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<Bi
         Biome customBiome = customBiomeBuilder.build();
         Holder<Biome> holder = nmsServer.registerBiome(getBiomeHolder(), customBiome, customBiomeKey);
 
-        return new NmsBiome_1_21(holder, new BiomeData(newBiomeKey, this.cachedData.baseBiomeKey(), colorData));
+        return new NmsBiome_1_21_5(holder, new BiomeData(newBiomeKey, this.cachedData.baseBiomeKey(), colorData));
     }
 
     @Override

@@ -1,14 +1,21 @@
 package me.arthed.custombiomecolors;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import me.arthed.custombiomecolors.data.DataManager;
 import me.arthed.custombiomecolors.nms.NmsBiome;
 import me.arthed.custombiomecolors.nms.NmsServer;
-import me.arthed.custombiomecolors.utils.StringUtils;
+import me.arthed.custombiomecolors.utils.StringUtil;
 import me.arthed.custombiomecolors.utils.objects.BiomeColorType;
-import me.arthed.custombiomecolors.utils.objects.BiomeColors;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
+import me.arthed.custombiomecolors.utils.objects.ColorData;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,59 +28,38 @@ public class BiomeManager {
     private final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
     private final DataManager dataManager = CustomBiomeColors.getInstance().getDataManager();
 
-    public void changeBiomeColor(Block[] blocks, BiomeColorType colorType, int color, Runnable runWhenDone) {
-        this.changeBiomeColor(blocks, colorType, color, new BiomeKey("cbc", StringUtils.randomString(8)), runWhenDone);
+    public void changeBiomeColor(Player player, Region region, BiomeColorType colorType, int color, boolean forceKey, Runnable runWhenDone) {
+        this.changeBiomeColor(player, region, colorType, color, new BiomeKey("cbc", StringUtil.randomString(8)), forceKey, runWhenDone);
     }
 
-    public void changeBiomeColor(Block[] blocks, BiomeColorType colorType, int color, BiomeKey biomeKey, Runnable runWhenDone) {
+    public void changeBiomeColor(Player player, Region region, BiomeColorType colorType, int color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
         Bukkit.getScheduler().runTaskAsynchronously(CustomBiomeColors.getInstance(), () -> {
-            // Separate blocks by their biome
+            com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
 
-            // key - BiomeBase of the biome
-            // value - list of blocks in that biome
-            Map<Object, List<Block>> blocksInEachBiome = new HashMap<>();
+            Map<BiomeType, List<BlockVector3>> biomesForChange = new HashMap<>();
 
-            for (Block block : blocks) {
-                boolean added = false;
-                Object blocksBiomeBase = nmsServer.getBlocksBiome(block);
-                for (Object biomeBase : blocksInEachBiome.keySet()) {
-                    if (blocksBiomeBase.equals(biomeBase)) {
-                        blocksInEachBiome.get(biomeBase).add(block);
-                        added = true;
-                        break;
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(wePlayer)) {
+                for (BlockVector3 pos : region) {
+                    BlockVector3 vector3 = BlockVector3.at(pos.x(), pos.y(), pos.z());
+                    BiomeType type = editSession.getBiome(vector3);
+                    biomesForChange.computeIfAbsent(type, k -> new ArrayList<>()).add(vector3);
+                }
+
+                int num = 0;
+                for (var entry : biomesForChange.entrySet()) {
+                    BiomeKey individualKey = biomeKey.createSuffix("_" + num++);
+                    NmsBiome biome = nmsServer.getBiomeFromBiomeKey(BiomeKey.fromString(entry.getKey().id()));
+                    ColorData colorData = biome.getBiomeData().colorData().setColor(colorType, color);
+                    NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, individualKey, colorData));
+                    for (var vec3 : entry.getValue()) {
+                        nmsServer.setBiomeAt(new Location(player.getWorld(), vec3.x(), vec3.y(), vec3.z()), newBiome);
                     }
                 }
-                if (!added) {
-                    List<Block> blocksInBiome = new ArrayList<>();
-                    blocksInBiome.add(block);
-                    blocksInEachBiome.put(blocksBiomeBase, blocksInBiome);
-                }
-            }
-
-            // Add the new color change to every block from each biome type
-
-            BiomeKey individualBiomeKey = biomeKey;
-            int i = 0;
-            for (Object biomeBase : blocksInEachBiome.keySet()) {
-                NmsBiome biome = nmsServer.getWrappedBiomeHolder(biomeBase);
-                BiomeColors biomeColors = biome.getBiomeColors();
-                biomeColors.setColor(colorType, color);
-
-                NmsBiome newBiome = this.dataManager.getBiomeWithSpecificColors(biomeColors);
-
-                if (newBiome == null) {
-                    newBiome = biome.cloneWithDifferentColors(this.nmsServer, individualBiomeKey, biomeColors);
-                    this.dataManager.saveBiome(individualBiomeKey, biomeColors);
-                    individualBiomeKey = new BiomeKey(biomeKey.key, biomeKey.value + "." + i);
-                    i++;
-                }
-
-                for (Block block : blocksInEachBiome.get(biomeBase)) {
-                    nmsServer.setBlockBiome(block, newBiome);
-                }
+                editSession.flushQueue();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             runWhenDone.run();
         });
     }
-
 }

@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 
-public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
+public class NmsServer_1_21_5 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
     private static final Field MappedRegistry$frozen;
     private static final Field MappedRegistry$unregisteredIntrusiveHolders;
@@ -41,7 +41,7 @@ public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceK
         }
     }
 
-    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
+    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
 
     @SuppressWarnings("unchecked")
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
@@ -49,7 +49,7 @@ public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceK
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new NmsBiome_1_21(this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new NmsBiome_1_21_5(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
@@ -58,15 +58,15 @@ public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceK
         if ((biome = BiomeData.getBiomeFromHolder(biomeBase)) != null) {
             return biome;
         }
-        return new NmsBiome_1_21(biomeBase);
+        return new NmsBiome_1_21_5(biomeBase);
     }
 
     public boolean doesBiomeExist(BiomeKey biomeKey) {
-        return this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
+        return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
-        Holder<Biome> biomeHolder = this.biomeRegistry.getHolder(ResourceKey.create(
+        Holder<Biome> biomeHolder = this.biomeRegistry.get(ResourceKey.create(
             Registries.BIOME,
             ResourceLocation.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
         )).orElseThrow();
@@ -97,10 +97,13 @@ public class NmsServer_1_21 implements NmsServer<Biome, Holder<Biome>, ResourceK
         if (colorData.foliageColor().isPresent()) {
             customBiomeColors.foliageColorOverride(colorData.foliageColor().get());
         }
+        if (colorData.dryFoliageColor().isPresent()) {
+            customBiomeColors.dryFoliageColorOverride(colorData.dryFoliageColor().get());
+        }
 
         customBiomeBuilder.specialEffects(customBiomeColors.build());
         Biome customBiome = customBiomeBuilder.build();
-        return new NmsBiome_1_21(this.registerBiome(biomeHolder, customBiome, customBiomeKey), biomeData);
+        return new NmsBiome_1_21_5(this.registerBiome(biomeHolder, customBiome, customBiomeKey), biomeData);
     }
 
     public void setBiomeAt(Location location, NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {

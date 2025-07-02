@@ -1,19 +1,25 @@
 package me.arthed.custombiomecolors.utils.objects;
 
-public class BiomeKey {
+import com.google.gson.TypeAdapter;
+import net.kyori.adventure.key.Key;
 
-    public final String key;
-    public final String value;
+public record BiomeKey(String key, String value) {
 
-    public BiomeKey(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public static BiomeKey fromString(String biomeKeyString) {
+        String[] split = biomeKeyString.split(":", 2);
+        return new BiomeKey(split[0], split[1]);
     }
 
-    public BiomeKey(String biomeKeyString) {
-        String[] split = biomeKeyString.split(":", 2);
-        this.key = split[0];
-        this.value = split[1];
+    public static BiomeKey fromKey(Key key) {
+        return fromString(key.asString());
+    }
+
+    public Key toKey() {
+        return Key.key(this.key, this.value);
+    }
+
+    public BiomeKey createSuffix(String valueSuffix) {
+        return fromString(this.key + ":" + this.value + valueSuffix);
     }
 
     @Override

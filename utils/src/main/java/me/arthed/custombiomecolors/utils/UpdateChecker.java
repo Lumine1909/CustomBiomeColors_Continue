@@ -22,7 +22,7 @@ public class UpdateChecker implements Listener {
     private final String currentVersion;
     private final String message;
     private final JavaPlugin plugin;
-    ;
+
     public boolean needUpdate;
 
     public UpdateChecker(JavaPlugin plugin) {
