@@ -25,7 +25,7 @@ public class GetBiomeColorsCommand implements CommandExecutor {
             if (sender instanceof Player player) {
                 NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(player.getLocation()));
                 BiomeData biomeData = biome.getBiomeData();
-                player.sendMessage(Component.text("Colors of the biome you are in (" +  biomeData.biomeKey() + "): ", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+                player.sendMessage(Component.text("Colors of the biome you are in (" + biomeData.biomeKey() + "): ", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
                 player.sendMessage(Component.text(" - Grass: ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageGrass(biomeData.colorData().grassColor(), biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));
                 player.sendMessage(Component.text(" - Foliage: ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageGrass(biomeData.colorData().foliageColor(), biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));
                 player.sendMessage(Component.text(" - Dry Foliage: ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageDryFoliage(biomeData.colorData().dryFoliageColor(), biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));

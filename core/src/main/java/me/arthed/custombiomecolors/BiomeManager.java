@@ -3,9 +3,7 @@ package me.arthed.custombiomecolors;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import me.arthed.custombiomecolors.data.DataManager;
 import me.arthed.custombiomecolors.nms.NmsBiome;
 import me.arthed.custombiomecolors.nms.NmsServer;
@@ -36,19 +34,19 @@ public class BiomeManager {
         Bukkit.getScheduler().runTaskAsynchronously(CustomBiomeColors.getInstance(), () -> {
             com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
 
-            Map<BiomeType, List<BlockVector3>> biomesForChange = new HashMap<>();
+            Map<BiomeKey, List<Location>> biomesForChange = new HashMap<>();
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(wePlayer)) {
-                for (BlockVector3 pos : region) {
-                    BlockVector3 vector3 = BlockVector3.at(pos.x(), pos.y(), pos.z());
-                    BiomeType type = editSession.getBiome(vector3);
-                    biomesForChange.computeIfAbsent(type, k -> new ArrayList<>()).add(vector3);
+                for (var pos : region) {
+                    Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
+                    BiomeKey key = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(loc)).getBiomeData().biomeKey();
+                    biomesForChange.computeIfAbsent(key, k -> new ArrayList<>()).add(loc);
                 }
 
                 int num = 0;
                 for (var entry : biomesForChange.entrySet()) {
                     BiomeKey individualKey = biomeKey.createSuffix("_" + num++);
-                    NmsBiome biome = nmsServer.getBiomeFromBiomeKey(BiomeKey.fromString(entry.getKey().id()));
+                    NmsBiome biome = nmsServer.getBiomeFromBiomeKey(BiomeKey.fromString(entry.getKey().toString()));
                     ColorData colorData = biome.getBiomeData().colorData().setColor(colorType, color);
                     NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, individualKey, colorData));
                     for (var vec3 : entry.getValue()) {

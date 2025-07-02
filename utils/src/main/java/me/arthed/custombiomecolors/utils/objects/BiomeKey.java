@@ -1,6 +1,5 @@
 package me.arthed.custombiomecolors.utils.objects;
 
-import com.google.gson.TypeAdapter;
 import net.kyori.adventure.key.Key;
 
 public record BiomeKey(String key, String value) {

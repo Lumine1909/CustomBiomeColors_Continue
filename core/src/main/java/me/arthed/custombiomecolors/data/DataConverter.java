@@ -22,7 +22,8 @@ public class DataConverter {
 
     public DataConverter(File file) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Type typeToken = new TypeToken<Map<String, int[]>>() {}.getType();
+        Type typeToken = new TypeToken<Map<String, int[]>>() {
+        }.getType();
 
         if (!file.exists()) {
             CustomBiomeColors.getInstance().getSLF4JLogger().warn("Data file {} does not exist, skipping conversion.", file.getAbsolutePath());
@@ -54,7 +55,7 @@ public class DataConverter {
 
             BiomeKey biomeKey = BiomeKey.fromString(keyStr);
             ColorData colorData = new ColorData(
-                color[5],color[2], color[3], color[4],
+                color[5], color[2], color[3], color[4],
                 color[1] != 0 ? Optional.of(color[1]) : Optional.empty(),
                 Optional.empty(),
                 color[0] != 0 ? Optional.of(color[0]) : Optional.empty()
