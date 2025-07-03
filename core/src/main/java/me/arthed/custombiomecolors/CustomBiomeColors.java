@@ -1,6 +1,7 @@
 package me.arthed.custombiomecolors;
 
 import me.arthed.custombiomecolors.commands.GetBiomeColorsCommand;
+import me.arthed.custombiomecolors.commands.ReloadCommand;
 import me.arthed.custombiomecolors.commands.SetBiomeColorCommand;
 import me.arthed.custombiomecolors.commands.UnsupportedCommand;
 import me.arthed.custombiomecolors.data.DataManager;
@@ -10,7 +11,10 @@ import me.arthed.custombiomecolors.utils.BStats;
 import me.arthed.custombiomecolors.utils.BiomeColorUtil;
 import me.arthed.custombiomecolors.utils.UpdateChecker;
 import me.arthed.custombiomecolors.utils.objects.BiomeColorType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +22,8 @@ import java.util.Objects;
 
 @SuppressWarnings("rawtypes")
 public final class CustomBiomeColors extends JavaPlugin {
+
+    public static boolean fastEditorMode = false;
 
     private static CustomBiomeColors instance;
     private NmsServer nmsServer;
@@ -88,7 +94,8 @@ public final class CustomBiomeColors extends JavaPlugin {
         this.biomeManager = new BiomeManager();
         this.worldEditHandler = new WorldEditHandler();
         BiomeColorUtil.loadColorMaps();
-
+        callReload(Bukkit.getConsoleSender());
+        new ReloadCommand();
         Objects.requireNonNull(this.getCommand("/setgrasscolor")).setExecutor(new SetBiomeColorCommand("/setgrasscolor", BiomeColorType.GRASS));
         Objects.requireNonNull(this.getCommand("/setfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setfoliagecolor", BiomeColorType.FOLIAGE));
         Objects.requireNonNull(this.getCommand("/setwatercolor")).setExecutor(new SetBiomeColorCommand("/setwatercolor", BiomeColorType.WATER));
@@ -104,6 +111,13 @@ public final class CustomBiomeColors extends JavaPlugin {
         }
 
         new UpdateChecker(this);
+    }
+
+    public void callReload(CommandSender sender) {
+        saveDefaultConfig();
+        reloadConfig();
+        fastEditorMode = getConfig().getBoolean("fast-edit-mode", false);
+        sender.sendMessage(Component.text("[CustomBiomeColors] Reload complete", NamedTextColor.GREEN));
     }
 
     @Override

@@ -8,6 +8,11 @@ description: Change the color of grass, leaves, water and the sky in a region
 load: STARTUP
 
 commands:
+  custombiomecolors:
+    aliases:
+      - cbc
+    description: CustomBiomeColors admin command
+    permission: custombiomecolors.admin
   /setgrasscolor:
     description: Change the color of the grass in a region
     permission: custombiomecolors.grass

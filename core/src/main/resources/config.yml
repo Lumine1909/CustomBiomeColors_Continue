@@ -1,0 +1,4 @@
+# It may cause player be kicked when editing the biome
+# But this can extremely increase the efficiency
+# Enable if you are editing a huge region
+fast-edit-mode: false
