@@ -49,7 +49,9 @@ public class BiomeManager {
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(weWorld).fastMode(true).actor(wePlayer).build()) {
                 if (CustomBiomeColors.fastEditorMode) {
-                    NmsBiome biome = nmsServer.getBiomeFromBiomeKey(BiomeKey.fromString("minecraft:plains"));
+                    var pos = region.getMinimumPoint();
+                    Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
+                    NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(loc));
                     ColorData colorData = biome.getBiomeData().colorData().setColor(colorType, color);
                     NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, biomeKey.createSuffix("_0"), colorData));
                     BiomeType type = getOrCreate(newBiome.getBiomeData().biomeKey().toString());
