@@ -6,6 +6,8 @@ import me.arthed.custombiomecolors.integration.WorldEditHandler;
 import me.arthed.custombiomecolors.nms.NmsServer;
 import me.arthed.custombiomecolors.utils.objects.BiomeColorType;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -53,8 +55,9 @@ public class SetBiomeColorCommand implements TabExecutor {
                     return true;
                 }
 
+                long time = System.currentTimeMillis();
                 Runnable runWhenDone = () -> {
-                    sender.sendMessage(ChatColor.GREEN + "Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks.");
+                    sender.sendMessage(ChatColor.GREEN + "Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)");
                     sender.sendMessage(ChatColor.GREEN + "You must re-join to see the changes.");
                 };
 
@@ -74,9 +77,9 @@ public class SetBiomeColorCommand implements TabExecutor {
                     CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, false, runWhenDone);
                 }
 
-                sender.sendMessage(ChatColor.GRAY + "Changing the biome of " + optionalRegion.orElseThrow().getVolume() + " blocks...");
+                sender.sendMessage(Component.text("Changing the biome of " + optionalRegion.orElseThrow().getVolume() + " blocks...", NamedTextColor.AQUA));
                 if (optionalRegion.orElseThrow().getVolume() > 200000)
-                    sender.sendMessage(ChatColor.GRAY + "This might take a while.");
+                    sender.sendMessage(Component.text("This might take a while.", NamedTextColor.AQUA));
                 return true;
             }
         }

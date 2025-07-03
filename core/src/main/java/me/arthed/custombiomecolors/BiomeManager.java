@@ -1,12 +1,16 @@
 package me.arthed.custombiomecolors;
 
+import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -18,7 +22,6 @@ import me.arthed.custombiomecolors.utils.StringUtil;
 import me.arthed.custombiomecolors.utils.objects.BiomeColorType;
 import me.arthed.custombiomecolors.utils.objects.BiomeKey;
 import me.arthed.custombiomecolors.utils.objects.ColorData;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -43,11 +46,12 @@ public class BiomeManager {
     }
 
     public void changeBiomeColor(Player player, Region region, BiomeColorType colorType, int color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
-        Bukkit.getScheduler().runTaskAsynchronously(CustomBiomeColors.getInstance(), () -> {
-            com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
-            World weWorld = BukkitAdapter.adapt(player.getWorld());
+        com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
+        World weWorld = BukkitAdapter.adapt(player.getWorld());
 
+        FaweAPI.getTaskManager().async(() -> {
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(weWorld).fastMode(true).actor(wePlayer).build()) {
+                editSession.setReorderMode(EditSession.ReorderMode.FAST);
                 if (CustomBiomeColors.fastEditorMode) {
                     var pos = region.getMinimumPoint();
                     Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
@@ -55,9 +59,15 @@ public class BiomeManager {
                     ColorData colorData = biome.getBiomeData().colorData().setColor(colorType, color);
                     NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, biomeKey.createSuffix("_0"), colorData));
                     BiomeType type = getOrCreate(newBiome.getBiomeData().biomeKey().toString());
-                    RegionFunction replace = new BiomeReplace(editSession, type);
-                    RegionVisitor visitor = new RegionVisitor(region, replace);
-                    Operations.complete(visitor);
+                    if (region instanceof FlatRegion flatRegion) {
+                        FlatRegionFunction replace = new BiomeReplace(editSession, type);
+                        FlatRegionVisitor visitor = new FlatRegionVisitor(flatRegion, replace);
+                        Operations.completeLegacy(visitor);
+                    } else {
+                        RegionFunction replace = new BiomeReplace(editSession, type);
+                        RegionVisitor visitor = new RegionVisitor(region, replace);
+                        Operations.completeLegacy(visitor);
+                    }
                 } else {
                     int[] num = new int[]{0};
                     for (var pos : region) {
