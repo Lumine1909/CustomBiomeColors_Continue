@@ -1,6 +1,6 @@
 name: CustomBiomeColors
 version: $version
-main: me.arthed.custombiomecolors.CustomBiomeColors
+main: io.github.lumine1909.custombiomecolors.CustomBiomeColors
 api-version: 1.13
 authors: [ Arthed, Lumine1909 ]
 depend: [ WorldEdit ]
