@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 
 public class UpdateChecker implements Listener {
 
@@ -42,12 +43,12 @@ public class UpdateChecker implements Listener {
 
     private static String cleanVersion(String version) {
         if (version.startsWith("v")) version = version.substring(1);
-        int dashIndex = version.indexOf("-");
-        return (dashIndex >= 0) ? version.substring(0, dashIndex) : version;
+        int buildIndex = version.indexOf("-build");
+        return (buildIndex >= 0) ? version.substring(0, buildIndex) : version;
     }
 
     public void checkUpdates() {
-        Thread thread = new Thread(() -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 HttpClient client = HttpClient.newHttpClient();
 
@@ -68,7 +69,7 @@ public class UpdateChecker implements Listener {
                 String latestVersion = cleanVersion(tag);
 
                 if (!latestVersion.equalsIgnoreCase(currentVersion)) {
-                    plugin.getLogger().warning("A new version is available: " + tag +
+                    plugin.getLogger().warning("A new version is available: " + latestVersion +
                         " (current: " + plugin.getDescription().getVersion() + ")");
                     needUpdate = true;
                 } else {
@@ -78,9 +79,6 @@ public class UpdateChecker implements Listener {
                 plugin.getLogger().warning("Update check failed: " + e.getMessage());
             }
         });
-
-        thread.start();
-
     }
 
     @EventHandler
