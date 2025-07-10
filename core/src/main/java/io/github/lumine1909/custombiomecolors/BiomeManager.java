@@ -42,7 +42,7 @@ public class BiomeManager {
     }
 
     public void changeBiomeColor(Player player, Region region, BiomeColorType colorType, int color, boolean forceKey, Runnable runWhenDone) {
-        this.changeBiomeColor(player, region, colorType, color, new BiomeKey("cbc", StringUtil.randomString(8)), forceKey, runWhenDone);
+        this.changeBiomeColor(player, region, colorType, color, new BiomeKey("cbc", StringUtil.randomString(10)), forceKey, runWhenDone);
     }
 
     public void changeBiomeColor(Player player, Region region, BiomeColorType colorType, int color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
@@ -56,7 +56,7 @@ public class BiomeManager {
                 Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
                 NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(loc));
                 ColorData colorData = biome.getBiomeData().colorData().setColor(colorType, color);
-                NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, biomeKey.createSuffix("_0"), colorData));
+                NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, biomeKey, colorData));
                 BiomeType type = getOrCreate(newBiome.getBiomeData().biomeKey().toString());
                 if (region instanceof FlatRegion flatRegion) {
                     FlatRegionFunction replace = new BiomeReplace(editSession, type);
