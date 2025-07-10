@@ -29,6 +29,8 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static io.github.lumine1909.custombiomecolors.utils.Reflection.*;
 
@@ -38,6 +40,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
     private static final String HANDLER_NAME = "seasons-handler";
     private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
     private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.get(ResourceLocation.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
+    private static final ExecutorService asyncRunner = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override
     public void inject() {
@@ -88,24 +91,33 @@ public class PacketHandler_1_21_5 implements PacketHandler {
             if (msg instanceof ClientboundChunksBiomesPacket(
                 List<ClientboundChunksBiomesPacket.ChunkBiomeData> chunkBiomeData
             )) {
-                ServerLevel sw = (ServerLevel) player.level();
-                List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
-                chunkBiomeData.forEach(c -> {
-                    LevelChunk chunk = sw.getChunk(c.pos().x, c.pos().z);
-                    FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-                    extractBiomeData(buf, chunk);
-                    ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), buf.array());
-                    dataList.add(data);
+                asyncRunner.submit(() -> {
+                    ServerLevel sw = (ServerLevel) player.level();
+                    List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
+                    chunkBiomeData.forEach(c -> {
+                        LevelChunk chunk = sw.getChunk(c.pos().x, c.pos().z);
+                        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+                        extractBiomeData(buf, chunk);
+                        ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), buf.array());
+                        dataList.add(data);
+                    });
+                    ctx.channel().eventLoop().execute(() -> ctx.write(new ClientboundChunksBiomesPacket(dataList), ctx.voidPromise()));
                 });
-                msg = new ClientboundChunksBiomesPacket(dataList);
+                promise.setSuccess();
+                return;
             } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
-                ServerLevel sw = (ServerLevel) player.level();
-                ClientboundLevelChunkPacketData data = packet.getChunkData();
-                int x = packet.getX(), z = packet.getZ();
-                LevelChunk chunk = sw.getChunk(x, z);
-                FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-                extractChunkData(buf, chunk);
-                field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(buf));
+                asyncRunner.submit(() -> {
+                    ServerLevel sw = (ServerLevel) player.level();
+                    ClientboundLevelChunkPacketData data = packet.getChunkData();
+                    int x = packet.getX(), z = packet.getZ();
+                    LevelChunk chunk = sw.getChunk(x, z);
+                    FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+                    extractChunkData(buf, chunk);
+                    field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(buf));
+                    ctx.channel().eventLoop().execute(() -> ctx.write(packet, ctx.voidPromise()));
+                });
+                promise.setSuccess();
+                return;
             }
             super.write(ctx, msg, promise);
         }

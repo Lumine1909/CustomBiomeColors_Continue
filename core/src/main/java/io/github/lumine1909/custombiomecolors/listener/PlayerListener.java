@@ -10,6 +10,6 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        Bukkit.getScheduler().runTaskLater(CustomBiomeColors.getInstance(), () -> CustomBiomeColors.getInstance().getPacketHandler().injectPlayer(e.getPlayer()), 1L);
+        Bukkit.getScheduler().runTaskLater(CustomBiomeColors.getInstance(), () -> CustomBiomeColors.getInstance().getPacketHandler().injectPlayer(e.getPlayer()), 10L);
     }
 }
