@@ -58,7 +58,6 @@ public class SetBiomeColorCommand implements TabExecutor {
                 long time = System.currentTimeMillis();
                 Runnable runWhenDone = () -> {
                     sender.sendMessage(ChatColor.GREEN + "Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)");
-                    sender.sendMessage(ChatColor.GREEN + "You must re-join to see the changes.");
                 };
 
                 if (args.length > 1) {
