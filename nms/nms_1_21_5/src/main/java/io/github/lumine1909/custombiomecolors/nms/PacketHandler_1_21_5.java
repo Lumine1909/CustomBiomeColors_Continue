@@ -95,7 +95,10 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     ServerLevel sw = (ServerLevel) player.level();
                     List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
                     chunkBiomeData.forEach(c -> {
-                        LevelChunk chunk = sw.getChunk(c.pos().x, c.pos().z);
+                        LevelChunk chunk = sw.getChunkIfLoaded(c.pos().x, c.pos().z);
+                        if (chunk == null) {
+                            return;
+                        }
                         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
                         extractBiomeData(buf, chunk);
                         ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), buf.array());
@@ -110,7 +113,10 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     ServerLevel sw = (ServerLevel) player.level();
                     ClientboundLevelChunkPacketData data = packet.getChunkData();
                     int x = packet.getX(), z = packet.getZ();
-                    LevelChunk chunk = sw.getChunk(x, z);
+                    LevelChunk chunk = sw.getChunkIfLoaded(x, z);
+                    if (chunk == null) {
+                        return;
+                    }
                     FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
                     extractChunkData(buf, chunk);
                     field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(buf));
