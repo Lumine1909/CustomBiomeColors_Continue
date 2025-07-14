@@ -97,6 +97,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     chunkBiomeData.forEach(c -> {
                         LevelChunk chunk = sw.getChunkIfLoaded(c.pos().x, c.pos().z);
                         if (chunk == null) {
+                            ctx.channel().eventLoop().execute(() -> ctx.write(msg, ctx.voidPromise()));
                             return;
                         }
                         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
@@ -115,6 +116,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     int x = packet.getX(), z = packet.getZ();
                     LevelChunk chunk = sw.getChunkIfLoaded(x, z);
                     if (chunk == null) {
+                        ctx.channel().eventLoop().execute(() -> ctx.write(packet, ctx.voidPromise()));
                         return;
                     }
                     FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
