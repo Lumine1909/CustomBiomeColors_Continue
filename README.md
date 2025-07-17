@@ -3,7 +3,7 @@
 
 Building tool to change the color of grass, leaves, water or the sky in a region using custom biomes.
 
-Requires [WorldEdit](https://dev.bukkit.org/projects/worldedit).
+Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit).
 
 
 ![](https://i.imgur.com/tja8o5j.png)
@@ -14,11 +14,11 @@ Requires [WorldEdit](https://dev.bukkit.org/projects/worldedit).
   <img src="https://i.imgur.com/zkHUiNb.png">
 </details>
 
-❗ You must reconnect in order to see the changes
+❗ You must reconnect in order to see some of the changes
 
 ❗ Due to the way biomes work in minecraft, selections, especially small ones, might not be precise.
 
-❗ Supported version: 1.20.5 - 1.21.5
+❗ Supported version: 1.20.5 - 1.21.7
 
 
 # Commands
