@@ -2,7 +2,6 @@ package io.github.lumine1909.custombiomecolors.utils;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -67,6 +66,18 @@ public class Reflection {
         }
     }
 
+    @Nullable
+    public static <T> T getPrivateObject(Object object, String fieldName) {
+        try {
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return (T) field.get(object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static class FieldAccessor {
 
         private final Field field;
@@ -117,17 +128,5 @@ public class Reflection {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    @Nullable
-    public static <T> T getPrivateObject(Object object, String fieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return (T) field.get(object);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

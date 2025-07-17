@@ -17,9 +17,6 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.IdentityHashMap;
 
 import static io.github.lumine1909.custombiomecolors.utils.Reflection.*;

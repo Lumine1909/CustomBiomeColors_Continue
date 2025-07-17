@@ -97,7 +97,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     chunkBiomeData.forEach(c -> {
                         LevelChunk chunk = sw.getChunkIfLoaded(c.pos().x, c.pos().z);
                         if (chunk == null) {
-                            ctx.channel().eventLoop().execute(() -> ctx.write(msg, ctx.voidPromise()));
+                            PacketHandler.writeSafely(ctx, msg);
                             return;
                         }
                         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
@@ -105,7 +105,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                         ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), buf.array());
                         dataList.add(data);
                     });
-                    ctx.channel().eventLoop().execute(() -> ctx.write(new ClientboundChunksBiomesPacket(dataList), ctx.voidPromise()));
+                    PacketHandler.writeSafely(ctx, new ClientboundChunksBiomesPacket(dataList));
                 });
                 promise.setSuccess();
                 return;
@@ -116,13 +116,13 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     int x = packet.getX(), z = packet.getZ();
                     LevelChunk chunk = sw.getChunkIfLoaded(x, z);
                     if (chunk == null) {
-                        ctx.channel().eventLoop().execute(() -> ctx.write(packet, ctx.voidPromise()));
+                        PacketHandler.writeSafely(ctx, packet);
                         return;
                     }
                     FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
                     extractChunkData(buf, chunk);
                     field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(buf));
-                    ctx.channel().eventLoop().execute(() -> ctx.write(packet, ctx.voidPromise()));
+                    PacketHandler.writeSafely(ctx, msg);
                 });
                 promise.setSuccess();
                 return;
