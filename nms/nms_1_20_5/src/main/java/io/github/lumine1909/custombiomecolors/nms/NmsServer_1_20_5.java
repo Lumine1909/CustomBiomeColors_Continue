@@ -24,7 +24,7 @@ import static io.github.lumine1909.custombiomecolors.utils.Reflection.*;
 public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
     private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
-
+    private final Holder.Reference<Biome> plains = biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft", "plains"))).orElseThrow();
     @SuppressWarnings("unchecked")
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
         NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
@@ -51,7 +51,7 @@ public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, Resourc
         Holder<Biome> biomeHolder = this.biomeRegistry.getHolder(ResourceKey.create(
             Registries.BIOME,
             new ResourceLocation(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
-        )).orElseThrow();
+        )).orElse(plains);
 
         Biome biomeBase = biomeHolder.value();
         ColorData colorData = biomeData.colorData();
