@@ -23,6 +23,7 @@ import net.minecraft.util.BitStorage;
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -96,7 +97,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
                     chunkBiomeData.forEach(c -> {
                         LevelChunk chunk = sw.getChunkIfLoaded(c.pos().x, c.pos().z);
-                        if (chunk == null) {
+                        if (chunk == null || chunk.getFullStatus().ordinal() == 0) {
                             PacketHandler.writeSafely(ctx, msg);
                             return;
                         }
@@ -115,8 +116,8 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                     ClientboundLevelChunkPacketData data = packet.getChunkData();
                     int x = packet.getX(), z = packet.getZ();
                     LevelChunk chunk = sw.getChunkIfLoaded(x, z);
-                    if (chunk == null) {
-                        PacketHandler.writeSafely(ctx, packet);
+                    if (chunk == null || chunk.getFullStatus().ordinal() == 0) {
+                        PacketHandler.writeSafely(ctx, msg);
                         return;
                     }
                     FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());

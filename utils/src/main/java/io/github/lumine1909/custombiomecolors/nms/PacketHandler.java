@@ -15,7 +15,7 @@ public interface PacketHandler {
             if (!ctx.channel().isActive()) {
                 return;
             }
-            ctx.writeAndFlush(msg, ctx.voidPromise());
+            ctx.write(msg, ctx.voidPromise());
         });
     }
 
