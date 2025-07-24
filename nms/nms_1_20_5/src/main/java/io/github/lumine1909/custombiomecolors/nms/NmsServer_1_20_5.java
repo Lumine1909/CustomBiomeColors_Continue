@@ -25,6 +25,7 @@ public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, Resourc
 
     private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
     private final Holder.Reference<Biome> plains = biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft", "plains"))).orElseThrow();
+
     @SuppressWarnings("unchecked")
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
         NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> biome;

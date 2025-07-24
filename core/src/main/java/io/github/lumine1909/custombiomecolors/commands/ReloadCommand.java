@@ -17,7 +17,6 @@ public class ReloadCommand implements TabExecutor {
     public ReloadCommand() {
         Objects.requireNonNull(Bukkit.getPluginCommand("cbc")).setExecutor(this);
         Objects.requireNonNull(Bukkit.getPluginCommand("cbc")).setTabCompleter(this);
-
     }
 
     @Override

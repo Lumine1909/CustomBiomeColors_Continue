@@ -25,7 +25,9 @@ public record BiomeData(BiomeKey biomeKey, BiomeKey baseBiomeKey, ColorData colo
     }
 
     public static void updateBiome(ColorData colorData, NmsBiome nmsBiome) {
-        colorCache.put(colorData, nmsBiome);
+        if (!colorCache.containsKey(colorData) || nmsBiome.getBiomeData().biomeKey().toString().startsWith("cbc:")) {
+            colorCache.put(colorData, nmsBiome);
+        }
         keyCache.put(nmsBiome.getBiomeData().biomeKey(), nmsBiome);
         holderCache.put(nmsBiome.getBiomeHolder(), nmsBiome);
     }

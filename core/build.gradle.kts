@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "2.0.2"
+version = "2.1.0"
 
 repositories {
     mavenCentral()
@@ -35,7 +35,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.7.jar")
+        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.8.jar")
         minimize()
     }
     processResources {

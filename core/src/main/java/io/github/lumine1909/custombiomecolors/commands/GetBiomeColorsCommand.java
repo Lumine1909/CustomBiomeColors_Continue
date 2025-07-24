@@ -20,7 +20,7 @@ public class GetBiomeColorsCommand implements CommandExecutor {
 
     private static final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
 
-    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String @NotNull [] args) {
         if (cmd.getName().equalsIgnoreCase("/getbiomecolors")) {
             if (sender instanceof Player player) {
                 NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(player.getLocation()));

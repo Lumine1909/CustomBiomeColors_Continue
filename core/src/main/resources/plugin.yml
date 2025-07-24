@@ -1,9 +1,12 @@
 name: CustomBiomeColors
 version: $version
 main: io.github.lumine1909.custombiomecolors.CustomBiomeColors
-api-version: 1.13
-authors: [ Arthed, Lumine1909 ]
-depend: [ WorldEdit ]
+api-version: 1.20
+authors:
+  - Lumine1909
+  - Arthed
+depend:
+  - WorldEdit
 softdepend:
   - Terra
 description: Change the color of grass, leaves, water and the sky in a region

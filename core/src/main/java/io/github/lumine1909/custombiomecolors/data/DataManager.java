@@ -46,8 +46,7 @@ public class DataManager {
             this.plugin.saveResource(fileName, false);
         }
         try (FileReader reader = new FileReader(this.file)) {
-            Type typeToken = new TypeToken<Map<BiomeKey, BiomeData>>() {
-            }.getType();
+            Type typeToken = new TypeToken<Map<BiomeKey, BiomeData>>() {}.getType();
             this.biomeDataMap = gson.fromJson(reader, typeToken);
         } catch (Exception e) {
             plugin.getSLF4JLogger().warn("It seems you are using an legacy data format, start converting...");
@@ -83,7 +82,7 @@ public class DataManager {
     @NotNull
     public NmsBiome getBiomeByColorOrElse(boolean forceKey, ColorData colorData, Supplier<NmsBiome> orElse) {
         NmsBiome biome;
-        if (forceKey || (biome = BiomeData.getBiome(colorData)) == null) {
+        if (forceKey || (biome = BiomeData.getBiome(colorData)) == null || !biome.getBiomeData().biomeKey().toString().startsWith("cbc:")) {
             biome = orElse.get();
             saveBiome(biome.getBiomeData().biomeKey(), biome.getBiomeData());
             plugin.getPacketHandler().updateCache(biome.getBiomeData().biomeKey().toString(), System.currentTimeMillis() + 1000);

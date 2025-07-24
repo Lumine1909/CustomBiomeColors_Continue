@@ -99,17 +99,8 @@ public final class CustomBiomeColors extends JavaPlugin {
         this.biomeManager = new BiomeManager();
         this.worldEditHandler = new WorldEditHandler();
         BiomeColorUtil.loadColorMaps();
-        callReload(Bukkit.getConsoleSender());
-        new ReloadCommand();
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        Objects.requireNonNull(this.getCommand("/setgrasscolor")).setExecutor(new SetBiomeColorCommand("/setgrasscolor", BiomeColorType.GRASS));
-        Objects.requireNonNull(this.getCommand("/setfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setfoliagecolor", BiomeColorType.FOLIAGE));
-        Objects.requireNonNull(this.getCommand("/setwatercolor")).setExecutor(new SetBiomeColorCommand("/setwatercolor", BiomeColorType.WATER));
-        Objects.requireNonNull(this.getCommand("/setwaterfogcolor")).setExecutor(new SetBiomeColorCommand("/setwaterfogcolor", BiomeColorType.WATER_FOG));
-        Objects.requireNonNull(this.getCommand("/setskycolor")).setExecutor(new SetBiomeColorCommand("/setskycolor", BiomeColorType.SKY));
-        Objects.requireNonNull(this.getCommand("/setfogcolor")).setExecutor(new SetBiomeColorCommand("/setfogcolor", BiomeColorType.FOG));
-        Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
-
+        registerCommands();
         if (obtainVersion() >= 2105) {
             Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setdryfoliagecolor", BiomeColorType.DRY_FOLIAGE));
         } else {
@@ -118,6 +109,17 @@ public final class CustomBiomeColors extends JavaPlugin {
 
         getPacketHandler().inject();
         new UpdateChecker(this);
+    }
+
+    private void registerCommands() {
+        new ReloadCommand();
+        SetBiomeColorCommand.register(this.getCommand("/setgrasscolor"), "/setgrasscolor", BiomeColorType.GRASS);
+        SetBiomeColorCommand.register(this.getCommand("/setfoliagecolor"), "/setfoliagecolor", BiomeColorType.FOLIAGE);
+        SetBiomeColorCommand.register(this.getCommand("/setwatercolor"), "/setwatercolor", BiomeColorType.WATER);
+        SetBiomeColorCommand.register(this.getCommand("/setwaterfogcolor"), "/setwaterfogcolor", BiomeColorType.WATER_FOG);
+        SetBiomeColorCommand.register(this.getCommand("/setskycolor"), "/setskycolor", BiomeColorType.SKY);
+        SetBiomeColorCommand.register(this.getCommand("/setfogcolor"), "/setfogcolor", BiomeColorType.FOG);
+        Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
     }
 
     public void callReload(CommandSender sender) {

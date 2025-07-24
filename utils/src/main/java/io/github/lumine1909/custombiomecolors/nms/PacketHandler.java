@@ -11,11 +11,14 @@ public interface PacketHandler {
     Map<String, Long> createTimeCache = new HashMap<>();
 
     static void writeSafely(ChannelHandlerContext ctx, Object msg) {
+        if (!ctx.channel().isOpen() || !ctx.channel().isActive()) {
+            return;
+        }
         ctx.channel().eventLoop().execute(() -> {
-            if (!ctx.channel().isActive()) {
+            if (!ctx.channel().isOpen() || !ctx.channel().isActive()) {
                 return;
             }
-            ctx.write(msg, ctx.voidPromise());
+            ctx.writeAndFlush(msg, ctx.voidPromise());
         });
     }
 

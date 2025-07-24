@@ -22,6 +22,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -91,18 +94,13 @@ public class PacketHandler_1_21_3 implements PacketHandler {
             if (msg instanceof ClientboundChunksBiomesPacket(
                 List<ClientboundChunksBiomesPacket.ChunkBiomeData> chunkBiomeData
             )) {
+                ServerLevel level = (ServerLevel) player.level();
+                List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
                 asyncRunner.submit(() -> {
-                    ServerLevel sw = (ServerLevel) player.level();
-                    List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
                     chunkBiomeData.forEach(c -> {
-                        LevelChunk chunk = sw.getChunkIfLoaded(c.pos().x, c.pos().z);
-                        if (chunk == null || chunk.getFullStatus().ordinal() == 0) {
-                            PacketHandler.writeSafely(ctx, msg);
-                            return;
-                        }
-                        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-                        extractBiomeData(buf, chunk);
-                        ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), buf.array());
+                        FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
+                        modifyBiomeData(writeBuf, c.getReadBuffer(), level.getSectionsCount());
+                        ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), ByteBufUtil.getBytes(writeBuf));
                         dataList.add(data);
                     });
                     PacketHandler.writeSafely(ctx, new ClientboundChunksBiomesPacket(dataList));
@@ -110,18 +108,12 @@ public class PacketHandler_1_21_3 implements PacketHandler {
                 promise.setSuccess();
                 return;
             } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
+                ServerLevel level = (ServerLevel) player.level();
+                ClientboundLevelChunkPacketData data = packet.getChunkData();
                 asyncRunner.submit(() -> {
-                    ServerLevel sw = (ServerLevel) player.level();
-                    ClientboundLevelChunkPacketData data = packet.getChunkData();
-                    int x = packet.getX(), z = packet.getZ();
-                    LevelChunk chunk = sw.getChunkIfLoaded(x, z);
-                    if (chunk == null || chunk.getFullStatus().ordinal() == 0) {
-                        PacketHandler.writeSafely(ctx, msg);
-                        return;
-                    }
-                    FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-                    extractChunkData(buf, chunk);
-                    field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(buf));
+                    FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
+                    modifyChunkData(data.getReadBuffer(), writeBuf, level.getSectionsCount());
+                    field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(writeBuf));
                     PacketHandler.writeSafely(ctx, msg);
                 });
                 promise.setSuccess();
@@ -130,20 +122,27 @@ public class PacketHandler_1_21_3 implements PacketHandler {
             super.write(ctx, msg, promise);
         }
 
-        private void extractBiomeData(FriendlyByteBuf buf, LevelChunk chunk) {
-            for (LevelChunkSection levelChunkSection : chunk.getSections()) {
-                writeBiomes(buf, levelChunkSection);
+        private void modifyBiomeData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
+            for (int index = 0; index < size; index++) {
+                LevelChunkSection section = new LevelChunkSection(
+                    new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
+                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
+                );
+                section.readBiomes(readBuf);
+                writeBiomes(writeBuf, section);
             }
         }
 
-        private void extractChunkData(FriendlyByteBuf buf, LevelChunk chunk) {
-            int chunkSectionIndex = 0;
-
-            for (LevelChunkSection levelChunkSection : chunk.getSections()) {
-                buf.writeShort((short) field$LevelChunkSection$nonEmptyBlockCount.get(levelChunkSection));
-                levelChunkSection.states.write(buf, null, chunkSectionIndex);
-                writeBiomes(buf, levelChunkSection);
-                chunkSectionIndex++;
+        private void modifyChunkData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
+            for (int index = 0; index < size; index++) {
+                LevelChunkSection section = new LevelChunkSection(
+                    new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
+                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
+                );
+                section.read(readBuf);
+                writeBuf.writeShort((short) field$LevelChunkSection$nonEmptyBlockCount.get(section));
+                section.states.write(writeBuf, null, index);
+                writeBiomes(writeBuf, section);
             }
         }
 
