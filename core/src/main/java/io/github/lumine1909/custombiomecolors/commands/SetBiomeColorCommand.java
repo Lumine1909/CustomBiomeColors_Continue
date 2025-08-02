@@ -98,10 +98,10 @@ public class SetBiomeColorCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         if (args.length == 1) {
-            return Collections.singletonList("#HEXCODE");
+            return List.of("#HEXCODE");
         } else if (args.length == 2) {
-            return Collections.singletonList("biome:name");
+            return List.of("biome:name");
         }
-        return null;
+        return Collections.emptyList();
     }
 }
