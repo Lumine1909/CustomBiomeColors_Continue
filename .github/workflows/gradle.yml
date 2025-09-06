@@ -29,7 +29,7 @@ jobs:
         id: build
         run: |
           ./gradlew build
-          echo "::set-output name=jar_file::$(find core/build/libs -name '*MC*.jar' -print -quit)"
+          echo "::set-output name=jar_file::$(find build/libs -name '*MC*.jar' -print -quit)"
 
       - name: Extract version from build.gradle.kts
         id: extract_version
