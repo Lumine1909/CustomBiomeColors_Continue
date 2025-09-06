@@ -7,6 +7,7 @@ on:
 jobs:
   build_and_release:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
     permissions:
       contents: write
     steps:
@@ -28,7 +29,7 @@ jobs:
         id: build
         run: |
           ./gradlew build
-          echo "::set-output name=jar_file::$(find build/libs -name '*MC*.jar' -print -quit)"
+          echo "::set-output name=jar_file::$(find core/build/libs -name '*MC*.jar' -print -quit)"
 
       - name: Extract version from build.gradle.kts
         id: extract_version
@@ -50,6 +51,7 @@ jobs:
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
 
       - name: Create and push tag
+        if: "!contains(github.event.head_commit.message, '[release skip]')"
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -58,10 +60,11 @@ jobs:
           git push origin "$NEW_TAG"
 
       - name: Create GitHub Release
+        if: "!contains(github.event.head_commit.message, '[release skip]')"
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "v${{ env.VERSION }}-build-${{ env.BUILD_NUMBER }}"
-          name: "${{ env.VERSION }}-build-${{ env.BUILD_NUMBER }}"
+          name: "Release v${{ env.VERSION }}-build-${{ env.BUILD_NUMBER }}"
           files: ${{ steps.build.outputs.jar_file }}
           draft: false
           prerelease: false
