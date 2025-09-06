@@ -25,6 +25,7 @@ Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit).
 `//getbiomecolors` - get the colors of the biome you're in<br>
 `//setgrasscolor #hexcode [biome:name]` - change the color of grass, ferns and sugarcane<br>
 `//setfoliagecolor #hexcode [biome:name]` - change the color of leaves and vines<br>
+`//setdryfoliagecolor #hexcode [biome:name]` - change the color of dry foliage<br>
 `//setwatercolor #hexcode [biome:name]` - change the color of water<br>
 `//setwaterfogcolor #hexcode [biome:name]` - change the color of the fog while in water<br>
 `//setskycolor #hexcode [biome:name]` - change the color of the sky<br>
@@ -38,6 +39,7 @@ biome:name - (Optional) the biome name that shows up when you press F3<br>
 `custombiomecolors.get`<br>
 `custombiomecolors.grass`<br>
 `custombiomecolors.foliage`<br>
+`custombiomecolors.dryfoliage`<br>
 `custombiomecolors.water`<br>
 `custombiomecolors.waterfog`<br>
 `custombiomecolors.sky`<br>
@@ -46,4 +48,4 @@ biome:name - (Optional) the biome name that shows up when you press F3<br>
 #
 
 - - - -
-[**Statistics**](https://bstats.org/plugin/bukkit/CustomBiomeColors/12660)
+[**Statistics**](https://bstats.org/plugin/bukkit/CustomBiomeColors_Continue/26161)
