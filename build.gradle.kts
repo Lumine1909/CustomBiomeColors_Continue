@@ -40,16 +40,18 @@ tasks {
             from(sub.tasks.jar.flatMap { it.archiveFile }.map { zipTree(it) })
         }
     }
-    processResources {
-        filteringCharset = Charsets.UTF_8.name()
-        val props = mapOf("version" to project.version)
-        inputs.properties(props)
-        filesMatching("plugin.yml") {
-            expand(props)
-        }
-    }
     assemble {
         dependsOn(shadowJar)
+    }
+    project(":plugin") {
+        tasks.withType<ProcessResources> {
+            filteringCharset = Charsets.UTF_8.name()
+            val props = mapOf("version" to rootProject.version)
+            inputs.properties(props)
+            filesMatching("plugin.yml") {
+                expand(props)
+            }
+        }
     }
 }
 
