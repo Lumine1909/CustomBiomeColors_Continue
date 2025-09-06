@@ -48,4 +48,4 @@ biome:name - (Optional) the biome name that shows up when you press F3<br>
 #
 
 - - - -
-[**Statistics**](https://bstats.org/plugin/bukkit/CustomBiomeColors_Continue/26161)
+[![bStats](https://bstats.org/signatures/bukkit/CustomBiomeColors_Continue.svg)](https://bstats.org/plugin/bukkit/CustomBiomeColors_Continue/26161)
