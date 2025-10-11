@@ -29,6 +29,7 @@ public final class CustomBiomeColors extends JavaPlugin {
     private WorldEditHandler worldEditHandler;
     private DataManager dataManager;
     private PacketHandler packetHandler;
+    private BStats bStats;
 
     public static CustomBiomeColors getInstance() {
         return instance;
@@ -94,7 +95,7 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        new BStats(this, 26161);
+        this.bStats = new BStats(this, 26161);
 
         this.biomeManager = new BiomeManager();
         this.worldEditHandler = new WorldEditHandler();
@@ -128,6 +129,7 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        this.bStats.shutdown();
         this.dataManager.saveOnClose();
         getPacketHandler().uninject();
     }

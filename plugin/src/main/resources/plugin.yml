@@ -12,6 +12,8 @@ softdepend:
 description: Change the color of grass, leaves, water and the sky in a region
 load: STARTUP
 
+folia-supported: true
+
 commands:
   custombiomecolors:
     aliases:

@@ -53,11 +53,15 @@ public class NmsBiome_1_21_5 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<
             .waterFogColor(colorData.waterFogColor())
             .skyColor(colorData.skyColor())
             .fogColor(colorData.fogColor());
+
         if (colorData.grassColor().isPresent()) {
             customBiomeColors.grassColorOverride(colorData.grassColor().get());
         }
         if (colorData.foliageColor().isPresent()) {
             customBiomeColors.foliageColorOverride(colorData.foliageColor().get());
+        }
+        if (colorData.dryFoliageColor().isPresent()) {
+            customBiomeColors.dryFoliageColorOverride(colorData.dryFoliageColor().get());
         }
 
         customBiomeBuilder.specialEffects(customBiomeColors.build());
