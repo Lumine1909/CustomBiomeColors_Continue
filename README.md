@@ -1,6 +1,7 @@
 # 
 ![CustomBiomeColors](https://i.imgur.com/r4TW5Rm.png)
 
+INFO: This is a fork of the continued version of the CustomBiomeColors plugin, which seems to be no longer maintained. This version is made to work with Folia.
 Building tool to change the color of grass, leaves, water or the sky in a region using custom biomes.
 
 Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit).
