@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static io.github.lumine1909.custombiomecolors.utils.Reflection.*;
+import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
 @SuppressWarnings("unchecked")
 public class PacketHandler_1_20_5 implements PacketHandler {
@@ -140,7 +140,7 @@ public class PacketHandler_1_20_5 implements PacketHandler {
                     new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getHolderOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
                 );
                 section.read(readBuf);
-                writeBuf.writeShort((short) field$LevelChunkSection$nonEmptyBlockCount.get(section));
+                writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));
                 section.states.write(writeBuf, null, index);
                 writeBiomes(writeBuf, section);
             }
@@ -154,7 +154,7 @@ public class PacketHandler_1_20_5 implements PacketHandler {
 
             buf.writeByte(storage.getBits());
             if (palette instanceof SingleValuePalette<Holder<Biome>> single) {
-                buf.writeVarInt(getModifiedId((Holder<Biome>) field$SingleValuePalette$value.get(single)));
+                buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.get(single)));
             } else if (palette instanceof LinearPalette<Holder<Biome>> linear) {
                 var array = (Object[]) field$LinearPalette$values.get(linear);
                 buf.writeVarInt(linear.getSize());

@@ -1,7 +1,7 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeData;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeKey;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
 import org.bukkit.Location;
 
 public interface NmsServer<Biome, Holder, ResourceKey> {

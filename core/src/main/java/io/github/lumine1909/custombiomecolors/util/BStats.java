@@ -12,7 +12,7 @@
  *
  * Violations will result in a ban of your plugin and account from bStats.
  */
-package io.github.lumine1909.custombiomecolors.utils;
+package io.github.lumine1909.custombiomecolors.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

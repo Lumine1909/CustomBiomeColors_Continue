@@ -18,10 +18,10 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
 import io.github.lumine1909.custombiomecolors.nms.NmsServer;
-import io.github.lumine1909.custombiomecolors.utils.StringUtil;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeColorType;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeKey;
-import io.github.lumine1909.custombiomecolors.utils.objects.ColorData;
+import io.github.lumine1909.custombiomecolors.util.StringUtil;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeColorType;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.util.object.ColorData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

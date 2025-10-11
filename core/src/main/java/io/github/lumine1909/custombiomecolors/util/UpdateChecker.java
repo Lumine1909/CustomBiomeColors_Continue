@@ -1,4 +1,4 @@
-package io.github.lumine1909.custombiomecolors.utils;
+package io.github.lumine1909.custombiomecolors.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

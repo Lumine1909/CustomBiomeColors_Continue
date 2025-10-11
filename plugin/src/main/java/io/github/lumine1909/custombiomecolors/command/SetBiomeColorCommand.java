@@ -1,11 +1,11 @@
-package io.github.lumine1909.custombiomecolors.commands;
+package io.github.lumine1909.custombiomecolors.command;
 
 import com.sk89q.worldedit.regions.Region;
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.nms.NmsServer;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeColorType;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeKey;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeColorType;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;

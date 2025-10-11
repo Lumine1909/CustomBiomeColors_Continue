@@ -1,10 +1,10 @@
-package io.github.lumine1909.custombiomecolors.commands;
+package io.github.lumine1909.custombiomecolors.command;
 
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
 import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
 import io.github.lumine1909.custombiomecolors.nms.NmsServer;
-import io.github.lumine1909.custombiomecolors.utils.MessageUtil;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeData;
+import io.github.lumine1909.custombiomecolors.util.MessageUtil;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

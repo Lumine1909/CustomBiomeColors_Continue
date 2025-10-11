@@ -1,4 +1,4 @@
-package io.github.lumine1909.custombiomecolors.utils.objects;
+package io.github.lumine1909.custombiomecolors.util.object;
 
 import java.util.Optional;
 

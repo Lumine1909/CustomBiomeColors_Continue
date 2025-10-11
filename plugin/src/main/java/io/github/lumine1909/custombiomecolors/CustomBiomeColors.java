@@ -1,17 +1,17 @@
 package io.github.lumine1909.custombiomecolors;
 
-import io.github.lumine1909.custombiomecolors.commands.GetBiomeColorsCommand;
-import io.github.lumine1909.custombiomecolors.commands.ReloadCommand;
-import io.github.lumine1909.custombiomecolors.commands.SetBiomeColorCommand;
-import io.github.lumine1909.custombiomecolors.commands.UnsupportedCommand;
+import io.github.lumine1909.custombiomecolors.command.GetBiomeColorsCommand;
+import io.github.lumine1909.custombiomecolors.command.ReloadCommand;
+import io.github.lumine1909.custombiomecolors.command.SetBiomeColorCommand;
+import io.github.lumine1909.custombiomecolors.command.UnsupportedCommand;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.listener.PlayerListener;
 import io.github.lumine1909.custombiomecolors.nms.*;
-import io.github.lumine1909.custombiomecolors.utils.BStats;
-import io.github.lumine1909.custombiomecolors.utils.BiomeColorUtil;
-import io.github.lumine1909.custombiomecolors.utils.UpdateChecker;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeColorType;
+import io.github.lumine1909.custombiomecolors.util.BStats;
+import io.github.lumine1909.custombiomecolors.util.BiomeColorUtil;
+import io.github.lumine1909.custombiomecolors.util.UpdateChecker;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeColorType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

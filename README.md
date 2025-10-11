@@ -18,7 +18,7 @@ Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit).
 
 ❗ Due to the way biomes work in minecraft, selections, especially small ones, might not be precise.
 
-❗ Supported version: 1.20.5 - 1.21.7
+❗ Supported version: 1.20.5 - 1.21.8
 
 
 # Commands

@@ -1,4 +1,4 @@
-package io.github.lumine1909.custombiomecolors.utils;
+package io.github.lumine1909.custombiomecolors.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
