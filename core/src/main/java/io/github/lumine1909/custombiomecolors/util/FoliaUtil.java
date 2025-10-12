@@ -1,35 +1,27 @@
 package io.github.lumine1909.custombiomecolors.util;
 
-/**
- * Utility class for Folia server detection and compatibility.
- * Taken from <a href="https://github.com/FreshSMP/FastAsyncWorldEdit">here</a>
- * Credits to R00t.
- */
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
+
 public class FoliaUtil {
 
-    private static final Boolean FOLIA_DETECTED = detectFolia();
+    public static final boolean IS_FOLIA;
 
-    /**
-     * Check if we're running on a Folia server.
-     *
-     * @return true if running on Folia
-     */
-    public static boolean isFoliaServer() {
-        return FOLIA_DETECTED;
-    }
-
-    /**
-     * Detect if Folia is available by checking for the RegionizedServer class.
-     * This method is called once during class initialization for performance.
-     *
-     * @return true if Folia is detected
-     */
-    private static boolean detectFolia() {
+    static {
+        boolean isFolia = false;
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
+            isFolia = true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        IS_FOLIA = isFolia;
+    }
+
+    public static void runDelayed(Plugin plugin, Runnable runnable, long delay) {
+        if (IS_FOLIA) {
+            Bukkit.getGlobalRegionScheduler().runDelayed(plugin, task -> runnable.run(), delay);
+        } else {
+            Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
         }
     }
 }

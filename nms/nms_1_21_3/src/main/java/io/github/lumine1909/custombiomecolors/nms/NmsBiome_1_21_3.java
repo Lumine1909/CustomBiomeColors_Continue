@@ -1,6 +1,5 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import io.github.lumine1909.custombiomecolors.util.Reflection;
 import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
 import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
 import io.github.lumine1909.custombiomecolors.util.object.ColorData;
