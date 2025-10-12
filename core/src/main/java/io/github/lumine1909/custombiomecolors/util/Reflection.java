@@ -55,6 +55,7 @@ public class Reflection {
             try {
                 return (T) field.get(obj);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
@@ -63,6 +64,7 @@ public class Reflection {
             try {
                 field.set(obj, value);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }

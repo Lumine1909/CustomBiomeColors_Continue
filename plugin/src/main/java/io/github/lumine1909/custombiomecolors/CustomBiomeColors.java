@@ -102,11 +102,7 @@ public final class CustomBiomeColors extends JavaPlugin {
         BiomeColorUtil.loadColorMaps();
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         registerCommands();
-        if (obtainVersion() >= 2105) {
-            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setdryfoliagecolor", BiomeColorType.DRY_FOLIAGE));
-        } else {
-            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new UnsupportedCommand("1.21.5"));
-        }
+
 
         getPacketHandler().inject();
         new UpdateChecker(this);
@@ -120,6 +116,11 @@ public final class CustomBiomeColors extends JavaPlugin {
         SetBiomeColorCommand.register(this.getCommand("/setwaterfogcolor"), "/setwaterfogcolor", BiomeColorType.WATER_FOG);
         SetBiomeColorCommand.register(this.getCommand("/setskycolor"), "/setskycolor", BiomeColorType.SKY);
         SetBiomeColorCommand.register(this.getCommand("/setfogcolor"), "/setfogcolor", BiomeColorType.FOG);
+        if (obtainVersion() >= 2105) {
+            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setdryfoliagecolor", BiomeColorType.DRY_FOLIAGE));
+        } else {
+            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new UnsupportedCommand("1.21.5"));
+        }
         Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
     }
 

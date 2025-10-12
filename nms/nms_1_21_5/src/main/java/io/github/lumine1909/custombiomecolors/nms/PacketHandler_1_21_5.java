@@ -40,10 +40,8 @@ import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 @SuppressWarnings("unchecked")
 public class PacketHandler_1_21_5 implements PacketHandler {
 
-    private static final String HANDLER_NAME = "seasons-handler";
     private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
     private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.get(ResourceLocation.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
-    private static final ExecutorService asyncRunner = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override
     public void inject() {
@@ -134,13 +132,14 @@ public class PacketHandler_1_21_5 implements PacketHandler {
         }
 
         private void modifyChunkData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
+
             for (int index = 0; index < size; index++) {
                 LevelChunkSection section = new LevelChunkSection(
                     new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
                     new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
                 );
                 section.read(readBuf);
-                writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));
+                writeBuf.writeShort((short) field$LevelChunkSection$nonEmptyBlockCount.get(section));
                 section.states.write(writeBuf, null, index);
                 writeBiomes(writeBuf, section);
             }

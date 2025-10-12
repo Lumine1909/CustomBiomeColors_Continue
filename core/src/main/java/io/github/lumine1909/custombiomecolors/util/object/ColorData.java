@@ -35,7 +35,7 @@ public record ColorData(
     }
 
     public ColorData setDryFoliageColor(int dryFoliageColor) {
-        return mutable().foliage(Optional.of(dryFoliageColor)).build();
+        return mutable().dryFoliage(Optional.of(dryFoliageColor)).build();
     }
 
     public ColorData setWaterColor(int waterColor) {
