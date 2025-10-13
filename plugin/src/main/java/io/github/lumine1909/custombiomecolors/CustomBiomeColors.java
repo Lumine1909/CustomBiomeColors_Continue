@@ -1,17 +1,17 @@
 package io.github.lumine1909.custombiomecolors;
 
-import io.github.lumine1909.custombiomecolors.commands.GetBiomeColorsCommand;
-import io.github.lumine1909.custombiomecolors.commands.ReloadCommand;
-import io.github.lumine1909.custombiomecolors.commands.SetBiomeColorCommand;
-import io.github.lumine1909.custombiomecolors.commands.UnsupportedCommand;
+import io.github.lumine1909.custombiomecolors.command.GetBiomeColorsCommand;
+import io.github.lumine1909.custombiomecolors.command.ReloadCommand;
+import io.github.lumine1909.custombiomecolors.command.SetBiomeColorCommand;
+import io.github.lumine1909.custombiomecolors.command.UnsupportedCommand;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.listener.PlayerListener;
 import io.github.lumine1909.custombiomecolors.nms.*;
-import io.github.lumine1909.custombiomecolors.utils.BStats;
-import io.github.lumine1909.custombiomecolors.utils.BiomeColorUtil;
-import io.github.lumine1909.custombiomecolors.utils.UpdateChecker;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeColorType;
+import io.github.lumine1909.custombiomecolors.util.BStats;
+import io.github.lumine1909.custombiomecolors.util.BiomeColorUtil;
+import io.github.lumine1909.custombiomecolors.util.UpdateChecker;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeColorType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -102,11 +102,7 @@ public final class CustomBiomeColors extends JavaPlugin {
         BiomeColorUtil.loadColorMaps();
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         registerCommands();
-        if (obtainVersion() >= 2105) {
-            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setdryfoliagecolor", BiomeColorType.DRY_FOLIAGE));
-        } else {
-            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new UnsupportedCommand("1.21.5"));
-        }
+
 
         getPacketHandler().inject();
         new UpdateChecker(this);
@@ -120,6 +116,11 @@ public final class CustomBiomeColors extends JavaPlugin {
         SetBiomeColorCommand.register(this.getCommand("/setwaterfogcolor"), "/setwaterfogcolor", BiomeColorType.WATER_FOG);
         SetBiomeColorCommand.register(this.getCommand("/setskycolor"), "/setskycolor", BiomeColorType.SKY);
         SetBiomeColorCommand.register(this.getCommand("/setfogcolor"), "/setfogcolor", BiomeColorType.FOG);
+        if (obtainVersion() >= 2105) {
+            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setdryfoliagecolor", BiomeColorType.DRY_FOLIAGE));
+        } else {
+            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new UnsupportedCommand("1.21.5"));
+        }
         Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
     }
 

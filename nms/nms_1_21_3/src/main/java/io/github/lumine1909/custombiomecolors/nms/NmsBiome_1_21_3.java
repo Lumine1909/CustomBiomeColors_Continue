@@ -1,15 +1,16 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import io.github.lumine1909.custombiomecolors.utils.Reflection;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeData;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeKey;
-import io.github.lumine1909.custombiomecolors.utils.objects.ColorData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.util.object.ColorData;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
+
+import static io.github.lumine1909.custombiomecolors.util.Reflection.field$Biome$specialEffects;
 
 public class NmsBiome_1_21_3 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
@@ -22,7 +23,7 @@ public class NmsBiome_1_21_3 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<
     }
 
     private static BiomeData fetchNmsBiomeData(Holder<Biome> nmsBiome) {
-        BiomeSpecialEffects biomeFog = Reflection.getPrivateObject(nmsBiome.value(), "specialEffects");
+        BiomeSpecialEffects biomeFog = field$Biome$specialEffects.get(nmsBiome.value());
         assert biomeFog != null;
         ColorData colorData = new ColorData.Mutable()
             .grass(biomeFog.getGrassColorOverride())

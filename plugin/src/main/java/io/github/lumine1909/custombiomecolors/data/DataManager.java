@@ -7,9 +7,9 @@ import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
 import io.github.lumine1909.custombiomecolors.data.adapter.BiomeDataAdapter;
 import io.github.lumine1909.custombiomecolors.data.adapter.BiomeKeyAdapter;
 import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeData;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeKey;
-import io.github.lumine1909.custombiomecolors.utils.objects.ColorData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.util.object.ColorData;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

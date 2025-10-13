@@ -1,6 +1,4 @@
-package io.github.lumine1909.custombiomecolors.utils;
-
-import org.jetbrains.annotations.Nullable;
+package io.github.lumine1909.custombiomecolors.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -18,6 +16,7 @@ public class Reflection {
     public static final Class<?> class$ClientboundLevelChunkPacketData = clazz("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData");
     public static final Class<?> class$LevelChunkSection = clazz("net.minecraft.world.level.chunk.LevelChunkSection");
     public static final Class<?> class$Holder$Reference = clazz("net.minecraft.core.Holder$Reference");
+    public static final Class<?> class$Biome = clazz("net.minecraft.world.level.biome.Biome");
     public static final FieldAccessor field$MappedRegistry$frozen = new FieldAccessor(class$MappedRegistry, "frozen");
     public static final FieldAccessor field$MappedRegistry$unregisteredIntrusiveHolders = new FieldAccessor(class$MappedRegistry, "unregisteredIntrusiveHolders");
     public static final FieldAccessor field$PalettedContainer$data = new FieldAccessor(class$PalettedContainer, "data");
@@ -28,35 +27,8 @@ public class Reflection {
     public static final FieldAccessor field$SingleValuePalette$value = new FieldAccessor(class$SingleValuePalette, "value");
     public static final FieldAccessor field$LinearPalette$values = new FieldAccessor(class$LinearPalette, "values");
     public static final FieldAccessor field$HashMapPalette$values = new FieldAccessor(class$HashMapPalette, "values");
+    public static final FieldAccessor field$Biome$specialEffects = new FieldAccessor(class$Biome, "specialEffects");
     public static final MethodAccessor method$Holder$bindTags = new MethodAccessor(class$Holder$Reference, "bindTags", Collection.class);
-
-    public static void copyFieldsForSubClass(Object from, Object to) {
-        for (Field field : from.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                Field field1 = to.getClass().getSuperclass().getDeclaredField(field.getName());
-                field1.setAccessible(true);
-                field1.set(to, field.get(from));
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException ignored) {
-            }
-        }
-    }
-
-    public static void copyFields(Object from, Object to) {
-        for (Field field : from.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                Field field1 = to.getClass().getDeclaredField(field.getName());
-                field1.setAccessible(true);
-                field1.set(to, field.get(from));
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException ignored) {
-            }
-        }
-    }
 
     public static Class<?> clazz(String name) {
         try {
@@ -64,18 +36,6 @@ public class Reflection {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Nullable
-    public static <T> T getPrivateObject(Object object, String fieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return (T) field.get(object);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static class FieldAccessor {
@@ -91,10 +51,11 @@ public class Reflection {
             }
         }
 
-        public Object get(Object obj) {
+        public <T> T get(Object obj) {
             try {
-                return field.get(obj);
-            } catch (IllegalAccessException e) {
+                return (T) field.get(obj);
+            } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
@@ -102,7 +63,8 @@ public class Reflection {
         public void set(Object obj, Object value) {
             try {
                 field.set(obj, value);
-            } catch (IllegalAccessException e) {
+            } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
@@ -121,9 +83,9 @@ public class Reflection {
             }
         }
 
-        public Object invoke(Object instance, Object... objects) {
+        public <T> T invoke(Object instance, Object... objects) {
             try {
-                return method.invoke(instance, objects);
+                return (T) method.invoke(instance, objects);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

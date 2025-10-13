@@ -35,15 +35,13 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static io.github.lumine1909.custombiomecolors.utils.Reflection.*;
+import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
 @SuppressWarnings("unchecked")
 public class PacketHandler_1_21_5 implements PacketHandler {
 
-    private static final String HANDLER_NAME = "seasons-handler";
     private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
     private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.get(ResourceLocation.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
-    private static final ExecutorService asyncRunner = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override
     public void inject() {
@@ -134,6 +132,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
         }
 
         private void modifyChunkData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
+
             for (int index = 0; index < size; index++) {
                 LevelChunkSection section = new LevelChunkSection(
                     new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
@@ -154,7 +153,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
 
             buf.writeByte(storage.getBits());
             if (palette instanceof SingleValuePalette<Holder<Biome>> single) {
-                buf.writeVarInt(getModifiedId((Holder<Biome>) field$SingleValuePalette$value.get(single)));
+                buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.get(single)));
             } else if (palette instanceof LinearPalette<Holder<Biome>> linear) {
                 var array = (Object[]) field$LinearPalette$values.get(linear);
                 buf.writeVarInt(linear.getSize());

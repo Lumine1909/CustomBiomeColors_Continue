@@ -4,9 +4,9 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeData;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeKey;
-import io.github.lumine1909.custombiomecolors.utils.objects.ColorData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.util.object.ColorData;
 
 import java.io.File;
 import java.io.FileReader;

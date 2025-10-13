@@ -1,8 +1,8 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeData;
-import io.github.lumine1909.custombiomecolors.utils.objects.BiomeKey;
-import io.github.lumine1909.custombiomecolors.utils.objects.ColorData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.util.object.ColorData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -19,7 +19,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 
 import java.util.IdentityHashMap;
 
-import static io.github.lumine1909.custombiomecolors.utils.Reflection.*;
+import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
 public class NmsServer_1_21_3 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
 

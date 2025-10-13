@@ -1,4 +1,4 @@
-package io.github.lumine1909.custombiomecolors.utils.objects;
+package io.github.lumine1909.custombiomecolors.util.object;
 
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ public record ColorData(
     }
 
     public ColorData setDryFoliageColor(int dryFoliageColor) {
-        return mutable().foliage(Optional.of(dryFoliageColor)).build();
+        return mutable().dryFoliage(Optional.of(dryFoliageColor)).build();
     }
 
     public ColorData setWaterColor(int waterColor) {

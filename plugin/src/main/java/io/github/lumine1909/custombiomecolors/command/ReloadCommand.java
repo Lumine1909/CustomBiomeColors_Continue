@@ -1,4 +1,4 @@
-package io.github.lumine1909.custombiomecolors.commands;
+package io.github.lumine1909.custombiomecolors.command;
 
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
 import org.bukkit.Bukkit;

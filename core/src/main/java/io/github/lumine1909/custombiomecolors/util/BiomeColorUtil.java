@@ -1,4 +1,6 @@
-package io.github.lumine1909.custombiomecolors.utils;
+package io.github.lumine1909.custombiomecolors.util;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,7 +19,7 @@ public class BiomeColorUtil {
             InputStream foliageStream = BiomeColorUtil.class.getResourceAsStream("/foliage.png");
             InputStream dryFoliageStream = BiomeColorUtil.class.getResourceAsStream("/dry_foliage.png");
         ) {
-            if (grassStream == null || foliageStream == null) {
+            if (grassStream == null || foliageStream == null || dryFoliageStream == null) {
                 throw new IOException("Missing colormap images in JAR root");
             }
 
@@ -32,7 +34,7 @@ public class BiomeColorUtil {
                 throw new IOException("Colormap images must be 256x256 pixels");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -48,11 +50,7 @@ public class BiomeColorUtil {
         return getColorFromMap(dryFoliageColorMap, temperature, downfall);
     }
 
-    private static int getColorFromMap(BufferedImage map, float temperature, float downfall) {
-        if (map == null) {
-            throw new IllegalStateException("Color maps not loaded. Call loadColorMaps() first.");
-        }
-
+    private static int getColorFromMap(@NotNull BufferedImage map, float temperature, float downfall) {
         temperature = Math.clamp(temperature, 0.0f, 1.0f);
         downfall = Math.clamp(downfall, 0.0f, 1.0f) * temperature;
 
