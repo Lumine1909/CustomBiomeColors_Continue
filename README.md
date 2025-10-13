@@ -3,7 +3,9 @@
 
 Building tool to change the color of grass, leaves, water or the sky in a region using custom biomes.
 
-Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit).
+Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit) or [FAWE for folia](https://github.com/FreshSMP/FastAsyncWorldEdit).
+
+Supported version: 1.20.5 - 1.21.8
 
 
 ![](https://i.imgur.com/tja8o5j.png)
@@ -17,8 +19,6 @@ Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit).
 ❗ You must reconnect in order to see some of the changes
 
 ❗ Due to the way biomes work in minecraft, selections, especially small ones, might not be precise.
-
-❗ Supported version: 1.20.5 - 1.21.8
 
 
 # Commands
