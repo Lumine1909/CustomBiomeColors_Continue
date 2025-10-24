@@ -22,9 +22,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -36,10 +33,11 @@ import java.util.List;
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
 @SuppressWarnings("unchecked")
-public class PacketHandler_1_21_5 implements PacketHandler {
+public class PacketHandler_1_21_9 implements PacketHandler {
 
     private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
     private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.get(ResourceLocation.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
+    private static final PalettedContainerFactory CONTAINER_FACTORY = PalettedContainerFactory.create(MinecraftServer.getServer().registryAccess());
 
     @Override
     public void inject() {
@@ -104,7 +102,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
                 promise.setSuccess();
                 return;
             } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
-                ServerLevel level = (ServerLevel) player.level();
+                ServerLevel level = player.level();
                 ClientboundLevelChunkPacketData data = packet.getChunkData();
                 asyncRunner.submit(() -> {
                     FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
@@ -120,10 +118,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
 
         private void modifyBiomeData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
             for (int index = 0; index < size; index++) {
-                LevelChunkSection section = new LevelChunkSection(
-                    new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
-                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
-                );
+                LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
                 section.readBiomes(readBuf);
                 writeBiomes(writeBuf, section);
             }
@@ -132,10 +127,7 @@ public class PacketHandler_1_21_5 implements PacketHandler {
         private void modifyChunkData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
 
             for (int index = 0; index < size; index++) {
-                LevelChunkSection section = new LevelChunkSection(
-                    new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
-                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
-                );
+                LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
                 section.read(readBuf);
                 writeBuf.writeShort((short) field$LevelChunkSection$nonEmptyBlockCount.get(section));
                 section.states.write(writeBuf, null, index);
