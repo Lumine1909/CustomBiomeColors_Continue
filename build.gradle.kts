@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":nms:nms_1_21"))
     implementation(project(":nms:nms_1_21_3"))
     implementation(project(":nms:nms_1_21_5"))
+    implementation(project(":nms:nms_1_21_9"))
 }
 
 java {
@@ -29,7 +30,7 @@ java {
 tasks {
     shadowJar {
         archiveVersion.set(version.toString())
-        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.8.jar")
+        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.10.jar")
         archiveClassifier.set("")
         mergeServiceFiles()
 

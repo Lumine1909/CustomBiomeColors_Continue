@@ -32,8 +32,6 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 

@@ -73,7 +73,10 @@ public final class CustomBiomeColors extends JavaPlugin {
         instance = this;
 
         int version = obtainVersion();
-        if (version >= 2105) {
+        if (version >= 2109) {
+            nmsServer = new NmsServer_1_21_9();
+            packetHandler = new PacketHandler_1_21_9();
+        } else if (version >= 2105) {
             nmsServer = new NmsServer_1_21_5();
             packetHandler = new PacketHandler_1_21_5();
         } else if (version >= 2103) {
