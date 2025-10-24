@@ -46,8 +46,7 @@ public class DataManager {
             this.plugin.saveResource(fileName, false);
         }
         try (FileReader reader = new FileReader(this.file)) {
-            Type typeToken = new TypeToken<Map<BiomeKey, BiomeData>>() {
-            }.getType();
+            Type typeToken = new TypeToken<Map<BiomeKey, BiomeData>>() {}.getType();
             this.biomeDataMap = gson.fromJson(reader, typeToken);
         } catch (Exception e) {
             plugin.getSLF4JLogger().warn("It seems you are using an legacy data format, start converting...");
