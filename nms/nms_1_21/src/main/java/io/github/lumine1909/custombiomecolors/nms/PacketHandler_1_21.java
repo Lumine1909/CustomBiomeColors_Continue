@@ -38,7 +38,7 @@ import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 @SuppressWarnings("unchecked")
 public class PacketHandler_1_21 implements PacketHandler {
 
-    private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
+    private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
     private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.getHolder(ResourceLocation.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
 
     @Override
