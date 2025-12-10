@@ -3,7 +3,7 @@ package io.github.lumine1909.custombiomecolors.data.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
 
 import java.io.IOException;
 

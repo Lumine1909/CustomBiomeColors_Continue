@@ -4,16 +4,16 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
-import io.github.lumine1909.custombiomecolors.util.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.ColorType;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DataConverter {
@@ -54,12 +54,14 @@ public class DataConverter {
             }
 
             BiomeKey biomeKey = BiomeKey.fromString(keyStr);
-            ColorData colorData = new ColorData(
-                color[5], color[2], color[3], color[4],
-                color[1] != 0 ? Optional.of(color[1]) : Optional.empty(),
-                Optional.empty(),
-                color[0] != 0 ? Optional.of(color[0]) : Optional.empty()
-            );
+            ColorData colorData = new ColorData()
+                .set(ColorType.GRASS, color[0] != 0 ? color[0] : ColorType.GRASS.defaultValue())
+                .set(ColorType.FOLIAGE, color[1] != 0 ? color[1] : ColorType.FOLIAGE.defaultValue())
+                .set(ColorType.WATER, color[2])
+                .set(ColorType.WATER_FOG, color[3])
+                .set(ColorType.SKY, color[4])
+                .set(ColorType.FOG, color[5]);
+
             BiomeData biomeData = new BiomeData(
                 biomeKey,
                 fallbackPlains,

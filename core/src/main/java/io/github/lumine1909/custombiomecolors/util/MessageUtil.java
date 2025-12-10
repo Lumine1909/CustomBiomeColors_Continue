@@ -13,32 +13,31 @@ public class MessageUtil {
     }
 
     private static Component getColorMessage(int color, boolean isDefault) {
-        int realColor = color & 0xFFFFFF;
-        Component colorMessage = Component.text(String.format("#%06X", realColor), TextColor.color(realColor));
+        Component colorMessage = Component.text(String.format("#%08X", color), TextColor.color(color));
         return isDefault ? colorMessage.append(Component.text(" (Default)", NamedTextColor.GRAY)) : colorMessage;
     }
 
-    public static Component getColorMessageGrass(Optional<Integer> color, float temperature, float downfall) {
-        if (color.isPresent()) {
-            return getColorMessage(color.get(), false);
+    public static Component getColorMessageGrass(Integer color, float temperature, float downfall) {
+        if (color != null) {
+            return getColorMessage(color, false);
         }
-        int realColor = BiomeColorUtil.getGrassColor(temperature, downfall);
-        return getColorMessage(realColor, true);
+        int defaultColor = BiomeColorUtil.getGrassColor(temperature, downfall);
+        return getColorMessage(defaultColor, true);
     }
 
-    public static Component getColorMessageFoliage(Optional<Integer> color, float temperature, float downfall) {
-        if (color.isPresent()) {
-            return getColorMessage(color.get(), false);
+    public static Component getColorMessageFoliage(Integer color, float temperature, float downfall) {
+        if (color != null) {
+            return getColorMessage(color, false);
         }
-        int realColor = BiomeColorUtil.getFoliageColor(temperature, downfall);
-        return getColorMessage(realColor, true);
+        int defaultColor = BiomeColorUtil.getFoliageColor(temperature, downfall);
+        return getColorMessage(defaultColor, true);
     }
 
-    public static Component getColorMessageDryFoliage(Optional<Integer> color, float temperature, float downfall) {
-        if (color.isPresent()) {
-            return getColorMessage(color.get(), false);
+    public static Component getColorMessageDryFoliage(Integer color, float temperature, float downfall) {
+        if (color != null) {
+            return getColorMessage(color, false);
         }
-        int realColor = BiomeColorUtil.getDryFoliageColor(temperature, downfall);
-        return getColorMessage(realColor, true);
+        int defaultColor = BiomeColorUtil.getDryFoliageColor(temperature, downfall);
+        return getColorMessage(defaultColor, true);
     }
 }

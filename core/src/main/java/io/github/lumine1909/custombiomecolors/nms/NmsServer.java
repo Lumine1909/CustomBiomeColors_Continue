@@ -1,7 +1,7 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
 import org.bukkit.Location;
 
 public interface NmsServer<Biome, Holder, ResourceKey> {
@@ -10,7 +10,7 @@ public interface NmsServer<Biome, Holder, ResourceKey> {
 
     NmsBiome<Biome, Holder, ResourceKey> getWrappedBiomeHolder(Holder biomeBase);
 
-    boolean doesBiomeExist(BiomeKey biomeKey);
+    boolean hasBiome(BiomeKey biomeKey);
 
     NmsBiome<Biome, Holder, ResourceKey> createCustomBiome(BiomeData biomeData);
 
@@ -20,5 +20,5 @@ public interface NmsServer<Biome, Holder, ResourceKey> {
 
     Holder registerBiome(Holder original, Biome biome, ResourceKey resourceKey);
 
-    String getBiomeString(NmsBiome<Biome, Holder, ResourceKey> nmsBiome);
+    String getBiomeId(NmsBiome<Biome, Holder, ResourceKey> nmsBiome);
 }

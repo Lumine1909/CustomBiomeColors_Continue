@@ -5,7 +5,7 @@ Building tool to change the color of grass, leaves, water or the sky in a region
 
 Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit) or [FAWE for folia](https://github.com/FreshSMP/FastAsyncWorldEdit).
 
-Supported version: 1.20.5 - 1.21.10
+Supported version: 1.20.5 - 1.21.11
 
 
 ![](https://i.imgur.com/tja8o5j.png)

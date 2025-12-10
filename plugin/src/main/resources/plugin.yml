@@ -55,6 +55,21 @@ commands:
     permission: custombiomecolors.fog
     permission-message: You do not have access to that command.
     usage: "Usage: /<command> <hex-color> [biome:name]"
+  /setsunrisesunsetcolor:
+    description: Change the color of the sunrise & sunset in a region
+    permission: custombiomecolors.sunrisesunset
+    permission-message: You do not have access to that command.
+    usage: "Usage: /<command> <hex-color> [biome:name]"
+  /setcloudcolor:
+    description: Change the color of the cloud in a region
+    permission: custombiomecolors.cloud
+    permission-message: You do not have access to that command.
+    usage: "Usage: /<command> <hex-color> [biome:name]"
+  /setskylightcolor:
+    description: Change the color of the sky light in a region
+    permission: custombiomecolors.skylight
+    permission-message: You do not have access to that command.
+    usage: "Usage: /<command> <hex-color> [biome:name]"
   /getbiomecolors:
     description: Get the colors of the biome you're in
     permission: custombiomecolors.get
@@ -72,6 +87,9 @@ permissions:
       custombiomecolors.waterfog: true
       custombiomecolors.sky: true
       custombiomecolors.fog: true
+      custombiomecolors.sunrisesunset: true
+      custombiomecolors.could: true
+      custombiomecolors.skylight: true
       custombiomecolors.get: true
   custombiomecolors.grass:
     description: Gives access to //setgrasscolor
@@ -93,6 +111,15 @@ permissions:
     default: op
   custombiomecolors.fog:
     description: Gives access to //setfogcolor
+    default: op
+  custombiomecolors.sunrisesunset:
+    description: Gives access to //setsunrisesunsetcolor
+    default: op
+  custombiomecolors.cloud:
+    description: Gives access to //setcloudcolor
+    default: op
+  custombiomecolors.skylight:
+    description: Gives access to //setskylightcolor
     default: op
   custombiomecolors.get:
     description: Gives access to //getbiomecolors

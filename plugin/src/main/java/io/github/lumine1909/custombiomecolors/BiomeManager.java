@@ -18,10 +18,10 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
 import io.github.lumine1909.custombiomecolors.nms.NmsServer;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.ColorType;
 import io.github.lumine1909.custombiomecolors.util.StringUtil;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeColorType;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
-import io.github.lumine1909.custombiomecolors.util.object.ColorData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -41,12 +41,12 @@ public class BiomeManager {
         return biomeType;
     }
 
-    public void changeBiomeColor(Player player, Region region, BiomeColorType colorType, int color, Runnable runWhenDone) {
+    public void changeBiomeColor(Player player, Region region, ColorType colorType, int color, Runnable runWhenDone) {
         this.changeBiomeColor(player, region, colorType, color, new BiomeKey("cbc", StringUtil.randomString(10)), false, runWhenDone);
     }
 
     @SuppressWarnings("deprecation")
-    public void changeBiomeColor(Player player, Region region, BiomeColorType colorType, int color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
+    public void changeBiomeColor(Player player, Region region, ColorType colorType, int color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
         com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
         World weWorld = BukkitAdapter.adapt(player.getWorld());
 
@@ -56,18 +56,12 @@ public class BiomeManager {
                 var pos = region.getMinimumPoint();
                 Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
                 NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(loc));
-                ColorData colorData = biome.getBiomeData().colorData().setColor(colorType, color);
+                ColorData colorData = biome.getBiomeData().colorData().clone().set(colorType, color);
                 NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, biomeKey, colorData));
                 BiomeType type = getOrCreate(newBiome.getBiomeData().biomeKey().toString());
-                if (region instanceof FlatRegion flatRegion) {
-                    FlatRegionFunction replace = new BiomeReplace(editSession, type);
-                    FlatRegionVisitor visitor = new FlatRegionVisitor(flatRegion, replace);
-                    Operations.completeLegacy(visitor);
-                } else {
-                    RegionFunction replace = new BiomeReplace(editSession, type);
-                    RegionVisitor visitor = new RegionVisitor(region, replace);
-                    Operations.completeLegacy(visitor);
-                }
+                RegionFunction replace = new BiomeReplace(editSession, type);
+                RegionVisitor visitor = new RegionVisitor(region, replace);
+                Operations.completeLegacy(visitor);
                 editSession.flushQueue();
             } catch (Exception e) {
                 e.printStackTrace();

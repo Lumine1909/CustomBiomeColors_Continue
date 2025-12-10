@@ -5,26 +5,11 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public interface PacketHandler {
 
     Map<String, Long> createTimeCache = new HashMap<>();
     String HANDLER_NAME = "cbc-handler";
-    ExecutorService asyncRunner = Executors.newVirtualThreadPerTaskExecutor();
-
-    static void writeSafely(ChannelHandlerContext ctx, Object msg) {
-        if (!ctx.channel().isOpen() || !ctx.channel().isActive()) {
-            return;
-        }
-        ctx.channel().eventLoop().execute(() -> {
-            if (!ctx.channel().isOpen() || !ctx.channel().isActive()) {
-                return;
-            }
-            ctx.writeAndFlush(msg, ctx.voidPromise());
-        });
-    }
 
     void inject();
 

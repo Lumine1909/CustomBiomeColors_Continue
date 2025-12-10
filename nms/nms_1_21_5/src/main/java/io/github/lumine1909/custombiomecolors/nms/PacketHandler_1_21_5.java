@@ -35,7 +35,6 @@ import java.util.List;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
-@SuppressWarnings("unchecked")
 public class PacketHandler_1_21_5 implements PacketHandler {
 
     private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
@@ -90,30 +89,21 @@ public class PacketHandler_1_21_5 implements PacketHandler {
             if (msg instanceof ClientboundChunksBiomesPacket(
                 List<ClientboundChunksBiomesPacket.ChunkBiomeData> chunkBiomeData
             )) {
-                ServerLevel level = (ServerLevel) player.level();
+                ServerLevel level = player.level().getMinecraftWorld();
                 List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
-                asyncRunner.submit(() -> {
-                    chunkBiomeData.forEach(c -> {
-                        FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
-                        modifyBiomeData(writeBuf, c.getReadBuffer(), level.getSectionsCount());
-                        ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), ByteBufUtil.getBytes(writeBuf));
-                        dataList.add(data);
-                    });
-                    PacketHandler.writeSafely(ctx, new ClientboundChunksBiomesPacket(dataList));
-                });
-                promise.setSuccess();
-                return;
-            } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
-                ServerLevel level = (ServerLevel) player.level();
-                ClientboundLevelChunkPacketData data = packet.getChunkData();
-                asyncRunner.submit(() -> {
+                chunkBiomeData.forEach(c -> {
                     FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
-                    modifyChunkData(data.getReadBuffer(), writeBuf, level.getSectionsCount());
-                    field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(writeBuf));
-                    PacketHandler.writeSafely(ctx, msg);
+                    modifyBiomeData(writeBuf, c.getReadBuffer(), level.getSectionsCount());
+                    ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), ByteBufUtil.getBytes(writeBuf));
+                    dataList.add(data);
                 });
-                promise.setSuccess();
-                return;
+                msg = new ClientboundChunksBiomesPacket(dataList);
+            } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
+                ServerLevel level = player.level().getMinecraftWorld();
+                ClientboundLevelChunkPacketData data = packet.getChunkData();
+                FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
+                modifyChunkData(data.getReadBuffer(), writeBuf, level.getSectionsCount());
+                field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(writeBuf));
             }
             super.write(ctx, msg, promise);
         }
@@ -130,36 +120,36 @@ public class PacketHandler_1_21_5 implements PacketHandler {
         }
 
         private void modifyChunkData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
-
             for (int index = 0; index < size; index++) {
                 LevelChunkSection section = new LevelChunkSection(
                     new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
                     new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
                 );
                 section.read(readBuf);
-                writeBuf.writeShort((short) field$LevelChunkSection$nonEmptyBlockCount.get(section));
+                writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));
                 section.states.write(writeBuf, null, index);
                 writeBiomes(writeBuf, section);
             }
         }
 
+        @SuppressWarnings({"DataFlowIssue", "unchecked"})
         private void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
             PalettedContainer<Holder<Biome>> container = (PalettedContainer<Holder<Biome>>) levelChunkSection.getBiomes();
-            BitStorage storage = ((BitStorage) field$PalettedContainer$Data$storage.get(field$PalettedContainer$data.get(container))).copy();
+            BitStorage storage = field$PalettedContainer$Data$storage.getUnsafe(field$PalettedContainer$data.get(container));
             Object containerData = field$PalettedContainer$data.get(container);
-            var palette = (Palette<Holder<Biome>>) field$PalettedContainer$Data$palette.get(containerData);
+            Palette<Holder<Biome>> palette = field$PalettedContainer$Data$palette.getUnsafe(containerData);
 
             buf.writeByte(storage.getBits());
             if (palette instanceof SingleValuePalette<Holder<Biome>> single) {
-                buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.get(single)));
+                buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.getUnsafe(single)));
             } else if (palette instanceof LinearPalette<Holder<Biome>> linear) {
-                var array = (Object[]) field$LinearPalette$values.get(linear);
+                Object[] array = field$LinearPalette$values.getUnsafe(linear);
                 buf.writeVarInt(linear.getSize());
                 for (int i = 0; i < linear.getSize(); i++) {
                     buf.writeVarInt(getModifiedId((Holder<Biome>) array[i]));
                 }
             } else if (palette instanceof HashMapPalette<Holder<Biome>> hashMap) {
-                var map = (CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>>) field$HashMapPalette$values.get(hashMap);
+                CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>> map = field$HashMapPalette$values.getUnsafe(hashMap);
                 buf.writeVarInt(hashMap.getSize());
                 for (int i = 0; i < hashMap.getSize(); i++) {
                     buf.writeVarInt(getModifiedId(map.byId(i)));

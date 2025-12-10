@@ -1,9 +1,10 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
-import io.github.lumine1909.custombiomecolors.util.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
 
+@SuppressWarnings("rawtypes")
 public abstract class NmsBiome<Biome, Holder, ResourceKey> {
 
     protected final Holder biomeHolder;
