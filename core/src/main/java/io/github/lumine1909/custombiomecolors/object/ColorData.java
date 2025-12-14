@@ -43,4 +43,9 @@ public record ColorData(Map<ColorType, Integer> data) {
         if (!(obj instanceof ColorData(Map<ColorType, Integer> data1))) return false;
         return data.equals(data1);
     }
+
+    @Override
+    public int hashCode() {
+        return data.hashCode();
+    }
 }
