@@ -15,30 +15,29 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
-public class PacketHandler_1_21 implements PacketHandler {
+public class PacketHandler_1_21_11 implements PacketHandler {
 
-    private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
-    private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.getHolder(ResourceLocation.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
+    private static final MappedRegistry<@NotNull Biome> REGISTRY = (MappedRegistry<@NotNull Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
+    private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.get(Identifier.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
+    private static final PalettedContainerFactory CONTAINER_FACTORY = PalettedContainerFactory.create(MinecraftServer.getServer().registryAccess());
 
     @Override
     public void inject() {
@@ -89,8 +88,9 @@ public class PacketHandler_1_21 implements PacketHandler {
             if (msg instanceof ClientboundChunksBiomesPacket(
                 List<ClientboundChunksBiomesPacket.ChunkBiomeData> chunkBiomeData
             )) {
-                ServerLevel level = player.level().getMinecraftWorld();
+                ServerLevel level = player.level();
                 List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
+
                 chunkBiomeData.forEach(c -> {
                     FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
                     modifyBiomeData(writeBuf, c.getReadBuffer(), level.getSectionsCount());
@@ -99,7 +99,7 @@ public class PacketHandler_1_21 implements PacketHandler {
                 });
                 msg = new ClientboundChunksBiomesPacket(dataList);
             } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
-                ServerLevel level = player.level().getMinecraftWorld();
+                ServerLevel level = player.level();
                 ClientboundLevelChunkPacketData data = packet.getChunkData();
                 FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
                 modifyChunkData(data.getReadBuffer(), writeBuf, level.getSectionsCount());
@@ -110,10 +110,7 @@ public class PacketHandler_1_21 implements PacketHandler {
 
         private void modifyBiomeData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
             for (int index = 0; index < size; index++) {
-                LevelChunkSection section = new LevelChunkSection(
-                    new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
-                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getHolderOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
-                );
+                LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
                 section.readBiomes(readBuf);
                 writeBiomes(writeBuf, section);
             }
@@ -121,10 +118,7 @@ public class PacketHandler_1_21 implements PacketHandler {
 
         private void modifyChunkData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
             for (int index = 0; index < size; index++) {
-                LevelChunkSection section = new LevelChunkSection(
-                    new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
-                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getHolderOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
-                );
+                LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
                 section.read(readBuf);
                 writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));
                 section.states.write(writeBuf, null, index);
@@ -134,31 +128,31 @@ public class PacketHandler_1_21 implements PacketHandler {
 
         @SuppressWarnings({"DataFlowIssue", "unchecked"})
         private void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
-            PalettedContainer<Holder<Biome>> container = (PalettedContainer<Holder<Biome>>) levelChunkSection.getBiomes();
+            PalettedContainer<@NotNull Holder<@NotNull Biome>> container = (PalettedContainer<@NotNull Holder<@NotNull Biome>>) levelChunkSection.getBiomes();
             BitStorage storage = field$PalettedContainer$Data$storage.getUnsafe(field$PalettedContainer$data.get(container));
             Object containerData = field$PalettedContainer$data.get(container);
-            Palette<Holder<Biome>> palette = field$PalettedContainer$Data$palette.getUnsafe(containerData);
+            Palette<@NotNull Holder<@NotNull Biome>> palette = field$PalettedContainer$Data$palette.getUnsafe(containerData);
 
             buf.writeByte(storage.getBits());
-            if (palette instanceof SingleValuePalette<Holder<Biome>> single) {
+            if (palette instanceof SingleValuePalette<@NotNull Holder<@NotNull Biome>> single) {
                 buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.getUnsafe(single)));
-            } else if (palette instanceof LinearPalette<Holder<Biome>> linear) {
+            } else if (palette instanceof LinearPalette<@NotNull Holder<@NotNull Biome>> linear) {
                 Object[] array = field$LinearPalette$values.getUnsafe(linear);
                 buf.writeVarInt(linear.getSize());
                 for (int i = 0; i < linear.getSize(); i++) {
-                    buf.writeVarInt(getModifiedId((Holder<Biome>) array[i]));
+                    buf.writeVarInt(getModifiedId((Holder<@NotNull Biome>) array[i]));
                 }
-            } else if (palette instanceof HashMapPalette<Holder<Biome>> hashMap) {
-                CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>> map = field$HashMapPalette$values.getUnsafe(hashMap);
+            } else if (palette instanceof HashMapPalette<@NotNull Holder<@NotNull Biome>> hashMap) {
+                CrudeIncrementalIntIdentityHashBiMap<@NotNull Holder<@NotNull Biome>> map = field$HashMapPalette$values.getUnsafe(hashMap);
                 buf.writeVarInt(hashMap.getSize());
                 for (int i = 0; i < hashMap.getSize(); i++) {
                     buf.writeVarInt(getModifiedId(map.byId(i)));
                 }
             }
-            buf.writeLongArray(storage.getRaw());
+            buf.writeFixedSizeLongArray(storage.getRaw());
         }
 
-        private int getModifiedId(Holder<Biome> origin) {
+        private int getModifiedId(@NotNull Holder<@NotNull Biome> origin) {
             long createTime = createTimeCache.getOrDefault(origin.getRegisteredName(), 0L);
             if (createTime > joinTime) {
                 warn();

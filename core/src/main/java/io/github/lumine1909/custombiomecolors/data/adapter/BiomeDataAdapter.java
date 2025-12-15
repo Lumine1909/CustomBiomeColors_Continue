@@ -3,12 +3,12 @@ package io.github.lumine1909.custombiomecolors.data.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
-import io.github.lumine1909.custombiomecolors.util.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.ColorType;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public class BiomeDataAdapter extends TypeAdapter<BiomeData> {
 
@@ -20,13 +20,13 @@ public class BiomeDataAdapter extends TypeAdapter<BiomeData> {
 
         ColorData color = data.colorData();
         writer.name("colorData").beginObject();
-        writer.name("fogColor").value(color.fogColor());
-        writer.name("waterColor").value(color.waterColor());
-        writer.name("waterFogColor").value(color.waterFogColor());
-        writer.name("skyColor").value(color.skyColor());
-        writer.name("foliageColor").value(color.foliageColor().orElse(-1));
-        writer.name("dryFoliageColor").value(color.dryFoliageColor().orElse(-1));
-        writer.name("grassColor").value(color.grassColor().orElse(-1));
+        color.forEach((colorType, value) -> {
+            try {
+                writer.name(colorType.serializedName()).value(value);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         writer.endObject();
 
         writer.endObject();
@@ -55,41 +55,15 @@ public class BiomeDataAdapter extends TypeAdapter<BiomeData> {
     }
 
     private ColorData readColorData(JsonReader reader) throws IOException {
-        int fogColor = 0;
-        int waterColor = 0;
-        int waterFogColor = 0;
-        int skyColor = 0;
-        Optional<Integer> foliageColor = Optional.empty();
-        Optional<Integer> dryFoliageColor = Optional.empty();
-        Optional<Integer> grassColor = Optional.empty();
-
         reader.beginObject();
+        ColorData data = new ColorData();
         while (reader.hasNext()) {
-            switch (reader.nextName()) {
-                case "fogColor" -> fogColor = reader.nextInt();
-                case "waterColor" -> waterColor = reader.nextInt();
-                case "waterFogColor" -> waterFogColor = reader.nextInt();
-                case "skyColor" -> skyColor = reader.nextInt();
-                case "foliageColor" -> {
-                    int i = reader.nextInt();
-                    foliageColor = i == -1 ? Optional.empty() : Optional.of(i);
-                }
-                case "dryFoliageColor" -> {
-                    int i = reader.nextInt();
-                    dryFoliageColor = i == -1 ? Optional.empty() : Optional.of(i);
-                }
-                case "grassColor" -> {
-                    int i = reader.nextInt();
-                    grassColor = i == -1 ? Optional.empty() : Optional.of(i);
-                }
-            }
+            String name = reader.nextName();
+            int value = reader.nextInt();
+            data.set(ColorType.BY_SERIALIZED_NAME.get(name), value);
         }
         reader.endObject();
-
-        return new ColorData(
-            fogColor, waterColor, waterFogColor, skyColor,
-            foliageColor, dryFoliageColor, grassColor
-        );
+        return data;
     }
 }
 

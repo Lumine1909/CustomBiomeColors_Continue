@@ -7,9 +7,9 @@ import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
 import io.github.lumine1909.custombiomecolors.data.adapter.BiomeDataAdapter;
 import io.github.lumine1909.custombiomecolors.data.adapter.BiomeKeyAdapter;
 import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
-import io.github.lumine1909.custombiomecolors.util.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -46,7 +46,8 @@ public class DataManager {
             this.plugin.saveResource(fileName, false);
         }
         try (FileReader reader = new FileReader(this.file)) {
-            Type typeToken = new TypeToken<Map<BiomeKey, BiomeData>>() {}.getType();
+            Type typeToken = new TypeToken<Map<BiomeKey, BiomeData>>() {
+            }.getType();
             this.biomeDataMap = gson.fromJson(reader, typeToken);
         } catch (Exception e) {
             plugin.getSLF4JLogger().warn("It seems you are using an legacy data format, start converting...");

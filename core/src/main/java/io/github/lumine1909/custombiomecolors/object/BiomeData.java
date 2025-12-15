@@ -1,4 +1,4 @@
-package io.github.lumine1909.custombiomecolors.util.object;
+package io.github.lumine1909.custombiomecolors.object;
 
 import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
 

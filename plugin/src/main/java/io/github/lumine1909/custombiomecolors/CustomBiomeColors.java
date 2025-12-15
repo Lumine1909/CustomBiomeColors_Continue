@@ -8,14 +8,16 @@ import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.listener.PlayerListener;
 import io.github.lumine1909.custombiomecolors.nms.*;
+import io.github.lumine1909.custombiomecolors.object.ColorType;
 import io.github.lumine1909.custombiomecolors.util.BStats;
 import io.github.lumine1909.custombiomecolors.util.BiomeColorUtil;
 import io.github.lumine1909.custombiomecolors.util.UpdateChecker;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeColorType;
+import io.github.lumine1909.custombiomecolors.util.VersionUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -33,19 +35,6 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     public static CustomBiomeColors getInstance() {
         return instance;
-    }
-
-    public static int obtainVersion() {
-        try {
-            String[] versions = Bukkit.getMinecraftVersion().split("\\.");
-            if (versions.length == 2) {
-                return Integer.parseInt(versions[1]) * 100;
-            } else if (versions.length == 3) {
-                return Integer.parseInt(versions[1]) * 100 + Integer.parseInt(versions[2]);
-            }
-        } catch (Exception ignored) {
-        }
-        return -1;
     }
 
     public NmsServer getNmsServer() {
@@ -72,8 +61,12 @@ public final class CustomBiomeColors extends JavaPlugin {
     public void onLoad() {
         instance = this;
 
-        int version = obtainVersion();
-        if (version >= 2109) {
+        int version = VersionUtil.obtainVersion();
+        ColorType.CURRENT_VERSION = version;
+        if (version >= 2111) {
+            nmsServer = new NmsServer_1_21_11();
+            packetHandler = new PacketHandler_1_21_11();
+        } else if (version >= 2109) {
             nmsServer = new NmsServer_1_21_9();
             packetHandler = new PacketHandler_1_21_9();
         } else if (version >= 2105) {
@@ -89,7 +82,7 @@ public final class CustomBiomeColors extends JavaPlugin {
             nmsServer = new NmsServer_1_20_5();
             packetHandler = new PacketHandler_1_20_5();
         } else {
-            throw new IllegalStateException("This plugin only support MC 1.20.5 - 1.21.7, for other versions, please contact author at https://github.com/Lumine1909/CustomBiomeColors_Continue/issues");
+            throw new IllegalStateException("This plugin only support MC 1.20.5 - 1.21.11, for other versions, please contact author at https://github.com/Lumine1909/CustomBiomeColors_Continue/issues");
         }
 
         this.dataManager = new DataManager("data.json");
@@ -113,18 +106,18 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     private void registerCommands() {
         new ReloadCommand();
-        SetBiomeColorCommand.register(this.getCommand("/setgrasscolor"), "/setgrasscolor", BiomeColorType.GRASS);
-        SetBiomeColorCommand.register(this.getCommand("/setfoliagecolor"), "/setfoliagecolor", BiomeColorType.FOLIAGE);
-        SetBiomeColorCommand.register(this.getCommand("/setwatercolor"), "/setwatercolor", BiomeColorType.WATER);
-        SetBiomeColorCommand.register(this.getCommand("/setwaterfogcolor"), "/setwaterfogcolor", BiomeColorType.WATER_FOG);
-        SetBiomeColorCommand.register(this.getCommand("/setskycolor"), "/setskycolor", BiomeColorType.SKY);
-        SetBiomeColorCommand.register(this.getCommand("/setfogcolor"), "/setfogcolor", BiomeColorType.FOG);
-        if (obtainVersion() >= 2105) {
-            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new SetBiomeColorCommand("/setdryfoliagecolor", BiomeColorType.DRY_FOLIAGE));
-        } else {
-            Objects.requireNonNull(this.getCommand("/setdryfoliagecolor")).setExecutor(new UnsupportedCommand("1.21.5"));
-        }
         Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
+
+        for (ColorType type : ColorType.values()) {
+            type.apply(
+                colorType -> SetBiomeColorCommand.register(getPluginCommand(colorType), type),
+                colorType -> UnsupportedCommand.register(getPluginCommand(colorType), type)
+            );
+        }
+    }
+
+    private PluginCommand getPluginCommand(ColorType colorType) {
+        return this.getCommand("/set" + colorType.name().toLowerCase().replaceAll("_", "") + "color");
     }
 
     public void callReload(CommandSender sender) {

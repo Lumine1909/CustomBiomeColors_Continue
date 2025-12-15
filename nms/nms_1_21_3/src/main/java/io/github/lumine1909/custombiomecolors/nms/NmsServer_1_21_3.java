@@ -1,8 +1,9 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import io.github.lumine1909.custombiomecolors.util.object.BiomeData;
-import io.github.lumine1909.custombiomecolors.util.object.BiomeKey;
-import io.github.lumine1909.custombiomecolors.util.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.ColorType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -44,46 +45,46 @@ public class NmsServer_1_21_3 implements NmsServer<Biome, Holder<Biome>, Resourc
         return new NmsBiome_1_21_3(biomeBase);
     }
 
-    public boolean doesBiomeExist(BiomeKey biomeKey) {
+    public boolean hasBiome(BiomeKey biomeKey) {
         return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
     public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
-        Holder<Biome> biomeHolder = this.biomeRegistry.get(ResourceKey.create(
+        Holder<Biome> holder = this.biomeRegistry.get(ResourceKey.create(
             Registries.BIOME,
             ResourceLocation.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
         )).orElse(plains);
 
-        Biome biomeBase = biomeHolder.value();
+        Biome biome = holder.value();
         ColorData colorData = biomeData.colorData();
         BiomeKey biomeKey = biomeData.biomeKey();
 
-        ResourceKey<Biome> customBiomeKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()));
-        Biome.BiomeBuilder customBiomeBuilder = new Biome.BiomeBuilder()
-            .generationSettings(biomeBase.getGenerationSettings())
-            .mobSpawnSettings(biomeBase.getMobSettings())
-            .hasPrecipitation(biomeBase.hasPrecipitation())
-            .temperature(biomeBase.climateSettings.temperature())
-            .downfall(biomeBase.climateSettings.downfall())
-            .temperatureAdjustment(biomeBase.climateSettings.temperatureModifier());
+        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()));
+        Biome.BiomeBuilder biomeBuilder = new Biome.BiomeBuilder()
+            .generationSettings(biome.getGenerationSettings())
+            .mobSpawnSettings(biome.getMobSettings())
+            .hasPrecipitation(biome.hasPrecipitation())
+            .temperature(biome.climateSettings.temperature())
+            .downfall(biome.climateSettings.downfall())
+            .temperatureAdjustment(biome.climateSettings.temperatureModifier());
 
-        BiomeSpecialEffects.Builder customBiomeColors = new BiomeSpecialEffects.Builder();
-        customBiomeColors.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE)
-            .waterColor(colorData.waterColor())
-            .waterFogColor(colorData.waterFogColor())
-            .skyColor(colorData.skyColor())
-            .fogColor(colorData.fogColor());
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder();
+        builder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE)
+            .waterColor(colorData.get(ColorType.WATER))
+            .waterFogColor(colorData.get(ColorType.WATER_FOG))
+            .skyColor(colorData.get(ColorType.SKY))
+            .fogColor(colorData.get(ColorType.FOG));
 
-        if (colorData.grassColor().isPresent()) {
-            customBiomeColors.grassColorOverride(colorData.grassColor().get());
+        if (colorData.has(ColorType.GRASS)) {
+            builder.grassColorOverride(colorData.get(ColorType.GRASS));
         }
-        if (colorData.foliageColor().isPresent()) {
-            customBiomeColors.foliageColorOverride(colorData.foliageColor().get());
+        if (colorData.has(ColorType.FOLIAGE)) {
+            builder.foliageColorOverride(colorData.get(ColorType.FOLIAGE));
         }
 
-        customBiomeBuilder.specialEffects(customBiomeColors.build());
-        Biome customBiome = customBiomeBuilder.build();
-        return new NmsBiome_1_21_3(this.registerBiome(biomeHolder, customBiome, customBiomeKey), biomeData);
+        biomeBuilder.specialEffects(builder.build());
+        Biome customBiome = biomeBuilder.build();
+        return new NmsBiome_1_21_3(this.registerBiome(holder, customBiome, resourceKey), biomeData);
     }
 
     public void setBiomeAt(Location location, NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
@@ -115,14 +116,14 @@ public class NmsServer_1_21_3 implements NmsServer<Biome, Holder<Biome>, Resourc
             field$MappedRegistry$frozen.set(this.biomeRegistry, true);
 
             return holder;
-        } catch (Exception error) {
-            error.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
 
-    public String getBiomeString(NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
-        ResourceLocation resourceLocation = this.biomeRegistry.getKey(nmsBiome.getBiome());
-        return resourceLocation == null ? "minecraft:plain" : resourceLocation.toString();
+    public String getBiomeId(NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
+        ResourceLocation id = this.biomeRegistry.getKey(nmsBiome.getBiome());
+        return id == null ? "minecraft:plain" : id.toString();
     }
 }

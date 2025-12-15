@@ -1,6 +1,7 @@
-package io.github.lumine1909.custombiomecolors.util.object;
+package io.github.lumine1909.custombiomecolors.object;
 
 import net.kyori.adventure.key.Key;
+import org.jetbrains.annotations.NotNull;
 
 public record BiomeKey(String key, String value) {
 
@@ -22,7 +23,7 @@ public record BiomeKey(String key, String value) {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return key + ":" + value;
     }
 }

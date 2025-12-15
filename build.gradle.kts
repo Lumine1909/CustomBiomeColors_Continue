@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "2.3.1"
+version = "2.4.0-rc1"
 
 repositories {
     mavenCentral()
@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":nms:nms_1_21_3"))
     implementation(project(":nms:nms_1_21_5"))
     implementation(project(":nms:nms_1_21_9"))
+    implementation(project(":nms:nms_1_21_11"))
 }
 
 java {
@@ -30,7 +31,7 @@ java {
 tasks {
     shadowJar {
         archiveVersion.set(version.toString())
-        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.10.jar")
+        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.11.jar")
         archiveClassifier.set("")
         mergeServiceFiles()
 
@@ -63,6 +64,10 @@ subprojects {
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.papermc.io/repository/maven-public/")
+    }
+
+    dependencies {
+        implementation("io.github.lumine1909:reflexion:1.0.4")
     }
 
     java {
