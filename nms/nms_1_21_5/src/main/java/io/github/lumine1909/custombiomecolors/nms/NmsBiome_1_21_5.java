@@ -22,14 +22,15 @@ public class NmsBiome_1_21_5 extends NmsBiome<Biome, Holder<Biome>, ResourceKey<
 
     private static BiomeData fetchNmsBiomeData(Holder<Biome> nmsBiome) {
         BiomeSpecialEffects specialEffects = nmsBiome.value().getSpecialEffects();
-        ColorData colorData = new ColorData()
+        ColorData colorData = new ColorData.Mutable()
             .set(ColorType.GRASS, specialEffects.getGrassColorOverride().orElse(null))
             .set(ColorType.FOLIAGE, specialEffects.getFoliageColorOverride().orElse(null))
             .set(ColorType.DRY_FOLIAGE, specialEffects.getDryFoliageColorOverride().orElse(null))
             .set(ColorType.WATER, specialEffects.getWaterColor())
             .set(ColorType.WATER_FOG, specialEffects.getWaterFogColor())
             .set(ColorType.SKY, specialEffects.getSkyColor())
-            .set(ColorType.FOG, specialEffects.getFogColor());
+            .set(ColorType.FOG, specialEffects.getFogColor())
+            .immutable();
         BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
         return new BiomeData(biomeKey, biomeKey, colorData);
     }

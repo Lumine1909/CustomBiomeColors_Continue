@@ -53,7 +53,7 @@ public class BiomeManager {
                 var pos = region.getMinimumPoint();
                 Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
                 NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(loc));
-                ColorData colorData = biome.getBiomeData().colorData().clone().set(colorType, color);
+                ColorData colorData = biome.getBiomeData().colorData().mutable().set(colorType, color).immutable();
                 NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, biomeKey, colorData));
                 BiomeType type = getOrCreate(newBiome.getBiomeData().biomeKey().toString());
                 RegionFunction replace = new BiomeReplace(editSession, type);

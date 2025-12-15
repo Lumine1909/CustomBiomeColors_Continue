@@ -18,6 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
+@SuppressWarnings("deprecation")
 public class UpdateChecker implements Listener {
 
     private static final String GITHUB_REPO = "Lumine1909/CustomBiomeColors_Continue";
@@ -48,8 +49,7 @@ public class UpdateChecker implements Listener {
 
     public void checkUpdates() {
         CompletableFuture.runAsync(() -> {
-            try {
-                HttpClient client = HttpClient.newHttpClient();
+            try (HttpClient client = HttpClient.newHttpClient()) {
 
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.github.com/repos/" + GITHUB_REPO + "/releases/latest"))

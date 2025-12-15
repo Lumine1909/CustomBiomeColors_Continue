@@ -6,19 +6,8 @@ import java.util.function.BiConsumer;
 
 public record ColorData(Map<ColorType, Integer> data) {
 
-    public ColorData() {
-        this(new HashMap<>());
-    }
-
-    public ColorData clone() {
-        return new ColorData(new HashMap<>(data));
-    }
-
-    public ColorData set(ColorType colorType, Integer color) {
-        if (color != null) {
-            data.put(colorType, color);
-        }
-        return this;
+    public Mutable mutable() {
+        return new Mutable(new HashMap<>(data));
     }
 
     public boolean has(ColorType colorType) {
@@ -33,19 +22,34 @@ public record ColorData(Map<ColorType, Integer> data) {
         data.forEach(consumer);
     }
 
-    public ColorData remove(ColorType colorType) {
-        data.remove(colorType);
-        return this;
-    }
+    public record Mutable(Map<ColorType, Integer> data) {
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ColorData(Map<ColorType, Integer> data1))) return false;
-        return data.equals(data1);
-    }
+        public Mutable() {
+            this(new HashMap<>());
+        }
 
-    @Override
-    public int hashCode() {
-        return data.hashCode();
+        public ColorData.Mutable set(ColorType colorType, Integer color) {
+            if (color != null) {
+                data.put(colorType, color);
+            }
+            return this;
+        }
+
+        public ColorData.Mutable remove(ColorType colorType) {
+            data.remove(colorType);
+            return this;
+        }
+
+        public boolean has(ColorType colorType) {
+            return data.containsKey(colorType);
+        }
+
+        public Integer get(ColorType colorType) {
+            return data.get(colorType);
+        }
+
+        public ColorData immutable() {
+            return new ColorData(new HashMap<>(data));
+        }
     }
 }

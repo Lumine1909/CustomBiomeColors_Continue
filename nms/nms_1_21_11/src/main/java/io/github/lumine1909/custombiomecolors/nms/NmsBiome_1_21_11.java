@@ -25,7 +25,7 @@ public class NmsBiome_1_21_11 extends NmsBiome<Biome, Holder<@NotNull Biome>, Re
     private static BiomeData fetchNmsBiomeData(Holder<@NotNull Biome> nmsBiome) {
         BiomeSpecialEffects specialEffects = nmsBiome.value().getSpecialEffects();
         EnvironmentAttributeMap attributes = nmsBiome.value().getAttributes();
-        ColorData colorData = new ColorData()
+        ColorData colorData = new ColorData.Mutable()
             .set(ColorType.GRASS, specialEffects.grassColorOverride().orElse(null))
             .set(ColorType.FOLIAGE, specialEffects.foliageColorOverride().orElse(null))
             .set(ColorType.DRY_FOLIAGE, specialEffects.dryFoliageColorOverride().orElse(null))
@@ -35,7 +35,8 @@ public class NmsBiome_1_21_11 extends NmsBiome<Biome, Holder<@NotNull Biome>, Re
             .set(ColorType.FOG, getData(attributes.get(EnvironmentAttributes.FOG_COLOR)))
             .set(ColorType.SUNRISE_SUNSET, getData(attributes.get(EnvironmentAttributes.SUNRISE_SUNSET_COLOR)))
             .set(ColorType.CLOUD, getData(attributes.get(EnvironmentAttributes.CLOUD_COLOR)))
-            .set(ColorType.SKY_LIGHT, getData(attributes.get(EnvironmentAttributes.SKY_LIGHT_COLOR)));
+            .set(ColorType.SKY_LIGHT, getData(attributes.get(EnvironmentAttributes.SKY_LIGHT_COLOR)))
+            .immutable();
         BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
         return new BiomeData(biomeKey, biomeKey, colorData);
     }
