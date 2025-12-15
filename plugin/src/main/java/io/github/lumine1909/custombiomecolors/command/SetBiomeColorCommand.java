@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @SuppressWarnings("rawtypes")
 public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
@@ -41,13 +40,12 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
             return true;
         }
         if (args.length > 0) {
-            Optional<Region> optionalRegion = worldEditHandler.getSelectedRegion(sender.getName());
-            if (optionalRegion.isEmpty()) {
+            Region selectedRegion = worldEditHandler.getSelectedRegion(sender.getName());
+            if (selectedRegion == null) {
                 sender.sendMessage(Component.text("[CustomBiomeColors] Make a region selection first!", NamedTextColor.RED));
                 return true;
             }
 
-            Region selectedRegion = optionalRegion.get();
             int color;
             try {
                 color = Integer.parseInt(args[0].replace("#", ""), 16);
@@ -69,14 +67,13 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
                     sender.sendMessage(Component.text("[CustomBiomeColors] There is already exists a biome with that name, please use another one!", NamedTextColor.RED));
                     return true;
                 }
-
                 CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, biomeKey, true, runWhenDone);
             } else {
                 CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, runWhenDone);
             }
 
-            sender.sendMessage(Component.text("[CustomBiomeColors] Changing the biome of " + optionalRegion.orElseThrow().getVolume() + " blocks...", NamedTextColor.AQUA));
-            if (optionalRegion.orElseThrow().getVolume() > 200000) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] Changing the biome of " + selectedRegion.getVolume() + " blocks...", NamedTextColor.AQUA));
+            if (selectedRegion.getVolume() > 200000) {
                 sender.sendMessage(Component.text("[CustomBiomeColors] This might take a while.", NamedTextColor.AQUA));
             }
             return true;
@@ -89,7 +86,7 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
         if (args.length == 1) {
             return List.of("#HEXCODE");
         } else if (args.length == 2) {
-            return List.of("biome:name");
+            return List.of("namespace:biomename");
         }
         return Collections.emptyList();
     }

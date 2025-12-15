@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public enum ColorType {
-    GRASS(-1),
-    FOLIAGE(-1),
+    GRASS(-1, true),
+    FOLIAGE(-1, true),
     WATER(-1),
     WATER_FOG(0x050533),
     SKY(0),
     FOG(0),
-    DRY_FOLIAGE(-1, "1.21.5"),
+    DRY_FOLIAGE(-1, "1.21.5", true),
     SUNRISE_SUNSET(0, "1.21.11"),
     CLOUD(0, "1.21.11"),
     SKY_LIGHT(0, "1.21.11");
@@ -30,21 +30,32 @@ public enum ColorType {
     private final int defaultValue;
     private final String version;
     private final int versionInt;
+    private final boolean isSpecial;
     private final String messageName;
     private final String serializedName;
 
     ColorType(int defaultValue) {
-        this(defaultValue, "", 0);
+        this(defaultValue, "", 0, false);
+    }
+
+    ColorType(int defaultValue, boolean isSpecial) {
+        this(defaultValue, "", 0, isSpecial);
     }
 
     ColorType(int defaultValue, String version) {
-        this(defaultValue, version, VersionUtil.obtainVersion(version));
+        this(defaultValue, version, VersionUtil.obtainVersion(version), false);
     }
 
-    ColorType(int defaultValue, String version, int versionInt) {
+    ColorType(int defaultValue, String version, boolean isSpecial) {
+        this(defaultValue, version, VersionUtil.obtainVersion(version), isSpecial);
+    }
+
+
+    ColorType(int defaultValue, String version, int versionInt, boolean isSpecial) {
         this.defaultValue = defaultValue;
         this.version = version;
         this.versionInt = versionInt;
+        this.isSpecial = isSpecial;
         this.messageName = messageName(this);
         this.serializedName = serializedName(this);
     }
@@ -110,5 +121,9 @@ public enum ColorType {
 
     public boolean isSupported() {
         return CURRENT_VERSION >= versionInt;
+    }
+
+    public boolean isSpecial() {
+        return isSpecial;
     }
 }

@@ -32,30 +32,25 @@ public class GetBiomeColorsCommand implements TabExecutor {
         Objects.requireNonNull(Bukkit.getPluginCommand("/getbiomecolors")).setTabCompleter(this);
     }
 
-    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String @NotNull [] args) {
-        if (cmd.getName().equalsIgnoreCase("/getbiomecolors")) {
-            if (sender instanceof Player player) {
-                NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(player.getLocation()));
-                BiomeData biomeData = biome.getBiomeData();
-                player.sendMessage(Component.text("Colors of the biome you are in (" + biomeData.biomeKey() + "): ", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
-                player.sendMessage(Component.text(" - Grass: ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageGrass(biomeData.colorData().get(ColorType.GRASS), biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));
-                player.sendMessage(Component.text(" - Foliage: ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageFoliage(biomeData.colorData().get(ColorType.FOLIAGE), biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));
-                player.sendMessage(Component.text(" - Dry Foliage: ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageDryFoliage(biomeData.colorData().get(ColorType.DRY_FOLIAGE), biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));
-
-                //TODO: Support dimension_type based default color, make it looks better
-                biomeData.colorData().forEach((colorType, color) -> {
-                    if (!colorType.isSupported()) {
-                        return;
-                    }
-                    if (colorType != ColorType.GRASS && colorType != ColorType.FOLIAGE && colorType != ColorType.DRY_FOLIAGE) {
-                        player.sendMessage(Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY).append(MessageUtil.getColorMessage(color).decorate(TextDecoration.BOLD)));
-                    }
-                });
-                return true;
-            }
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            return true;
         }
-        return false;
+        NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(player.getLocation()));
+        BiomeData biomeData = biome.getBiomeData();
+        player.sendMessage(Component.text("Colors of the biome you are in (" + biomeData.biomeKey() + "): ", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
+        biomeData.colorData().forEach((colorType, color) -> {
+            if (!colorType.isSupported()) {
+                return;
+            }
+            if (colorType.isSpecial()) {
+                player.sendMessage(Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageSpecial(color, colorType, biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));
+            } else {
+                player.sendMessage(Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY).append(MessageUtil.getColorMessage(color).decorate(TextDecoration.BOLD)));
+            }
+        });
+        return true;
     }
 
     @Override

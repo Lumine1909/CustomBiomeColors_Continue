@@ -23,16 +23,19 @@ Supported version: 1.20.5 - 1.21.11
 
 # Commands
 `//getbiomecolors` - get the colors of the biome you're in<br>
-`//setgrasscolor #hexcode [biome:name]` - change the color of grass, ferns and sugarcane<br>
-`//setfoliagecolor #hexcode [biome:name]` - change the color of leaves and vines<br>
-`//setdryfoliagecolor #hexcode [biome:name]` - change the color of dry foliage<br>
-`//setwatercolor #hexcode [biome:name]` - change the color of water<br>
-`//setwaterfogcolor #hexcode [biome:name]` - change the color of the fog while in water<br>
-`//setskycolor #hexcode [biome:name]` - change the color of the sky<br>
-`//setfogcolor #hexcode [biome:name]` - change the color of the fog<br>
+`//setgrasscolor #hexcode [namespace:biomename]` - change the color of grass, ferns and sugarcane<br>
+`//setfoliagecolor #hexcode [namespace:biomename]` - change the color of leaves and vines<br>
+`//setdryfoliagecolor #hexcode [namespace:biomename]` - change the color of dry foliage<br>
+`//setwatercolor #hexcode [namespace:biomename]` - change the color of water<br>
+`//setwaterfogcolor #hexcode [namespace:biomename]` - change the color of the fog while in water<br>
+`//setskycolor #hexcode [namespace:biomename]` - change the color of the sky<br>
+`//setfogcolor #hexcode [namespace:biomename]` - change the color of the fog<br>
+`//setsunrisesunsetcolor #hexcode [namespace:biomename]` - change the color of the sun rise and sun set<br>
+`//setcloudcolor #hexcode [namespace:biomename]` - change the color of the cloud<br>
+`//setskylightcolor #hexcode [namespace:biomename]` - change the color of the sky light<br>
 
 #hexcode - the hex color code<br>
-biome:name - (Optional) the biome name that shows up when you press F3<br>
+namespace:biomename - (Optional) the biome name that shows up when you press F3<br>
 
 # Permissions
 `custombiomecolors.all`<br>
@@ -44,7 +47,9 @@ biome:name - (Optional) the biome name that shows up when you press F3<br>
 `custombiomecolors.waterfog`<br>
 `custombiomecolors.sky`<br>
 `custombiomecolors.fog`<br>
-
+`custombiomecolors.sunrisesunset`<br>
+`custombiomecolors.cloud`<br>
+`custombiomecolors.skylight`<br>
 #
 
 - - - -

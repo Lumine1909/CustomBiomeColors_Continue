@@ -4,13 +4,10 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
-import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -25,7 +22,7 @@ import io.github.lumine1909.custombiomecolors.util.StringUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings("rawtypes")
 public class BiomeManager {
 
     private final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
@@ -45,7 +42,7 @@ public class BiomeManager {
         this.changeBiomeColor(player, region, colorType, color, new BiomeKey("cbc", StringUtil.randomString(10)), false, runWhenDone);
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "unchecked"})
     public void changeBiomeColor(Player player, Region region, ColorType colorType, int color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
         com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
         World weWorld = BukkitAdapter.adapt(player.getWorld());
