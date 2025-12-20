@@ -54,7 +54,6 @@ public class GetBiomeColorsCommand implements TabExecutor {
                     .append(Component.text(" (Biome)    ", NamedTextColor.GRAY));
                 shouldSend = true;
             }
-            dimensionColor.forEach((c, i) -> System.out.println(c + ": " + i));
             if (dimensionColor != null && (color = dimensionColor.get(colorType)) != null) {
                 message = message.append(
                         MessageUtil.getColorMessage(colorType, color, 0, 0)
