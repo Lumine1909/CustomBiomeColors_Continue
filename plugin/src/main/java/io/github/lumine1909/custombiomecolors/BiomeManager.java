@@ -13,8 +13,8 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
-import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
-import io.github.lumine1909.custombiomecolors.nms.NmsServer;
+import io.github.lumine1909.custombiomecolors.nms.BiomeAccessor;
+import io.github.lumine1909.custombiomecolors.nms.ServerDataHandler;
 import io.github.lumine1909.custombiomecolors.object.BiomeKey;
 import io.github.lumine1909.custombiomecolors.object.ColorData;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 @SuppressWarnings("rawtypes")
 public class BiomeManager {
 
-    private final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
+    private final ServerDataHandler serverDataHandler = CustomBiomeColors.getInstance().getServerDataHandler();
     private final DataManager dataManager = CustomBiomeColors.getInstance().getDataManager();
 
     private static BiomeType getOrCreate(String id) {
@@ -52,9 +52,9 @@ public class BiomeManager {
                 editSession.setReorderMode(EditSession.ReorderMode.FAST);
                 var pos = region.getMinimumPoint();
                 Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
-                NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(loc));
-                ColorData colorData = biome.getBiomeData().colorData().clone().set(colorType, color);
-                NmsBiome newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(nmsServer, biomeKey, colorData));
+                BiomeAccessor biome = serverDataHandler.wrapToAccessor(serverDataHandler.getBiomeAt(loc));
+                ColorData colorData = biome.getBiomeData().colorData().mutable().set(colorType, color).build();
+                BiomeAccessor newBiome = dataManager.getBiomeByColorOrElse(forceKey, colorData, () -> biome.cloneWithDifferentColor(serverDataHandler, biomeKey, colorData));
                 BiomeType type = getOrCreate(newBiome.getBiomeData().biomeKey().toString());
                 RegionFunction replace = new BiomeReplace(editSession, type);
                 RegionVisitor visitor = new RegionVisitor(region, replace);

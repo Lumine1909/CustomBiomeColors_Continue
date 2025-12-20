@@ -1,6 +1,6 @@
 package io.github.lumine1909.custombiomecolors.object;
 
-import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
+import io.github.lumine1909.custombiomecolors.nms.BiomeAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,27 +8,27 @@ import java.util.Map;
 @SuppressWarnings("rawtypes")
 public record BiomeData(BiomeKey biomeKey, BiomeKey baseBiomeKey, ColorData colorData) {
 
-    private static final Map<ColorData, NmsBiome> colorCache = new HashMap<>();
-    private static final Map<BiomeKey, NmsBiome> keyCache = new HashMap<>();
-    private static final Map<Object, NmsBiome> holderCache = new HashMap<>();
+    private static final Map<ColorData, BiomeAccessor> colorCache = new HashMap<>();
+    private static final Map<BiomeKey, BiomeAccessor> keyCache = new HashMap<>();
+    private static final Map<Object, BiomeAccessor> holderCache = new HashMap<>();
 
-    public static NmsBiome getBiome(ColorData colorData) {
+    public static BiomeAccessor getBiome(ColorData colorData) {
         return colorCache.get(colorData);
     }
 
-    public static NmsBiome getBiome(BiomeKey biomeKey) {
+    public static BiomeAccessor getBiome(BiomeKey biomeKey) {
         return keyCache.get(biomeKey);
     }
 
-    public static NmsBiome getBiomeFromHolder(Object holder) {
+    public static BiomeAccessor getBiomeFromHolder(Object holder) {
         return holderCache.get(holder);
     }
 
-    public static void updateBiome(ColorData colorData, NmsBiome nmsBiome) {
-        if (!colorCache.containsKey(colorData) || nmsBiome.getBiomeData().biomeKey().toString().startsWith("cbc:")) {
-            colorCache.put(colorData, nmsBiome);
+    public static void updateBiome(ColorData colorData, BiomeAccessor biomeAccessor) {
+        if (!colorCache.containsKey(colorData) || biomeAccessor.getBiomeData().biomeKey().toString().startsWith("cbc:")) {
+            colorCache.put(colorData, biomeAccessor);
         }
-        keyCache.put(nmsBiome.getBiomeData().biomeKey(), nmsBiome);
-        holderCache.put(nmsBiome.getBiomeHolder(), nmsBiome);
+        keyCache.put(biomeAccessor.getBiomeData().biomeKey(), biomeAccessor);
+        holderCache.put(biomeAccessor.getBiomeHolder(), biomeAccessor);
     }
 }
