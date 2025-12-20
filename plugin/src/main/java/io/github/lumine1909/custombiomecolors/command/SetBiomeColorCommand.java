@@ -3,7 +3,7 @@ package io.github.lumine1909.custombiomecolors.command;
 import com.sk89q.worldedit.regions.Region;
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
-import io.github.lumine1909.custombiomecolors.nms.NmsServer;
+import io.github.lumine1909.custombiomecolors.nms.ServerDataHandler;
 import io.github.lumine1909.custombiomecolors.object.BiomeKey;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
 import net.kyori.adventure.text.Component;
@@ -23,7 +23,7 @@ import java.util.List;
 public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
 
     private static final WorldEditHandler worldEditHandler = CustomBiomeColors.getInstance().getWorldEditHandler();
-    private static final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
+    private static final ServerDataHandler BIOME_DATA_HANDLER = CustomBiomeColors.getInstance().getServerDataHandler();
 
     public static void register(@Nullable PluginCommand command, ColorType type) {
         if (command == null) {
@@ -48,7 +48,7 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
 
             int color;
             try {
-                color = Integer.parseInt(args[0].replace("#", ""), 16);
+                color = Integer.parseUnsignedInt(args[0].replace("#", ""), 16);
             } catch (NumberFormatException e) {
                 sender.sendMessage(Component.text("[CustomBiomeColors] Invalid color, please use a valid hex color code!", NamedTextColor.RED));
                 return true;
@@ -63,7 +63,7 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
                     return true;
                 }
                 BiomeKey biomeKey = BiomeKey.fromString(args[1]);
-                if (nmsServer.hasBiome(biomeKey)) {
+                if (BIOME_DATA_HANDLER.hasBiome(biomeKey)) {
                     sender.sendMessage(Component.text("[CustomBiomeColors] There is already exists a biome with that name, please use another one!", NamedTextColor.RED));
                     return true;
                 }

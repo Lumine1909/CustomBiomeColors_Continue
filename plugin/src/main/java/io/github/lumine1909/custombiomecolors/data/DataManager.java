@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
 import io.github.lumine1909.custombiomecolors.data.adapter.BiomeDataAdapter;
 import io.github.lumine1909.custombiomecolors.data.adapter.BiomeKeyAdapter;
-import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
+import io.github.lumine1909.custombiomecolors.nms.BiomeAccessor;
 import io.github.lumine1909.custombiomecolors.object.BiomeData;
 import io.github.lumine1909.custombiomecolors.object.BiomeKey;
 import io.github.lumine1909.custombiomecolors.object.ColorData;
@@ -81,8 +81,8 @@ public class DataManager {
     }
 
     @NotNull
-    public NmsBiome getBiomeByColorOrElse(boolean forceKey, ColorData colorData, Supplier<NmsBiome> orElse) {
-        NmsBiome biome;
+    public BiomeAccessor getBiomeByColorOrElse(boolean forceKey, ColorData colorData, Supplier<BiomeAccessor> orElse) {
+        BiomeAccessor biome;
         if (forceKey || (biome = BiomeData.getBiome(colorData)) == null || !biome.getBiomeData().biomeKey().toString().startsWith("cbc:")) {
             biome = orElse.get();
             saveBiome(biome.getBiomeData().biomeKey(), biome.getBiomeData());
@@ -93,7 +93,7 @@ public class DataManager {
 
     public void loadBiomes() {
         for (var entry : this.biomeDataMap.entrySet()) {
-            plugin.getNmsServer().createCustomBiome(entry.getValue());
+            plugin.getServerDataHandler().createCustomBiome(entry.getValue());
         }
     }
 

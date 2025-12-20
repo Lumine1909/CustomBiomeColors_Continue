@@ -54,14 +54,14 @@ public class DataConverter {
             }
 
             BiomeKey biomeKey = BiomeKey.fromString(keyStr);
-            ColorData colorData = new ColorData.Mutable()
-                .set(ColorType.GRASS, color[0] != 0 ? color[0] : ColorType.GRASS.defaultValue())
-                .set(ColorType.FOLIAGE, color[1] != 0 ? color[1] : ColorType.FOLIAGE.defaultValue())
+            ColorData colorData = new ColorData.Builder()
+                .set(ColorType.GRASS, color[0] != 0 ? color[0] : ColorType.GRASS.mask())
+                .set(ColorType.FOLIAGE, color[1] != 0 ? color[1] : ColorType.FOLIAGE.mask())
                 .set(ColorType.WATER, color[2])
                 .set(ColorType.WATER_FOG, color[3])
                 .set(ColorType.SKY, color[4])
                 .set(ColorType.FOG, color[5])
-                .immutable();
+                .build();
 
             BiomeData biomeData = new BiomeData(
                 biomeKey,

@@ -5,13 +5,13 @@ import io.github.lumine1909.custombiomecolors.object.BiomeKey;
 import io.github.lumine1909.custombiomecolors.object.ColorData;
 
 @SuppressWarnings("rawtypes")
-public abstract class NmsBiome<Biome, Holder, ResourceKey> {
+public abstract class BiomeAccessor<Biome, Holder, ResourceKey> {
 
     protected final Holder biomeHolder;
     protected final Biome biomeBase;
     protected final BiomeData cachedData;
 
-    public NmsBiome(Holder biomeHolder, Biome biome, BiomeData cachedData) {
+    public BiomeAccessor(Holder biomeHolder, Biome biome, BiomeData cachedData) {
         this.biomeHolder = biomeHolder;
         this.biomeBase = biome;
         this.cachedData = cachedData;
@@ -30,7 +30,7 @@ public abstract class NmsBiome<Biome, Holder, ResourceKey> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NmsBiome that = (NmsBiome) o;
+        BiomeAccessor that = (BiomeAccessor) o;
         return that.biomeHolder.equals(this.biomeHolder) && that.cachedData.equals(this.cachedData);
     }
 
@@ -42,5 +42,5 @@ public abstract class NmsBiome<Biome, Holder, ResourceKey> {
 
     public abstract float getHumidity();
 
-    public abstract NmsBiome<Biome, Holder, ResourceKey> cloneWithDifferentColor(NmsServer<Biome, Holder, ResourceKey> nmsServer, BiomeKey newBiomeKey, ColorData newColor);
+    public abstract BiomeAccessor<Biome, Holder, ResourceKey> cloneWithDifferentColor(ServerDataHandler<Biome, Holder, ResourceKey> serverDataHandler, BiomeKey newBiomeKey, ColorData newColor);
 }

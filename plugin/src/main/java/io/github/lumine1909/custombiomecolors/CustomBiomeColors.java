@@ -26,7 +26,7 @@ import java.util.Objects;
 public final class CustomBiomeColors extends JavaPlugin {
 
     private static CustomBiomeColors instance;
-    private NmsServer nmsServer;
+    private ServerDataHandler serverDataHandler;
     private BiomeManager biomeManager;
     private WorldEditHandler worldEditHandler;
     private DataManager dataManager;
@@ -37,8 +37,8 @@ public final class CustomBiomeColors extends JavaPlugin {
         return instance;
     }
 
-    public NmsServer getNmsServer() {
-        return this.nmsServer;
+    public ServerDataHandler getServerDataHandler() {
+        return this.serverDataHandler;
     }
 
     public BiomeManager getBiomeManager() {
@@ -64,22 +64,22 @@ public final class CustomBiomeColors extends JavaPlugin {
         int version = VersionUtil.obtainVersion();
         ColorType.CURRENT_VERSION = version;
         if (version >= 2111) {
-            nmsServer = new NmsServer_1_21_11();
+            serverDataHandler = new ServerDataHandler_1_21_11();
             packetHandler = new PacketHandler_1_21_11();
         } else if (version >= 2109) {
-            nmsServer = new NmsServer_1_21_9();
+            serverDataHandler = new ServerDataHandler_1_21_9();
             packetHandler = new PacketHandler_1_21_9();
         } else if (version >= 2105) {
-            nmsServer = new NmsServer_1_21_5();
+            serverDataHandler = new ServerDataHandler_1_21_5();
             packetHandler = new PacketHandler_1_21_5();
         } else if (version >= 2103) {
-            nmsServer = new NmsServer_1_21_3();
+            serverDataHandler = new ServerDataHandler_1_21_3();
             packetHandler = new PacketHandler_1_21_3();
         } else if (version >= 2100) {
-            nmsServer = new NmsServer_1_21();
+            serverDataHandler = new ServerDataHandler_1_21();
             packetHandler = new PacketHandler_1_21();
         } else if (version >= 2005) {
-            nmsServer = new NmsServer_1_20_5();
+            serverDataHandler = new ServerDataHandler_1_20_5();
             packetHandler = new PacketHandler_1_20_5();
         } else {
             throw new IllegalStateException("This plugin only support MC 1.20.5 - 1.21.11, for other versions, please contact author at https://github.com/Lumine1909/CustomBiomeColors_Continue/issues");

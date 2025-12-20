@@ -22,44 +22,44 @@ import java.util.IdentityHashMap;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
-public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, ResourceKey<Biome>> {
+public class ServerDataHandler_1_21_5 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
-    private final Holder.Reference<Biome> plains = biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft", "plains"))).orElseThrow();
+    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
+    private final Holder.Reference<Biome> plains = biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
 
     @SuppressWarnings("unchecked")
-    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
-        NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
+        BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new NmsBiome_1_20_5(this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new BiomeAccessor_1_21_5(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
-    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> getWrappedBiomeHolder(Holder<Biome> biomeBase) {
-        NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> wrapToAccessor(Holder<Biome> biomeBase) {
+        BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
         if ((biome = BiomeData.getBiomeFromHolder(biomeBase)) != null) {
             return biome;
         }
-        return new NmsBiome_1_20_5(biomeBase);
+        return new BiomeAccessor_1_21_5(biomeBase);
     }
 
     public boolean hasBiome(BiomeKey biomeKey) {
-        return this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).isPresent();
+        return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
-    public NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
-        Holder<Biome> holder = this.biomeRegistry.getHolder(ResourceKey.create(
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
+        Holder<Biome> holder = this.biomeRegistry.get(ResourceKey.create(
             Registries.BIOME,
-            new ResourceLocation(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
+            ResourceLocation.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
         )).orElse(plains);
 
         Biome biome = holder.value();
         ColorData colorData = biomeData.colorData();
         BiomeKey biomeKey = biomeData.biomeKey();
 
-        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()));
+        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()));
         Biome.BiomeBuilder biomeBuilder = new Biome.BiomeBuilder()
             .generationSettings(biome.getGenerationSettings())
             .mobSpawnSettings(biome.getMobSettings())
@@ -81,18 +81,21 @@ public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, Resourc
         if (colorData.has(ColorType.FOLIAGE)) {
             builder.foliageColorOverride(colorData.get(ColorType.FOLIAGE));
         }
+        if (colorData.has(ColorType.DRY_FOLIAGE)) {
+            builder.dryFoliageColorOverride(colorData.get(ColorType.DRY_FOLIAGE));
+        }
 
         biomeBuilder.specialEffects(builder.build());
         Biome customBiome = biomeBuilder.build();
-        return new NmsBiome_1_20_5(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+        return new BiomeAccessor_1_21_5(this.registerBiome(holder, customBiome, resourceKey), biomeData);
     }
 
-    public void setBiomeAt(Location location, NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
+    public void setBiomeAt(Location location, BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biomeAccessor) {
         BlockPos blockPosition = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         Level nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
 
         net.minecraft.world.level.chunk.LevelChunk chunk = nmsWorld.getChunkAt(blockPosition);
-        chunk.setBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2, nmsBiome.getBiomeHolder());
+        chunk.setBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2, biomeAccessor.getBiomeHolder());
     }
 
     public Holder<Biome> getBiomeAt(Location location) {
@@ -122,8 +125,8 @@ public class NmsServer_1_20_5 implements NmsServer<Biome, Holder<Biome>, Resourc
         return null;
     }
 
-    public String getBiomeId(NmsBiome<Biome, Holder<Biome>, ResourceKey<Biome>> nmsBiome) {
-        ResourceLocation id = this.biomeRegistry.getKey(nmsBiome.getBiome());
+    public String getBiomeId(BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biomeAccessor) {
+        ResourceLocation id = this.biomeRegistry.getKey(biomeAccessor.getBiome());
         return id == null ? "minecraft:plain" : id.toString();
     }
 }

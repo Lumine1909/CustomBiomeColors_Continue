@@ -7,16 +7,16 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public enum ColorType {
-    GRASS(-1, true),
-    FOLIAGE(-1, true),
-    WATER(-1),
-    WATER_FOG(0x050533),
-    SKY(0),
-    FOG(0),
-    DRY_FOLIAGE(-1, "1.21.5", true),
-    SUNRISE_SUNSET(0, "1.21.11"),
-    CLOUD(0, "1.21.11"),
-    SKY_LIGHT(0, "1.21.11");
+    GRASS(6, true),
+    FOLIAGE(6, true),
+    DRY_FOLIAGE(6, "1.21.5", true),
+    WATER(6),
+    WATER_FOG(6),
+    SKY(6),
+    FOG(6),
+    SUNRISE_SUNSET(8, "1.21.11"),
+    CLOUD(8, "1.21.11"),
+    SKY_LIGHT(6, "1.21.11");
 
     public static int CURRENT_VERSION = 0;
     public static Map<String, ColorType> BY_SERIALIZED_NAME = new HashMap<>();
@@ -27,32 +27,34 @@ public enum ColorType {
         }
     }
 
-    private final int defaultValue;
     private final String version;
     private final int versionInt;
+    private final int maskSize;
+    private final int mask;
     private final boolean isSpecial;
     private final String messageName;
     private final String serializedName;
 
-    ColorType(int defaultValue) {
-        this(defaultValue, "", 0, false);
+    ColorType(int maskSize) {
+        this(maskSize, "", 0, false);
     }
 
-    ColorType(int defaultValue, boolean isSpecial) {
-        this(defaultValue, "", 0, isSpecial);
+    ColorType(int maskSize, boolean isSpecial) {
+        this(maskSize, "", 0, isSpecial);
     }
 
-    ColorType(int defaultValue, String version) {
-        this(defaultValue, version, VersionUtil.obtainVersion(version), false);
+    ColorType(int maskSize, String version) {
+        this(maskSize, version, VersionUtil.obtainVersion(version), false);
     }
 
-    ColorType(int defaultValue, String version, boolean isSpecial) {
-        this(defaultValue, version, VersionUtil.obtainVersion(version), isSpecial);
+    ColorType(int maskSize, String version, boolean isSpecial) {
+        this(maskSize, version, VersionUtil.obtainVersion(version), isSpecial);
     }
 
 
-    ColorType(int defaultValue, String version, int versionInt, boolean isSpecial) {
-        this.defaultValue = defaultValue;
+    ColorType(int maskSize, String version, int versionInt, boolean isSpecial) {
+        this.maskSize = maskSize;
+        this.mask = maskSize == 8 ? 0xFFFF_FFFF : 0xFF_FFFF;
         this.version = version;
         this.versionInt = versionInt;
         this.isSpecial = isSpecial;
@@ -103,10 +105,6 @@ public enum ColorType {
         return this.version;
     }
 
-    public boolean isDefault(Integer value) {
-        return value == null || value.equals(-1);
-    }
-
     public String messageName() {
         return messageName;
     }
@@ -115,8 +113,12 @@ public enum ColorType {
         return serializedName;
     }
 
-    public int defaultValue() {
-        return defaultValue;
+    public int mask() {
+        return mask;
+    }
+
+    public int maskSize() {
+        return maskSize;
     }
 
     public boolean isSupported() {

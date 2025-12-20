@@ -1,9 +1,10 @@
 package io.github.lumine1909.custombiomecolors.command;
 
 import io.github.lumine1909.custombiomecolors.CustomBiomeColors;
-import io.github.lumine1909.custombiomecolors.nms.NmsBiome;
-import io.github.lumine1909.custombiomecolors.nms.NmsServer;
+import io.github.lumine1909.custombiomecolors.nms.BiomeAccessor;
+import io.github.lumine1909.custombiomecolors.nms.ServerDataHandler;
 import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
 import io.github.lumine1909.custombiomecolors.util.MessageUtil;
 import net.kyori.adventure.text.Component;
@@ -25,7 +26,7 @@ import java.util.Objects;
 @SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
 public class GetBiomeColorsCommand implements TabExecutor {
 
-    private static final NmsServer nmsServer = CustomBiomeColors.getInstance().getNmsServer();
+    private static final ServerDataHandler BIOME_DATA_HANDLER = CustomBiomeColors.getInstance().getServerDataHandler();
 
     public GetBiomeColorsCommand() {
         Objects.requireNonNull(Bukkit.getPluginCommand("/getbiomecolors")).setExecutor(this);
@@ -37,19 +38,34 @@ public class GetBiomeColorsCommand implements TabExecutor {
             sender.sendMessage(ChatColor.RED + "Only players can use this command.");
             return true;
         }
-        NmsBiome biome = nmsServer.getWrappedBiomeHolder(nmsServer.getBiomeAt(player.getLocation()));
+        BiomeAccessor biome = BIOME_DATA_HANDLER.wrapToAccessor(BIOME_DATA_HANDLER.getBiomeAt(player.getLocation()));
         BiomeData biomeData = biome.getBiomeData();
         player.sendMessage(Component.text("Colors of the biome you are in (" + biomeData.biomeKey() + "): ", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
-        biomeData.colorData().forEach((colorType, color) -> {
-            if (!colorType.isSupported()) {
-                return;
+        ColorData biomeColor = biomeData.colorData();
+        ColorData dimensionColor = CustomBiomeColors.getInstance().getServerDataHandler().getDimensionColor(player.getLocation());
+        for (ColorType colorType : ColorType.values()) {
+            Component message = Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY);
+            boolean shouldSend = false;
+            Integer color;
+            if (biomeColor != null && (color = biomeColor.get(colorType)) != null) {
+                message = message.append(
+                        MessageUtil.getColorMessage(colorType, color, biome.getTemperature(), biome.getHumidity())
+                            .decorate(TextDecoration.BOLD))
+                    .append(Component.text(" (Biome)    ", NamedTextColor.GRAY));
+                shouldSend = true;
             }
-            if (colorType.isSpecial()) {
-                player.sendMessage(Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY).append(MessageUtil.getColorMessageSpecial(color, colorType, biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD)));
-            } else {
-                player.sendMessage(Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY).append(MessageUtil.getColorMessage(color).decorate(TextDecoration.BOLD)));
+            dimensionColor.forEach((c, i) -> System.out.println(c + ": " + i));
+            if (dimensionColor != null && (color = dimensionColor.get(colorType)) != null) {
+                message = message.append(
+                        MessageUtil.getColorMessage(colorType, color, 0, 0)
+                            .decorate(TextDecoration.BOLD))
+                    .append(Component.text(" (Dimension)    ", NamedTextColor.GRAY));
+                shouldSend = true;
             }
-        });
+            if (shouldSend) {
+                player.sendMessage(message);
+            }
+        }
         return true;
     }
 

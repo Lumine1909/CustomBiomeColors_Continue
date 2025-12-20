@@ -12,20 +12,20 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import org.jetbrains.annotations.NotNull;
 
-public class NmsBiome_1_21_11 extends NmsBiome<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> {
+public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> {
 
-    public NmsBiome_1_21_11(Holder<@NotNull Biome> biomeHolder) {
+    public BiomeAccessor_1_21_11(Holder<@NotNull Biome> biomeHolder) {
         this(biomeHolder, fetchNmsBiomeData(biomeHolder));
     }
 
-    public NmsBiome_1_21_11(Holder<@NotNull Biome> biomeHolder, BiomeData cachedData) {
+    public BiomeAccessor_1_21_11(Holder<@NotNull Biome> biomeHolder, BiomeData cachedData) {
         super(biomeHolder, biomeHolder.value(), cachedData);
     }
 
     private static BiomeData fetchNmsBiomeData(Holder<@NotNull Biome> nmsBiome) {
         BiomeSpecialEffects specialEffects = nmsBiome.value().getSpecialEffects();
         EnvironmentAttributeMap attributes = nmsBiome.value().getAttributes();
-        ColorData colorData = new ColorData.Mutable()
+        ColorData colorData = new ColorData.Builder()
             .set(ColorType.GRASS, specialEffects.grassColorOverride().orElse(null))
             .set(ColorType.FOLIAGE, specialEffects.foliageColorOverride().orElse(null))
             .set(ColorType.DRY_FOLIAGE, specialEffects.dryFoliageColorOverride().orElse(null))
@@ -36,7 +36,7 @@ public class NmsBiome_1_21_11 extends NmsBiome<Biome, Holder<@NotNull Biome>, Re
             .set(ColorType.SUNRISE_SUNSET, getData(attributes.get(EnvironmentAttributes.SUNRISE_SUNSET_COLOR)))
             .set(ColorType.CLOUD, getData(attributes.get(EnvironmentAttributes.CLOUD_COLOR)))
             .set(ColorType.SKY_LIGHT, getData(attributes.get(EnvironmentAttributes.SKY_LIGHT_COLOR)))
-            .immutable();
+            .build();
         BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
         return new BiomeData(biomeKey, biomeKey, colorData);
     }
@@ -45,9 +45,9 @@ public class NmsBiome_1_21_11 extends NmsBiome<Biome, Holder<@NotNull Biome>, Re
         return entry == null ? null : entry.applyModifier(0);
     }
 
-    public NmsBiome<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> cloneWithDifferentColor(NmsServer<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> nmsServer, BiomeKey newBiomeKey, ColorData colorData) {
+    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> cloneWithDifferentColor(ServerDataHandler<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> serverDataHandler, BiomeKey newBiomeKey, ColorData colorData) {
         BiomeData data = getBiomeData();
-        return nmsServer.createCustomBiome(new BiomeData(newBiomeKey, data.baseBiomeKey(), colorData));
+        return serverDataHandler.createCustomBiome(new BiomeData(newBiomeKey, data.baseBiomeKey(), colorData));
     }
 
     @Override

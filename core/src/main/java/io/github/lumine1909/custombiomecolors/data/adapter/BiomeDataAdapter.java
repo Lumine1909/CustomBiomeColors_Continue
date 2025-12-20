@@ -56,14 +56,14 @@ public class BiomeDataAdapter extends TypeAdapter<BiomeData> {
 
     private ColorData readColorData(JsonReader reader) throws IOException {
         reader.beginObject();
-        ColorData.Mutable data = new ColorData.Mutable();
+        ColorData.Builder data = new ColorData.Builder();
         while (reader.hasNext()) {
             String name = reader.nextName();
             int value = reader.nextInt();
             data.set(ColorType.BY_SERIALIZED_NAME.get(name), value);
         }
         reader.endObject();
-        return data.immutable();
+        return data.build();
     }
 }
 
