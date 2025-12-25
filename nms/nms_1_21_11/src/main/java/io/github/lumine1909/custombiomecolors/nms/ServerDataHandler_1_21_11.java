@@ -34,7 +34,7 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
     private final Holder.Reference<@NotNull Biome> plains = biomeRegistry.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
 
     @SuppressWarnings("unchecked")
-    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
+    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> getBiomeFromKey(BiomeKey biomeKey) {
         BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> biome;
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
@@ -147,11 +147,6 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
             e.printStackTrace();
         }
         return null;
-    }
-
-    public String getBiomeId(BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> biomeAccessor) {
-        Identifier id = this.biomeRegistry.getKey(biomeAccessor.getBiome());
-        return id == null ? "minecraft:plain" : id.toString();
     }
 
     @Override

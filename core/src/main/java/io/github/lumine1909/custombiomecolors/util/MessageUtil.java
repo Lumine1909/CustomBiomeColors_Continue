@@ -17,7 +17,7 @@ public class MessageUtil {
         return isDefault ? colorMessage.append(Component.text(" (Default)", NamedTextColor.GRAY)) : colorMessage;
     }
 
-    public static Component getColorMessageSpecial(ColorType colorType, Integer color, float temperature, float downfall) {
+    private static Component getColorMessageSpecial(ColorType colorType, Integer color, float temperature, float downfall) {
         if (color != null) {
             return getColorMessage(colorType, color, false);
         }

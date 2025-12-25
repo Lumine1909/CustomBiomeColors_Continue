@@ -51,7 +51,6 @@ public enum ColorType {
         this(maskSize, version, VersionUtil.obtainVersion(version), isSpecial);
     }
 
-
     ColorType(int maskSize, String version, int versionInt, boolean isSpecial) {
         this.maskSize = maskSize;
         this.mask = maskSize == 8 ? 0xFFFF_FFFF : 0xFF_FFFF;

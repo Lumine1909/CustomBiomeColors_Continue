@@ -28,7 +28,7 @@ public class ServerDataHandler_1_21 implements ServerDataHandler<Biome, Holder<B
     private final Holder.Reference<Biome> plains = biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
 
     @SuppressWarnings("unchecked")
-    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromBiomeKey(BiomeKey biomeKey) {
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromKey(BiomeKey biomeKey) {
         BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
@@ -122,8 +122,4 @@ public class ServerDataHandler_1_21 implements ServerDataHandler<Biome, Holder<B
         return null;
     }
 
-    public String getBiomeId(BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biomeAccessor) {
-        ResourceLocation id = this.biomeRegistry.getKey(biomeAccessor.getBiome());
-        return id == null ? "minecraft:plain" : id.toString();
-    }
 }

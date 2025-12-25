@@ -2,12 +2,11 @@ package io.github.lumine1909.custombiomecolors.nms;
 
 import io.github.lumine1909.custombiomecolors.object.BiomeData;
 import io.github.lumine1909.custombiomecolors.object.BiomeKey;
-import io.github.lumine1909.custombiomecolors.object.ColorType;
 import org.bukkit.Location;
 
 public interface ServerDataHandler<Biome, Holder, ResourceKey> extends DimensionDataAccessor {
 
-    BiomeAccessor<Biome, Holder, ResourceKey> getBiomeFromBiomeKey(BiomeKey biomeKey);
+    BiomeAccessor<Biome, Holder, ResourceKey> getBiomeFromKey(BiomeKey biomeKey);
 
     BiomeAccessor<Biome, Holder, ResourceKey> wrapToAccessor(Holder biomeBase);
 
@@ -20,6 +19,4 @@ public interface ServerDataHandler<Biome, Holder, ResourceKey> extends Dimension
     Holder getBiomeAt(Location location);
 
     Holder registerBiome(Holder original, Biome biome, ResourceKey resourceKey);
-
-    String getBiomeId(BiomeAccessor<Biome, Holder, ResourceKey> biomeAccessor);
 }
