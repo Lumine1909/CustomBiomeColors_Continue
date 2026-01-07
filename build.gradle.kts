@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "2.4.0"
+version = "2.4.1"
 
 repositories {
     mavenCentral()
@@ -67,7 +67,7 @@ subprojects {
     }
 
     dependencies {
-        implementation("io.github.lumine1909:reflexion:1.0.4")
+        implementation("io.github.lumine1909:reflexion:2.1.0")
     }
 
     java {

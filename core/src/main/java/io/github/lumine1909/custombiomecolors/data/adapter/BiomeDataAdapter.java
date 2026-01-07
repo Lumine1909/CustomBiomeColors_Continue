@@ -59,11 +59,14 @@ public class BiomeDataAdapter extends TypeAdapter<BiomeData> {
         ColorData.Builder data = new ColorData.Builder();
         while (reader.hasNext()) {
             String name = reader.nextName();
+            ColorType type = ColorType.BY_SERIALIZED_NAME.get(name);
             int value = reader.nextInt();
-            data.set(ColorType.BY_SERIALIZED_NAME.get(name), value);
+            if (type.isSpecial() && value == -1) {
+                continue;
+            }
+            data.set(type, value);
         }
         reader.endObject();
         return data.build();
     }
 }
-
