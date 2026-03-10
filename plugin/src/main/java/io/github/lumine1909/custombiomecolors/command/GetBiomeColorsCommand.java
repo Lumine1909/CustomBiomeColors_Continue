@@ -46,8 +46,8 @@ public class GetBiomeColorsCommand implements TabExecutor {
         for (ColorType colorType : ColorType.values()) {
             Component message = Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY);
             boolean shouldSend = false;
-            Integer color;
-            if (biomeColor != null && (color = biomeColor.get(colorType)) != null) {
+            Integer color = null;
+            if (biomeColor != null && (color = biomeColor.get(colorType)) != null || colorType.isSpecial()) {
                 message = message.append(
                         MessageUtil.getColorMessage(colorType, color, biome.getTemperature(), biome.getHumidity())
                             .decorate(TextDecoration.BOLD))
