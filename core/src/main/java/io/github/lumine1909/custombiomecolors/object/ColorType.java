@@ -18,8 +18,8 @@ public enum ColorType {
     CLOUD(8, "1.21.11"),
     SKY_LIGHT(6, "1.21.11");
 
+    public static final Map<String, ColorType> BY_SERIALIZED_NAME = new HashMap<>();
     public static int CURRENT_VERSION = 0;
-    public static Map<String, ColorType> BY_SERIALIZED_NAME = new HashMap<>();
 
     static {
         for (ColorType colorType : ColorType.values()) {

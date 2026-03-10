@@ -9,13 +9,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 
-public class BiomeAccessor_1_21_5 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    public BiomeAccessor_1_21_5(Holder<Biome> biomeHolder) {
+public class BiomeAccessor_1_21_4 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
+
+    public BiomeAccessor_1_21_4(Holder<Biome> biomeHolder) {
         this(biomeHolder, fetchNmsBiomeData(biomeHolder));
     }
 
-    public BiomeAccessor_1_21_5(Holder<Biome> biomeHolder, BiomeData cachedData) {
+    public BiomeAccessor_1_21_4(Holder<Biome> biomeHolder, BiomeData cachedData) {
         super(biomeHolder, biomeHolder.value(), cachedData);
     }
 
@@ -24,7 +25,6 @@ public class BiomeAccessor_1_21_5 extends BiomeAccessor<Biome, Holder<Biome>, Re
         ColorData colorData = new ColorData.Builder()
             .set(ColorType.GRASS, specialEffects.getGrassColorOverride().orElse(null))
             .set(ColorType.FOLIAGE, specialEffects.getFoliageColorOverride().orElse(null))
-            .set(ColorType.DRY_FOLIAGE, specialEffects.getDryFoliageColorOverride().orElse(null))
             .set(ColorType.WATER, specialEffects.getWaterColor())
             .set(ColorType.WATER_FOG, specialEffects.getWaterFogColor())
             .set(ColorType.SKY, specialEffects.getSkyColor())

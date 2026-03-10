@@ -45,11 +45,6 @@ public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<@NotNull 
         return entry == null ? null : entry.applyModifier(0);
     }
 
-    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> cloneWithDifferentColor(ServerDataHandler<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> serverDataHandler, BiomeKey newBiomeKey, ColorData colorData) {
-        BiomeData data = getBiomeData();
-        return serverDataHandler.createCustomBiome(new BiomeData(newBiomeKey, data.baseBiomeKey(), colorData));
-    }
-
     @Override
     public float getTemperature() {
         return biomeBase.climateSettings.temperature();

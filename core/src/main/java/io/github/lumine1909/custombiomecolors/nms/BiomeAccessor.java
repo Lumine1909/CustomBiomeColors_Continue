@@ -38,9 +38,11 @@ public abstract class BiomeAccessor<Biome, Holder, ResourceKey> {
         return cachedData;
     }
 
+    public BiomeAccessor<Biome, Holder, ResourceKey> cloneWithDifferentColor(ServerDataHandler<Biome, Holder, ResourceKey> serverDataHandler, BiomeKey newBiomeKey, ColorData newColor) {
+        return serverDataHandler.createCustomBiome(new BiomeData(newBiomeKey, cachedData.baseBiomeKey(), newColor));
+    }
+
     public abstract float getTemperature();
 
     public abstract float getHumidity();
-
-    public abstract BiomeAccessor<Biome, Holder, ResourceKey> cloneWithDifferentColor(ServerDataHandler<Biome, Holder, ResourceKey> serverDataHandler, BiomeKey newBiomeKey, ColorData newColor);
 }

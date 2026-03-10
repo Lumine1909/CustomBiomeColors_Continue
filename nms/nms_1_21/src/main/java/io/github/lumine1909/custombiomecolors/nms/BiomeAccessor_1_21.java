@@ -8,7 +8,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import org.jetbrains.annotations.NotNull;
 
 public class BiomeAccessor_1_21 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
@@ -32,11 +31,6 @@ public class BiomeAccessor_1_21 extends BiomeAccessor<Biome, Holder<Biome>, Reso
             .build();
         BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
         return new BiomeData(biomeKey, biomeKey, colorData);
-    }
-
-    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> cloneWithDifferentColor(ServerDataHandler<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> serverDataHandler, BiomeKey newBiomeKey, ColorData colorData) {
-        BiomeData data = getBiomeData();
-        return serverDataHandler.createCustomBiome(new BiomeData(newBiomeKey, data.baseBiomeKey(), colorData));
     }
 
     @Override

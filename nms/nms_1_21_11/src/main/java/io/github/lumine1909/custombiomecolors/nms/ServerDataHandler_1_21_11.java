@@ -4,10 +4,8 @@ import io.github.lumine1909.custombiomecolors.object.BiomeData;
 import io.github.lumine1909.custombiomecolors.object.BiomeKey;
 import io.github.lumine1909.custombiomecolors.object.ColorData;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -16,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.attribute.EnvironmentAttributeSystem;
 import net.minecraft.world.attribute.EnvironmentAttributes;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.phys.Vec3;
@@ -24,9 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.IdentityHashMap;
-
-import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
+import java.util.Collection;
 
 public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> {
 
@@ -113,47 +108,21 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         return new BiomeAccessor_1_21_11(this.registerBiome(holder, customBiome, resourceKey), biomeData);
     }
 
-    public void setBiomeAt(Location location, BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> biomeAccessor) {
-        BlockPos blockPosition = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        Level nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
-
-        net.minecraft.world.level.chunk.LevelChunk chunk = nmsWorld.getChunkAt(blockPosition);
-        chunk.setBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2, biomeAccessor.getBiomeHolder());
+    @Override
+    public MappedRegistry<Biome> getRegistry() {
+        return biomeRegistry;
     }
 
-    public Holder<@NotNull Biome> getBiomeAt(Location location) {
-        BlockPos blockPosition = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        Level nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
-
-        net.minecraft.world.level.chunk.LevelChunk chunk = nmsWorld.getChunkAt(blockPosition);
-        return chunk.getNoiseBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2);
-    }
-
-    public Holder<@NotNull Biome> registerBiome(Holder<@NotNull Biome> original, Biome
-        biome, ResourceKey<@NotNull Biome> resourceKey) {
-        try {
-            field$MappedRegistry$frozen.set(this.biomeRegistry, false);
-            field$MappedRegistry$unregisteredIntrusiveHolders.set(this.biomeRegistry, new IdentityHashMap<>());
-
-            this.biomeRegistry.createIntrusiveHolder(biome);
-            Holder<@NotNull Biome> holder = this.biomeRegistry.register(resourceKey, biome, RegistrationInfo.BUILT_IN);
-            method$Holder$bindTags.invoke(holder, original.tags().toList());
-
-            field$MappedRegistry$unregisteredIntrusiveHolders.set(this.biomeRegistry, null);
-            field$MappedRegistry$frozen.set(this.biomeRegistry, true);
-
-            return holder;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    @Override
+    public Collection<?> getTagList(Holder<Biome> original) {
+        return original.tags().toList();
     }
 
     @Override
     public ColorData getDimensionColor(Location location) {
         ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
         EnvironmentAttributeSystem attributes = level.environmentAttributes();
-        Vec3 vec3 = new Vec3(location.x(),  location.y(), location.z());
+        Vec3 vec3 = new Vec3(location.x(), location.y(), location.z());
         return new ColorData.Builder()
             .set(ColorType.SKY, attributes.getValue(EnvironmentAttributes.SKY_COLOR, vec3))
             .set(ColorType.FOG, attributes.getValue(EnvironmentAttributes.FOG_COLOR, vec3))

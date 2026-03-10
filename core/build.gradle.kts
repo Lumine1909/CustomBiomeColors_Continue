@@ -1,6 +1,9 @@
 plugins {
     id("java")
+    id("io.papermc.paperweight.userdev")
 }
+
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 group = "io.github.lumine1909"
 
@@ -10,8 +13,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    compileOnly("io.netty:netty-all:4.2.2.Final")
+    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT")
 }
 
 java {

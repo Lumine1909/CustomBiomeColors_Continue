@@ -38,12 +38,12 @@ public class BiomeManager {
         return biomeType;
     }
 
-    public void changeBiomeColor(Player player, Region region, ColorType colorType, int color, Runnable runWhenDone) {
+    public void changeBiomeColor(Player player, Region region, ColorType colorType, Integer color, Runnable runWhenDone) {
         this.changeBiomeColor(player, region, colorType, color, new BiomeKey("cbc", StringUtil.randomString(10)), false, runWhenDone);
     }
 
     @SuppressWarnings({"deprecation", "unchecked"})
-    public void changeBiomeColor(Player player, Region region, ColorType colorType, int color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
+    public void changeBiomeColor(Player player, Region region, ColorType colorType, Integer color, BiomeKey biomeKey, boolean forceKey, Runnable runWhenDone) {
         com.sk89q.worldedit.entity.Player wePlayer = BukkitAdapter.adapt(player);
         World weWorld = BukkitAdapter.adapt(player.getWorld());
 

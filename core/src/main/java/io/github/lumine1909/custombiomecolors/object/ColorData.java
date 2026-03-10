@@ -31,6 +31,8 @@ public record ColorData(Map<ColorType, Integer> data) {
         public Builder set(ColorType colorType, Integer color) {
             if (color != null) {
                 data.put(colorType, color);
+            } else {
+                remove(colorType);
             }
             return this;
         }
