@@ -68,7 +68,7 @@ subprojects {
     }
 
     dependencies {
-        implementation("io.github.lumine1909:reflexion:0.3.1")
+        implementation("io.github.lumine1909:reflexion:0.3.2")
     }
 
     java {
