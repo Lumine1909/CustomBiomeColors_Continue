@@ -10,19 +10,18 @@ import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import org.jetbrains.annotations.NotNull;
 
-public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> {
+public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    public BiomeAccessor_1_21_11(Holder<@NotNull Biome> biomeHolder) {
+    public BiomeAccessor_1_21_11(Holder<Biome> biomeHolder) {
         this(biomeHolder, fetchNmsBiomeData(biomeHolder));
     }
 
-    public BiomeAccessor_1_21_11(Holder<@NotNull Biome> biomeHolder, BiomeData cachedData) {
+    public BiomeAccessor_1_21_11(Holder<Biome> biomeHolder, BiomeData cachedData) {
         super(biomeHolder, biomeHolder.value(), cachedData);
     }
 
-    private static BiomeData fetchNmsBiomeData(Holder<@NotNull Biome> nmsBiome) {
+    private static BiomeData fetchNmsBiomeData(Holder<Biome> nmsBiome) {
         BiomeSpecialEffects specialEffects = nmsBiome.value().getSpecialEffects();
         EnvironmentAttributeMap attributes = nmsBiome.value().getAttributes();
         ColorData colorData = new ColorData.Builder()
@@ -41,7 +40,7 @@ public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<@NotNull 
         return new BiomeData(biomeKey, biomeKey, colorData);
     }
 
-    private static Integer getData(EnvironmentAttributeMap.Entry<@NotNull Integer, ?> entry) {
+    private static Integer getData(EnvironmentAttributeMap.Entry<Integer, ?> entry) {
         return entry == null ? null : entry.applyModifier(0);
     }
 

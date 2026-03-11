@@ -3,6 +3,7 @@ package io.github.lumine1909.custombiomecolors.object;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public record ColorData(Map<ColorType, Integer> data) {
 
@@ -20,6 +21,12 @@ public record ColorData(Map<ColorType, Integer> data) {
 
     public void forEach(BiConsumer<ColorType, Integer> consumer) {
         data.forEach(consumer);
+    }
+
+    public void applyNonNull(ColorType type, Consumer<Integer> consumer) {
+        if (data.containsKey(type)) {
+            consumer.accept(data.get(type));
+        }
     }
 
     public record Builder(Map<ColorType, Integer> data) {

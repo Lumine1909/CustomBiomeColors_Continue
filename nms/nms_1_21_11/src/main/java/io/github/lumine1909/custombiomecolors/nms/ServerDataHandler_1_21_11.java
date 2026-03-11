@@ -19,18 +19,17 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> {
+public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    private final MappedRegistry<@NotNull Biome> biomeRegistry = (MappedRegistry<@NotNull Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
-    private final Holder.Reference<@NotNull Biome> plains = biomeRegistry.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
+    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
+    private final Holder.Reference<Biome> plains = biomeRegistry.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
 
     @SuppressWarnings("unchecked")
-    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> getBiomeFromKey(BiomeKey biomeKey) {
-        BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> biome;
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromKey(BiomeKey biomeKey) {
+        BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
@@ -38,8 +37,8 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
     }
 
     @SuppressWarnings("unchecked")
-    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> wrapToAccessor(Holder<@NotNull Biome> biomeBase) {
-        BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> biome;
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> wrapToAccessor(Holder<Biome> biomeBase) {
+        BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> biome;
         if ((biome = BiomeData.getBiomeFromHolder(biomeBase)) != null) {
             return biome;
         }
@@ -50,8 +49,8 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
-    public BiomeAccessor<Biome, Holder<@NotNull Biome>, ResourceKey<@NotNull Biome>> createCustomBiome(BiomeData biomeData) {
-        Holder<@NotNull Biome> holder = this.biomeRegistry.get(ResourceKey.create(
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
+        Holder<Biome> holder = this.biomeRegistry.get(ResourceKey.create(
             Registries.BIOME,
             Identifier.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
         )).orElse(plains);
@@ -60,7 +59,7 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         ColorData colorData = biomeData.colorData();
         BiomeKey biomeKey = biomeData.biomeKey();
 
-        ResourceKey<@NotNull Biome> resourceKey = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()));
+        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()));
         Biome.BiomeBuilder biomeBuilder = new Biome.BiomeBuilder()
             .generationSettings(biome.getGenerationSettings())
             .mobSpawnSettings(biome.getMobSettings())
@@ -71,39 +70,20 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
 
         BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder();
         builder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE).waterColor(colorData.get(ColorType.WATER));
-
-        if (colorData.has(ColorType.GRASS)) {
-            builder.grassColorOverride(colorData.get(ColorType.GRASS));
-        }
-        if (colorData.has(ColorType.FOLIAGE)) {
-            builder.foliageColorOverride(colorData.get(ColorType.FOLIAGE));
-        }
-        if (colorData.has(ColorType.DRY_FOLIAGE)) {
-            builder.dryFoliageColorOverride(colorData.get(ColorType.DRY_FOLIAGE));
-        }
+        colorData.applyNonNull(ColorType.GRASS, builder::grassColorOverride);
+        colorData.applyNonNull(ColorType.FOLIAGE, builder::foliageColorOverride);
+        colorData.applyNonNull(ColorType.DRY_FOLIAGE, builder::dryFoliageColorOverride);
         biomeBuilder.specialEffects(builder.build());
 
         EnvironmentAttributeMap.Builder attributesBuilder = EnvironmentAttributeMap.builder().putAll(biome.getAttributes());
-        if (colorData.has(ColorType.WATER_FOG)) {
-            attributesBuilder.set(EnvironmentAttributes.WATER_FOG_COLOR, colorData.get(ColorType.WATER_FOG));
-        }
-        if (colorData.has(ColorType.SKY)) {
-            attributesBuilder.set(EnvironmentAttributes.SKY_COLOR, colorData.get(ColorType.SKY));
-        }
-        if (colorData.has(ColorType.FOG)) {
-            attributesBuilder.set(EnvironmentAttributes.FOG_COLOR, colorData.get(ColorType.FOG));
-        }
-        if (colorData.has(ColorType.SUNRISE_SUNSET)) {
-            attributesBuilder.set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, colorData.get(ColorType.SUNRISE_SUNSET));
-        }
-        if (colorData.has(ColorType.CLOUD)) {
-            attributesBuilder.set(EnvironmentAttributes.CLOUD_COLOR, colorData.get(ColorType.CLOUD));
-        }
-        if (colorData.has(ColorType.SKY_LIGHT)) {
-            attributesBuilder.set(EnvironmentAttributes.SKY_COLOR, colorData.get(ColorType.SKY_LIGHT));
-        }
-
+        colorData.applyNonNull(ColorType.WATER_FOG, v -> attributesBuilder.set(EnvironmentAttributes.WATER_FOG_COLOR, v));
+        colorData.applyNonNull(ColorType.SKY, v -> attributesBuilder.set(EnvironmentAttributes.SKY_COLOR, v));
+        colorData.applyNonNull(ColorType.FOG, v -> attributesBuilder.set(EnvironmentAttributes.FOG_COLOR, v));
+        colorData.applyNonNull(ColorType.SUNRISE_SUNSET, v -> attributesBuilder.set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, v));
+        colorData.applyNonNull(ColorType.CLOUD, v -> attributesBuilder.set(EnvironmentAttributes.CLOUD_COLOR, v));
+        colorData.applyNonNull(ColorType.SKY_LIGHT, v -> attributesBuilder.set(EnvironmentAttributes.SKY_COLOR, v));
         biomeBuilder.putAttributes(attributesBuilder);
+
         Biome customBiome = biomeBuilder.build();
         return new BiomeAccessor_1_21_11(this.registerBiome(holder, customBiome, resourceKey), biomeData);
     }

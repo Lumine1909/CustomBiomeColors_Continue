@@ -67,16 +67,9 @@ public class ServerDataHandler_1_21_9 implements ServerDataHandler<Biome, Holder
             .waterFogColor(colorData.get(ColorType.WATER_FOG))
             .skyColor(colorData.get(ColorType.SKY))
             .fogColor(colorData.get(ColorType.FOG));
-
-        if (colorData.has(ColorType.GRASS)) {
-            builder.grassColorOverride(colorData.get(ColorType.GRASS));
-        }
-        if (colorData.has(ColorType.FOLIAGE)) {
-            builder.foliageColorOverride(colorData.get(ColorType.FOLIAGE));
-        }
-        if (colorData.has(ColorType.DRY_FOLIAGE)) {
-            builder.dryFoliageColorOverride(colorData.get(ColorType.DRY_FOLIAGE));
-        }
+        colorData.applyNonNull(ColorType.GRASS, builder::grassColorOverride);
+        colorData.applyNonNull(ColorType.FOLIAGE, builder::foliageColorOverride);
+        colorData.applyNonNull(ColorType.DRY_FOLIAGE, builder::dryFoliageColorOverride);
 
         biomeBuilder.specialEffects(builder.build());
         Biome customBiome = biomeBuilder.build();
