@@ -46,9 +46,9 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
                 return true;
             }
 
-            int color;
+            Integer color;
             try {
-                color = Integer.parseUnsignedInt(args[0].replace("#", ""), 16);
+                color = args[0].equals("default") ? null : Integer.parseUnsignedInt(args[0].replace("#", ""), 16);
             } catch (NumberFormatException e) {
                 sender.sendMessage(Component.text("[CustomBiomeColors] Invalid color, please use a valid hex color code!", NamedTextColor.RED));
                 return true;
@@ -84,7 +84,7 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         if (args.length == 1) {
-            return List.of("#HEXCODE");
+            return List.of("#HEXCODE", "default");
         } else if (args.length == 2) {
             return List.of("namespace:biomename");
         }

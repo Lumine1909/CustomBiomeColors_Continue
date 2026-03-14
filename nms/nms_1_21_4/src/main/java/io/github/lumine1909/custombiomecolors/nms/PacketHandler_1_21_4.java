@@ -17,10 +17,10 @@ import org.bukkit.entity.Player;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
-public class PacketHandler_1_20_5 implements PacketHandler {
+public class PacketHandler_1_21_4 implements PacketHandler {
 
-    private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
-    private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.getHolder(new ResourceLocation("minecraft", "plains")).orElseThrow().value());
+    private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
+    private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.get(ResourceLocation.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
 
     @Override
     public Interceptor getInterceptor(Player player) {
@@ -37,7 +37,7 @@ public class PacketHandler_1_20_5 implements PacketHandler {
             for (int index = 0; index < size; index++) {
                 LevelChunkSection section = new LevelChunkSection(
                     new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
-                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getHolderOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
+                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
                 );
                 section.readBiomes(readBuf);
                 writeBiomes(writeBuf, section);
@@ -48,7 +48,7 @@ public class PacketHandler_1_20_5 implements PacketHandler {
             for (int index = 0; index < size; index++) {
                 LevelChunkSection section = new LevelChunkSection(
                     new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES, null),
-                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getHolderOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
+                    new PalettedContainer<>(REGISTRY.asHolderIdMap(), REGISTRY.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null)
                 );
                 section.read(readBuf);
                 writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));

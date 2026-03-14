@@ -15,7 +15,7 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects;
 
 import java.util.Collection;
 
-public class ServerDataHandler_1_21_5 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
+public class ServerDataHandler_1_21_4 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
     private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
     private final Holder.Reference<Biome> plains = biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
@@ -26,7 +26,7 @@ public class ServerDataHandler_1_21_5 implements ServerDataHandler<Biome, Holder
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new BiomeAccessor_1_21_5(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new BiomeAccessor_1_21_4(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
@@ -35,7 +35,7 @@ public class ServerDataHandler_1_21_5 implements ServerDataHandler<Biome, Holder
         if ((biome = BiomeData.getBiomeFromHolder(biomeBase)) != null) {
             return biome;
         }
-        return new BiomeAccessor_1_21_5(biomeBase);
+        return new BiomeAccessor_1_21_4(biomeBase);
     }
 
     public boolean hasBiome(BiomeKey biomeKey) {
@@ -69,11 +69,10 @@ public class ServerDataHandler_1_21_5 implements ServerDataHandler<Biome, Holder
             .fogColor(colorData.get(ColorType.FOG));
         colorData.applyNonNull(ColorType.GRASS, builder::grassColorOverride);
         colorData.applyNonNull(ColorType.FOLIAGE, builder::foliageColorOverride);
-        colorData.applyNonNull(ColorType.DRY_FOLIAGE, builder::dryFoliageColorOverride);
 
         biomeBuilder.specialEffects(builder.build());
         Biome customBiome = biomeBuilder.build();
-        return new BiomeAccessor_1_21_5(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+        return new BiomeAccessor_1_21_4(this.registerBiome(holder, customBiome, resourceKey), biomeData);
     }
 
     @Override

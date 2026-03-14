@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "2.4.1"
+version = "2.4.2"
 
 repositories {
     mavenCentral()
@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":nms:nms_1_20_5"))
     implementation(project(":nms:nms_1_21"))
     implementation(project(":nms:nms_1_21_3"))
+    implementation(project(":nms:nms_1_21_4"))
     implementation(project(":nms:nms_1_21_5"))
     implementation(project(":nms:nms_1_21_9"))
     implementation(project(":nms:nms_1_21_11"))
@@ -67,7 +68,7 @@ subprojects {
     }
 
     dependencies {
-        implementation("io.github.lumine1909:reflexion:2.1.0")
+        implementation("io.github.lumine1909:reflexion:0.3.2")
     }
 
     java {

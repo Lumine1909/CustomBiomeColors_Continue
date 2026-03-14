@@ -7,11 +7,11 @@ import net.kyori.adventure.text.format.TextColor;
 
 public class MessageUtil {
 
-    public static Component getColorMessage(ColorType colorType, int color, float temperature, float downfall) {
+    public static Component getColorMessage(ColorType colorType, Integer color, float temperature, float downfall) {
         return colorType.isSpecial() ? getColorMessageSpecial(colorType, color, temperature, downfall) : getColorMessage(colorType, color, false);
     }
 
-    private static Component getColorMessage(ColorType colorType, int color, boolean isDefault) {
+    private static Component getColorMessage(ColorType colorType, Integer color, boolean isDefault) {
         color &= colorType.mask();
         Component colorMessage = Component.text(String.format("#%0" + colorType.maskSize() + "X", color), TextColor.color(color));
         return isDefault ? colorMessage.append(Component.text(" (Default)", NamedTextColor.GRAY)) : colorMessage;

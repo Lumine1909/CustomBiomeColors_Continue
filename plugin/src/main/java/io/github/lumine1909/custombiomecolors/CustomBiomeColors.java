@@ -72,6 +72,9 @@ public final class CustomBiomeColors extends JavaPlugin {
         } else if (version >= 2105) {
             serverDataHandler = new ServerDataHandler_1_21_5();
             packetHandler = new PacketHandler_1_21_5();
+        } else if (version >= 2104) {
+            serverDataHandler = new ServerDataHandler_1_21_4();
+            packetHandler = new PacketHandler_1_21_4();
         } else if (version >= 2103) {
             serverDataHandler = new ServerDataHandler_1_21_3();
             packetHandler = new PacketHandler_1_21_3();
