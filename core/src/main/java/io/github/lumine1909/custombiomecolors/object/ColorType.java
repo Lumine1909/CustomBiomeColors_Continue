@@ -86,8 +86,7 @@ public enum ColorType {
         sb.append(parts[0].toLowerCase());
         for (int i = 1; i < parts.length; i++) {
             String p = parts[i].toLowerCase();
-            sb.append(Character.toUpperCase(p.charAt(0)))
-                .append(p.substring(1));
+            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1));
         }
         return sb.append("Color").toString();
     }
