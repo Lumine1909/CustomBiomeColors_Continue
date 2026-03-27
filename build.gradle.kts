@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "2.4.2"
+version = "2.4.3-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -32,7 +32,7 @@ java {
 tasks {
     shadowJar {
         archiveVersion.set(version.toString())
-        archiveFileName.set("CustomBiomeColors-${version}-MC-1.20.5-1.21.11.jar")
+        archiveFileName.set("CustomBiomeColors-${version}+1.20.5-1.21.11.jar")
         archiveClassifier.set("")
         mergeServiceFiles()
 
