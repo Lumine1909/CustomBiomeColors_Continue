@@ -102,7 +102,6 @@ public final class CustomBiomeColors extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         registerCommands();
 
-
         getPacketHandler().inject();
         new UpdateChecker(this);
     }
@@ -110,7 +109,6 @@ public final class CustomBiomeColors extends JavaPlugin {
     private void registerCommands() {
         new ReloadCommand();
         Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
-
         for (ColorType type : ColorType.values()) {
             type.apply(
                 colorType -> SetBiomeColorCommand.register(getPluginCommand(colorType), type),

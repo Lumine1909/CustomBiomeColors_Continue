@@ -92,11 +92,11 @@ public enum ColorType {
         return sb.append("Color").toString();
     }
 
-    public void apply(Consumer<ColorType> supportConsumer, Consumer<ColorType> unSupportConsumer) {
+    public void apply(Consumer<ColorType> supportConsumer, Consumer<ColorType> unsupportConsumer) {
         if (isSupported()) {
             supportConsumer.accept(this);
         } else {
-            unSupportConsumer.accept(this);
+            unsupportConsumer.accept(this);
         }
     }
 
