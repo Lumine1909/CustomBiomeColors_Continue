@@ -63,7 +63,10 @@ public final class CustomBiomeColors extends JavaPlugin {
 
         int version = VersionUtil.obtainVersion();
         ColorType.CURRENT_VERSION = version;
-        if (version >= 2111) {
+        if (version >= 2600) {
+            serverDataHandler = new ServerDataHandler_26_1();
+            packetHandler = new PacketHandler_26_1();
+        } else if (version >= 2111) {
             serverDataHandler = new ServerDataHandler_1_21_11();
             packetHandler = new PacketHandler_1_21_11();
         } else if (version >= 2109) {

@@ -1,0 +1,56 @@
+package io.github.lumine1909.custombiomecolors.nms;
+
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
+import io.github.lumine1909.custombiomecolors.object.BiomeKey;
+import io.github.lumine1909.custombiomecolors.object.ColorData;
+import io.github.lumine1909.custombiomecolors.object.ColorType;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.attribute.EnvironmentAttributeMap;
+import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+
+public class BiomeAccessor_26_1 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
+
+    public BiomeAccessor_26_1(Holder<Biome> biomeHolder) {
+        this(biomeHolder, fetchNmsBiomeData(biomeHolder));
+    }
+
+    public BiomeAccessor_26_1(Holder<Biome> biomeHolder, BiomeData cachedData) {
+        super(biomeHolder, biomeHolder.value(), cachedData);
+    }
+
+    private static BiomeData fetchNmsBiomeData(Holder<Biome> nmsBiome) {
+        BiomeSpecialEffects specialEffects = nmsBiome.value().getSpecialEffects();
+        EnvironmentAttributeMap attributes = nmsBiome.value().getAttributes();
+        ColorData colorData = new ColorData.Builder()
+            .set(ColorType.GRASS, specialEffects.grassColorOverride().orElse(null))
+            .set(ColorType.FOLIAGE, specialEffects.foliageColorOverride().orElse(null))
+            .set(ColorType.DRY_FOLIAGE, specialEffects.dryFoliageColorOverride().orElse(null))
+            .set(ColorType.WATER, specialEffects.waterColor())
+            .set(ColorType.WATER_FOG, getData(attributes.get(EnvironmentAttributes.WATER_FOG_COLOR)))
+            .set(ColorType.SKY, getData(attributes.get(EnvironmentAttributes.SKY_COLOR)))
+            .set(ColorType.FOG, getData(attributes.get(EnvironmentAttributes.FOG_COLOR)))
+            .set(ColorType.SUNRISE_SUNSET, getData(attributes.get(EnvironmentAttributes.SUNRISE_SUNSET_COLOR)))
+            .set(ColorType.CLOUD, getData(attributes.get(EnvironmentAttributes.CLOUD_COLOR)))
+            .set(ColorType.SKY_LIGHT, getData(attributes.get(EnvironmentAttributes.SKY_LIGHT_COLOR)))
+            .build();
+        BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
+        return new BiomeData(biomeKey, biomeKey, colorData);
+    }
+
+    private static Integer getData(EnvironmentAttributeMap.Entry<Integer, ?> entry) {
+        return entry == null ? null : entry.applyModifier(0);
+    }
+
+    @Override
+    public float getTemperature() {
+        return biomeBase.climateSettings.temperature();
+    }
+
+    @Override
+    public float getHumidity() {
+        return biomeBase.climateSettings.downfall();
+    }
+}

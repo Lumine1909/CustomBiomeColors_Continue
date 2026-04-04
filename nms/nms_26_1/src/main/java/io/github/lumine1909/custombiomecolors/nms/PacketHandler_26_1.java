@@ -1,0 +1,89 @@
+package io.github.lumine1909.custombiomecolors.nms;
+
+import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BitStorage;
+import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.*;
+import org.bukkit.entity.Player;
+
+import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
+
+public class PacketHandler_26_1 implements PacketHandler {
+
+    private static final MappedRegistry<Biome> REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
+    private static final int PLAINS_ID = REGISTRY.getId(REGISTRY.get(Identifier.fromNamespaceAndPath("minecraft", "plains")).orElseThrow().value());
+    private static final PalettedContainerFactory CONTAINER_FACTORY = PalettedContainerFactory.create(MinecraftServer.getServer().registryAccess());
+
+    @Override
+    public Interceptor getInterceptor(Player player) {
+        return new PacketInterceptor(player);
+    }
+
+    private static final class PacketInterceptor extends Interceptor {
+
+        public PacketInterceptor(Player player) {
+            super(player);
+        }
+
+        protected void modifyBiomeData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
+            for (int index = 0; index < size; index++) {
+                LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
+                section.readBiomes(readBuf);
+                writeBiomes(writeBuf, section);
+            }
+        }
+
+        protected void modifyChunkData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
+            for (int index = 0; index < size; index++) {
+                LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
+                section.read(readBuf);
+                writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));
+                // Anti-xray seems not implemented yet :(
+                //section.states.write(writeBuf, null, index);
+                section.states.write(writeBuf);
+                writeBiomes(writeBuf, section);
+            }
+        }
+
+        @SuppressWarnings({"DataFlowIssue", "unchecked"})
+        private void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
+            PalettedContainer<Holder<Biome>> container = (PalettedContainer<Holder<Biome>>) levelChunkSection.getBiomes();
+            BitStorage storage = field$PalettedContainer$Data$storage.getUntyped(field$PalettedContainer$data.get(container));
+            Object containerData = field$PalettedContainer$data.get(container);
+            Palette<Holder<Biome>> palette = field$PalettedContainer$Data$palette.getUntyped(containerData);
+
+            buf.writeByte(storage.getBits());
+            if (palette instanceof SingleValuePalette<Holder<Biome>> single) {
+                buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.getUntyped(single)));
+            } else if (palette instanceof LinearPalette<Holder<Biome>> linear) {
+                Object[] array = field$LinearPalette$values.getUntyped(linear);
+                buf.writeVarInt(linear.getSize());
+                for (int i = 0; i < linear.getSize(); i++) {
+                    buf.writeVarInt(getModifiedId((Holder<Biome>) array[i]));
+                }
+            } else if (palette instanceof HashMapPalette<Holder<Biome>> hashMap) {
+                CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>> map = field$HashMapPalette$values.getUntyped(hashMap);
+                buf.writeVarInt(hashMap.getSize());
+                for (int i = 0; i < hashMap.getSize(); i++) {
+                    buf.writeVarInt(getModifiedId(map.byId(i)));
+                }
+            }
+            buf.writeFixedSizeLongArray(storage.getRaw());
+        }
+
+        private int getModifiedId(Holder<Biome> origin) {
+            long createTime = createTimeCache.getOrDefault(origin.getRegisteredName(), 0L);
+            if (createTime > joinTime) {
+                warn();
+                return PLAINS_ID;
+            }
+            return REGISTRY.getId(origin.value());
+        }
+    }
+}
