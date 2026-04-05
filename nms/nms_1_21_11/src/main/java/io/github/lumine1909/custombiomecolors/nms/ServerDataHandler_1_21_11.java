@@ -103,6 +103,7 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         return original.tags().toList();
     }
 
+    /*
     @SuppressWarnings("rawtypes")
     private static final Map<ColorType, EnvironmentAttribute> COLOR_ATTRIBUTE = Map.of(
         ColorType.SKY, EnvironmentAttributes.SKY_COLOR,
@@ -146,4 +147,5 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
             field$ValueSampler$layers.set(sampler, List.copyOf(layers));
         });
     }
+     */
 }
