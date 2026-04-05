@@ -7,7 +7,6 @@ import io.github.lumine1909.custombiomecolors.command.UnsupportedCommand;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.listener.PlayerListener;
-import io.github.lumine1909.custombiomecolors.listener.WorldListener;
 import io.github.lumine1909.custombiomecolors.nms.*;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
 import io.github.lumine1909.custombiomecolors.util.BStats;

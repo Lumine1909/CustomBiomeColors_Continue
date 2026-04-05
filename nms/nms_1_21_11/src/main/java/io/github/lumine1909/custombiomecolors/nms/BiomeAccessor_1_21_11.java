@@ -7,9 +7,10 @@ import io.github.lumine1909.custombiomecolors.object.ColorType;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.attribute.EnvironmentAttributeMap;
-import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
+
+import static io.github.lumine1909.custombiomecolors.nms.ServerDataHandler_1_21_11.COLOR_ATTRIBUTE;
 
 public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
@@ -24,20 +25,14 @@ public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<Biome>, R
     private static BiomeData fetchNmsBiomeData(Holder<Biome> nmsBiome) {
         BiomeSpecialEffects specialEffects = nmsBiome.value().getSpecialEffects();
         EnvironmentAttributeMap attributes = nmsBiome.value().getAttributes();
-        ColorData colorData = new ColorData.Builder()
+        ColorData.Builder builder = new ColorData.Builder()
             .set(ColorType.GRASS, specialEffects.grassColorOverride().orElse(null))
             .set(ColorType.FOLIAGE, specialEffects.foliageColorOverride().orElse(null))
             .set(ColorType.DRY_FOLIAGE, specialEffects.dryFoliageColorOverride().orElse(null))
-            .set(ColorType.WATER, specialEffects.waterColor())
-            .set(ColorType.WATER_FOG, getData(attributes.get(EnvironmentAttributes.WATER_FOG_COLOR)))
-            .set(ColorType.SKY, getData(attributes.get(EnvironmentAttributes.SKY_COLOR)))
-            .set(ColorType.FOG, getData(attributes.get(EnvironmentAttributes.FOG_COLOR)))
-            .set(ColorType.SUNRISE_SUNSET, getData(attributes.get(EnvironmentAttributes.SUNRISE_SUNSET_COLOR)))
-            .set(ColorType.CLOUD, getData(attributes.get(EnvironmentAttributes.CLOUD_COLOR)))
-            .set(ColorType.SKY_LIGHT, getData(attributes.get(EnvironmentAttributes.SKY_LIGHT_COLOR)))
-            .build();
+            .set(ColorType.WATER, specialEffects.waterColor());
+        COLOR_ATTRIBUTE.forEach((color, attribute) -> builder.set(color, getData(attributes.get(attribute))));
         BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
-        return new BiomeData(biomeKey, biomeKey, colorData);
+        return new BiomeData(biomeKey, biomeKey, builder.build());
     }
 
     private static Integer getData(EnvironmentAttributeMap.Entry<Integer, ?> entry) {

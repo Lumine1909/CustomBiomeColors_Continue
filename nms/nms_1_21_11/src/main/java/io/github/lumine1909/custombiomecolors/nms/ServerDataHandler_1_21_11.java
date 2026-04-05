@@ -11,24 +11,30 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.attribute.*;
+import net.minecraft.world.attribute.EnvironmentAttribute;
+import net.minecraft.world.attribute.EnvironmentAttributeMap;
+import net.minecraft.world.attribute.EnvironmentAttributeSystem;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-import static io.github.lumine1909.custombiomecolors.util.Reflection.field$EnvironmentAttributeSystem$attributeSamplers;
-import static io.github.lumine1909.custombiomecolors.util.Reflection.field$ValueSampler$layers;
 
 public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
+    static final Map<ColorType, EnvironmentAttribute<Integer>> COLOR_ATTRIBUTE = Map.of(
+        ColorType.SKY, EnvironmentAttributes.SKY_COLOR,
+        ColorType.FOG, EnvironmentAttributes.FOG_COLOR,
+        ColorType.WATER_FOG, EnvironmentAttributes.WATER_FOG_COLOR,
+        ColorType.CLOUD, EnvironmentAttributes.CLOUD_COLOR,
+        ColorType.SUNRISE_SUNSET, EnvironmentAttributes.SUNRISE_SUNSET_COLOR,
+        ColorType.SKY_LIGHT, EnvironmentAttributes.SKY_LIGHT_COLOR
+    );
     private static final MappedRegistry<Biome> BIOME_REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
     private static final Holder.Reference<Biome> PLAINS = BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
 
@@ -38,7 +44,7 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new BiomeAccessor_1_21_11(this.BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new BiomeAccessor_1_21_11(BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
@@ -51,11 +57,11 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
     }
 
     public boolean hasBiome(BiomeKey biomeKey) {
-        return this.BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
+        return BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
     public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
-        Holder<Biome> holder = this.BIOME_REGISTRY.get(ResourceKey.create(
+        Holder<Biome> holder = BIOME_REGISTRY.get(ResourceKey.create(
             Registries.BIOME,
             Identifier.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
         )).orElse(PLAINS);
@@ -79,17 +85,10 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         colorData.applyNonNull(ColorType.FOLIAGE, builder::foliageColorOverride);
         colorData.applyNonNull(ColorType.DRY_FOLIAGE, builder::dryFoliageColorOverride);
         biomeBuilder.specialEffects(builder.build());
-
         EnvironmentAttributeMap.Builder attributesBuilder = EnvironmentAttributeMap.builder().putAll(biome.getAttributes());
-        colorData.applyNonNull(ColorType.WATER_FOG, v -> attributesBuilder.set(EnvironmentAttributes.WATER_FOG_COLOR, v));
-        colorData.applyNonNull(ColorType.SKY, v -> attributesBuilder.set(EnvironmentAttributes.SKY_COLOR, v));
-        colorData.applyNonNull(ColorType.FOG, v -> attributesBuilder.set(EnvironmentAttributes.FOG_COLOR, v));
-        colorData.applyNonNull(ColorType.SUNRISE_SUNSET, v -> attributesBuilder.set(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, v));
-        colorData.applyNonNull(ColorType.CLOUD, v -> attributesBuilder.set(EnvironmentAttributes.CLOUD_COLOR, v));
-        colorData.applyNonNull(ColorType.SKY_LIGHT, v -> attributesBuilder.set(EnvironmentAttributes.SKY_COLOR, v));
-        biomeBuilder.putAttributes(attributesBuilder);
-
+        COLOR_ATTRIBUTE.forEach((color, attribute) -> colorData.applyNonNull(color, v -> attributesBuilder.set(attribute, v)));
         Biome customBiome = biomeBuilder.build();
+
         return new BiomeAccessor_1_21_11(this.registerBiome(holder, customBiome, resourceKey), biomeData);
     }
 
@@ -103,28 +102,17 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         return original.tags().toList();
     }
 
-    /*
-    @SuppressWarnings("rawtypes")
-    private static final Map<ColorType, EnvironmentAttribute> COLOR_ATTRIBUTE = Map.of(
-        ColorType.SKY, EnvironmentAttributes.SKY_COLOR,
-        ColorType.FOG, EnvironmentAttributes.FOG_COLOR,
-        ColorType.WATER_FOG, EnvironmentAttributes.WATER_FOG_COLOR,
-        ColorType.CLOUD, EnvironmentAttributes.CLOUD_COLOR,
-        ColorType.SUNRISE_SUNSET, EnvironmentAttributes.SUNRISE_SUNSET_COLOR,
-        ColorType.SKY_LIGHT, EnvironmentAttributes.SKY_LIGHT_COLOR
-    );
-
-    @SuppressWarnings("unchecked")
     @Override
     public ColorData getDimensionColor(Location location) {
         ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
         EnvironmentAttributeSystem attributes = level.environmentAttributes();
         Vec3 vec3 = new Vec3(location.x(), location.y(), location.z());
-        ColorData.Builder builder =  new ColorData.Builder();
+        ColorData.Builder builder = new ColorData.Builder();
         COLOR_ATTRIBUTE.forEach((color, attribute) -> builder.set(color, (Integer) attributes.getValue(attribute, vec3)));
         return builder.build();
     }
 
+    /*
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void modifyEnvironmentSampler(World world) {

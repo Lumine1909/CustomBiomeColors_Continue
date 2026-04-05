@@ -23,7 +23,7 @@ public class VersionUtil {
             } else if (versions.length == 3) {
                 return versions[0].equals("1") ?
                     Integer.parseInt(versions[1]) * 100 + Integer.parseInt(versions[2])
-                    :  Integer.parseInt(versions[0]) * 100 + Integer.parseInt(versions[1]) * 10 + Integer.parseInt(versions[2]);
+                    : Integer.parseInt(versions[0]) * 100 + Integer.parseInt(versions[1]) * 10 + Integer.parseInt(versions[2]);
             }
         } catch (Exception ignored) {
         }

@@ -4,7 +4,6 @@ import io.github.lumine1909.reflexion.Field;
 import io.github.lumine1909.reflexion.Method;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("rawtypes")
@@ -32,8 +31,8 @@ public class Reflection {
     public static final Method<Void> method$Holder$bindTags = Method.of(class$Holder$Reference, "bindTags", void.class, Collection.class);
 
     // Optional value for higher version
-    public static final Field<Map> field$EnvironmentAttributeSystem$attributeSamplers = Field.of("net.minecraft.world.attribute.EnvironmentAttributeSystem", "attributeSamplers", true);
-    public static final Field<List> field$ValueSampler$layers = Field.of("net.minecraft.world.attribute.EnvironmentAttributeSystem$ValueSampler", "layers", true);
+    //public static final Field<Map> field$EnvironmentAttributeSystem$attributeSamplers = Field.of("net.minecraft.world.attribute.EnvironmentAttributeSystem", "attributeSamplers", true);
+    //public static final Field<List> field$ValueSampler$layers = Field.of("net.minecraft.world.attribute.EnvironmentAttributeSystem$ValueSampler", "layers", true);
 
     public static Class<?> clazz(String name) {
         try {
