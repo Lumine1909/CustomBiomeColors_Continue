@@ -33,7 +33,7 @@ java {
 tasks {
     shadowJar {
         archiveVersion.set(version.toString())
-        archiveFileName.set("CustomBiomeColors-${version}+1.20.5-1.21.11.jar")
+        archiveFileName.set("CustomBiomeColors-${version}+1.20.5-26.1.1.jar")
         archiveClassifier.set("")
         mergeServiceFiles()
 
