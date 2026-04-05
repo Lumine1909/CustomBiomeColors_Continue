@@ -11,21 +11,26 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.attribute.EnvironmentAttributeMap;
-import net.minecraft.world.attribute.EnvironmentAttributeSystem;
-import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.attribute.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import static io.github.lumine1909.custombiomecolors.util.Reflection.field$EnvironmentAttributeSystem$attributeSamplers;
+import static io.github.lumine1909.custombiomecolors.util.Reflection.field$ValueSampler$layers;
 
 public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
-    private final Holder.Reference<Biome> plains = biomeRegistry.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
+    private static final MappedRegistry<Biome> BIOME_REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().lookup(Registries.BIOME).orElseThrow();
+    private static final Holder.Reference<Biome> PLAINS = BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("minecraft", "plains"))).orElseThrow();
 
     @SuppressWarnings("unchecked")
     public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromKey(BiomeKey biomeKey) {
@@ -33,7 +38,7 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new BiomeAccessor_1_21_11(this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new BiomeAccessor_1_21_11(this.BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
@@ -46,14 +51,14 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
     }
 
     public boolean hasBiome(BiomeKey biomeKey) {
-        return this.biomeRegistry.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
+        return this.BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
     public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
-        Holder<Biome> holder = this.biomeRegistry.get(ResourceKey.create(
+        Holder<Biome> holder = this.BIOME_REGISTRY.get(ResourceKey.create(
             Registries.BIOME,
             Identifier.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
-        )).orElse(plains);
+        )).orElse(PLAINS);
 
         Biome biome = holder.value();
         ColorData colorData = biomeData.colorData();
@@ -90,7 +95,7 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
 
     @Override
     public MappedRegistry<Biome> getRegistry() {
-        return biomeRegistry;
+        return BIOME_REGISTRY;
     }
 
     @Override
@@ -98,18 +103,47 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         return original.tags().toList();
     }
 
+    @SuppressWarnings("rawtypes")
+    private static final Map<ColorType, EnvironmentAttribute> COLOR_ATTRIBUTE = Map.of(
+        ColorType.SKY, EnvironmentAttributes.SKY_COLOR,
+        ColorType.FOG, EnvironmentAttributes.FOG_COLOR,
+        ColorType.WATER_FOG, EnvironmentAttributes.WATER_FOG_COLOR,
+        ColorType.CLOUD, EnvironmentAttributes.CLOUD_COLOR,
+        ColorType.SUNRISE_SUNSET, EnvironmentAttributes.SUNRISE_SUNSET_COLOR,
+        ColorType.SKY_LIGHT, EnvironmentAttributes.SKY_LIGHT_COLOR
+    );
+
+    @SuppressWarnings("unchecked")
     @Override
     public ColorData getDimensionColor(Location location) {
         ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
         EnvironmentAttributeSystem attributes = level.environmentAttributes();
         Vec3 vec3 = new Vec3(location.x(), location.y(), location.z());
-        return new ColorData.Builder()
-            .set(ColorType.SKY, attributes.getValue(EnvironmentAttributes.SKY_COLOR, vec3))
-            .set(ColorType.FOG, attributes.getValue(EnvironmentAttributes.FOG_COLOR, vec3))
-            .set(ColorType.WATER_FOG, attributes.getValue(EnvironmentAttributes.WATER_FOG_COLOR, vec3))
-            .set(ColorType.CLOUD, attributes.getValue(EnvironmentAttributes.CLOUD_COLOR, vec3))
-            .set(ColorType.SUNRISE_SUNSET, attributes.getValue(EnvironmentAttributes.SUNRISE_SUNSET_COLOR, vec3))
-            .set(ColorType.SKY_LIGHT, attributes.getValue(EnvironmentAttributes.SKY_LIGHT_COLOR, vec3))
-            .build();
+        ColorData.Builder builder =  new ColorData.Builder();
+        COLOR_ATTRIBUTE.forEach((color, attribute) -> builder.set(color, (Integer) attributes.getValue(attribute, vec3)));
+        return builder.build();
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
+    public void modifyEnvironmentSampler(World world) {
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        EnvironmentAttributeSystem attributeSystem = level.environmentAttributes();
+        // Map<EnvironmentAttribute<?>, ValueSampler<?>> attributeSamplers;
+        Map attributeSamplers = field$EnvironmentAttributeSystem$attributeSamplers.get(attributeSystem);
+
+        COLOR_ATTRIBUTE.values().forEach(attribute -> {
+            Object sampler = attributeSamplers.get(attribute);
+            List<EnvironmentAttributeLayer> layers = new ArrayList<>(field$ValueSampler$layers.get(sampler));
+            layers.add((EnvironmentAttributeLayer.Positional) (_, pos, biomeInterpolator) -> {
+                if (biomeInterpolator != null && attribute.isSpatiallyInterpolated()) {
+                    return biomeInterpolator.applyAttributeLayer(attribute, attribute.defaultValue());
+                } else {
+                    Holder<Biome> noiseBiomeAtPosition = level.getBiomeManager().getNoiseBiomeAtPosition(pos.x, pos.y, pos.z);
+                    return noiseBiomeAtPosition.value().getAttributes().applyModifier(attribute, attribute.defaultValue());
+                }
+            });
+            field$ValueSampler$layers.set(sampler, List.copyOf(layers));
+        });
     }
 }

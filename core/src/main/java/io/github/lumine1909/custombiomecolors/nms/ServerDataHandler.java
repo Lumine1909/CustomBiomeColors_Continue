@@ -14,7 +14,7 @@ import java.util.IdentityHashMap;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
-public interface ServerDataHandler<Biome, Holder, ResourceKey> extends DimensionDataAccessor {
+public interface ServerDataHandler<Biome, Holder, ResourceKey> extends ExtraDataHandler {
 
     BiomeAccessor<Biome, Holder, ResourceKey> getBiomeFromKey(BiomeKey biomeKey);
 
@@ -35,11 +35,8 @@ public interface ServerDataHandler<Biome, Holder, ResourceKey> extends Dimension
 
     @SuppressWarnings("unchecked")
     default Holder getBiomeAt(Location location) {
-        BlockPos blockPosition = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         Level nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
-
-        net.minecraft.world.level.chunk.LevelChunk chunk = nmsWorld.getChunkAt(blockPosition);
-        return (Holder) chunk.getNoiseBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2);
+        return (Holder) nmsWorld.getNoiseBiome(location.getBlockX() >> 2, location.getBlockY() >> 2, location.getBlockZ() >> 2);
     }
 
     MappedRegistry<Biome> getRegistry();
