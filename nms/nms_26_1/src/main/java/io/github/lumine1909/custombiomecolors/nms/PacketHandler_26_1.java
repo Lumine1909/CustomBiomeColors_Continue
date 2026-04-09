@@ -44,9 +44,7 @@ public class PacketHandler_26_1 implements PacketHandler {
                 LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
                 section.read(readBuf);
                 writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));
-                // Anti-xray seems not implemented yet :(
-                //section.states.write(writeBuf, null, index);
-                section.states.write(writeBuf);
+                section.states.write(writeBuf, null, index);
                 writeBiomes(writeBuf, section);
             }
         }

@@ -6,5 +6,5 @@ paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArt
 
 dependencies {
     implementation(project(":core"))
-    paperweight.paperDevBundle("26.1.1.build.9-alpha")
+    paperweight.paperDevBundle("26.1.1.build.29-alpha")
 }

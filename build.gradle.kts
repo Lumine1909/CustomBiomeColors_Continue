@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "2.5.0-SNAPSHOT"
+version = "2.5.0"
 
 repositories {
     mavenCentral()
@@ -24,11 +24,10 @@ dependencies {
     implementation(project(":nms:nms_1_21_5"))
     implementation(project(":nms:nms_1_21_9"))
     implementation(project(":nms:nms_1_21_11"))
-    implementation(project(":nms:nms_26_1"))
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
@@ -90,6 +89,6 @@ subprojects {
     }
 
     java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
 }

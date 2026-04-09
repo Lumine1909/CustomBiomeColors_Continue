@@ -11,7 +11,6 @@ dependencies {
     implementation(project(":nms:nms_1_21_5"))
     implementation(project(":nms:nms_1_21_9"))
     implementation(project(":nms:nms_1_21_11"))
-    implementation(project(":nms:nms_26_1"))
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
     implementation(platform("com.intellectualsites.bom:bom-newest:1.52"))
     compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
