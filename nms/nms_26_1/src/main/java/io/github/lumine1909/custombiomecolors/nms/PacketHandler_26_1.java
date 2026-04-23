@@ -44,6 +44,7 @@ public class PacketHandler_26_1 implements PacketHandler {
                 LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
                 section.read(readBuf);
                 writeBuf.writeShort(field$LevelChunkSection$nonEmptyBlockCount.get(section));
+                writeBuf.writeShort(field$LevelChunkSection$fluidCount.get(section));
                 section.states.write(writeBuf, null, index);
                 writeBiomes(writeBuf, section);
             }

@@ -24,16 +24,17 @@ dependencies {
     implementation(project(":nms:nms_1_21_5"))
     implementation(project(":nms:nms_1_21_9"))
     implementation(project(":nms:nms_1_21_11"))
+    implementation(project(":nms:nms_26_1"))
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 tasks {
     shadowJar {
         archiveVersion.set(version.toString())
-        archiveFileName.set("CustomBiomeColors-${version}+1.20.5-26.1.1.jar")
+        archiveFileName.set("CustomBiomeColors-${version}+1.20.5-26.1.2.jar")
         archiveClassifier.set("")
         mergeServiceFiles()
 

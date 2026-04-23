@@ -6,5 +6,9 @@ paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArt
 
 dependencies {
     implementation(project(":core"))
-    paperweight.paperDevBundle("26.1.1.build.29-alpha")
+    paperweight.paperDevBundle("26.1.2.build.19-alpha")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }

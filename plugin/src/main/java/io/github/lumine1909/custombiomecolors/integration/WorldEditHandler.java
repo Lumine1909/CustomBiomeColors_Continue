@@ -2,6 +2,7 @@ package io.github.lumine1909.custombiomecolors.integration;
 
 import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -25,19 +26,21 @@ import java.util.function.Function;
 
 public class WorldEditHandler {
 
-    private final WorldEdit worldEdit = WorldEdit.getInstance();
-    private final Consumer<Runnable> taskExecutor = getExecutor();
+    private static final boolean HAS_FAWE;
 
-    private static Consumer<Runnable> getExecutor() {
+    static {
+        boolean hasFawe = false;
         try {
             Class.forName("com.fastasyncworldedit.core.FaweAPI");
             // Fawe exists, great!
-            return runnable -> FaweAPI.getTaskManager().async(runnable);
-        } catch (ClassNotFoundException e) {
-            // Fawe does not exist, sync WE call
-            return Runnable::run;
+            hasFawe = true;
+        } catch (ClassNotFoundException ignored) {
         }
+        HAS_FAWE = hasFawe;
     }
+
+    private final WorldEdit worldEdit = WorldEdit.getInstance();
+    private final Consumer<Runnable> taskExecutor = HAS_FAWE ? runnable -> FaweAPI.getTaskManager().async(runnable) : Runnable::run;
 
     public static BiomeType getOrCreate(String id) {
         BiomeType biomeType;
@@ -45,8 +48,22 @@ public class WorldEditHandler {
             return biomeType;
         }
         biomeType = new BiomeType(id);
-        BiomeTypes.register(biomeType);
+        BiomeType.REGISTRY.register(biomeType.id(), biomeType);
         return biomeType;
+    }
+
+    private static EditSession createSession(World weWorld, com.sk89q.worldedit.entity.Player wePlayer) {
+        EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(weWorld);
+        if (HAS_FAWE) {
+            builder.fastMode(true);
+        }
+        return builder.actor(wePlayer).build();
+    }
+
+    private static void flushSession(EditSession session) {
+        if (HAS_FAWE) {
+            session.flushQueue();
+        }
     }
 
     public @Nullable Region getSelectedRegion(String authorsName) {
@@ -72,7 +89,7 @@ public class WorldEditHandler {
         World weWorld = BukkitAdapter.adapt(player.getWorld());
 
         taskExecutor.accept(() -> {
-            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(weWorld).fastMode(true).actor(wePlayer).build()) {
+            try (EditSession editSession = createSession(weWorld, wePlayer)) {
                 editSession.setReorderMode(EditSession.ReorderMode.FAST);
                 BlockVector3 pos = region.getMinimumPoint();
                 Location loc = new Location(player.getWorld(), pos.x(), pos.y(), pos.z());
@@ -80,7 +97,7 @@ public class WorldEditHandler {
                 RegionFunction replace = new BiomeReplace(editSession, type);
                 RegionVisitor visitor = new RegionVisitor(region, replace);
                 Operations.completeLegacy(visitor);
-                editSession.flushQueue();
+                flushSession(editSession);
             } catch (Exception e) {
                 e.printStackTrace();
             }
