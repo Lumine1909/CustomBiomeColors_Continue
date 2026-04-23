@@ -65,20 +65,26 @@ public class PacketHandler_1_21_5 implements PacketHandler {
             Palette<Holder<Biome>> palette = field$PalettedContainer$Data$palette.getUntyped(containerData);
 
             buf.writeByte(storage.getBits());
-            if (palette instanceof SingleValuePalette<Holder<Biome>> single) {
-                buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.getUntyped(single)));
-            } else if (palette instanceof LinearPalette<Holder<Biome>> linear) {
-                Object[] array = field$LinearPalette$values.getUntyped(linear);
-                buf.writeVarInt(linear.getSize());
-                for (int i = 0; i < linear.getSize(); i++) {
-                    buf.writeVarInt(getModifiedId((Holder<Biome>) array[i]));
+            switch (palette) {
+                case SingleValuePalette<Holder<Biome>> single ->
+                    buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.getUntyped(single)));
+                case LinearPalette<Holder<Biome>> linear -> {
+                    Object[] array = field$LinearPalette$values.getUntyped(linear);
+                    int size = linear.getSize();
+                    buf.writeVarInt(size);
+                    for (int i = 0; i < size; i++) {
+                        buf.writeVarInt(getModifiedId((Holder<Biome>) array[i]));
+                    }
                 }
-            } else if (palette instanceof HashMapPalette<Holder<Biome>> hashMap) {
-                CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>> map = field$HashMapPalette$values.getUntyped(hashMap);
-                buf.writeVarInt(hashMap.getSize());
-                for (int i = 0; i < hashMap.getSize(); i++) {
-                    buf.writeVarInt(getModifiedId(map.byId(i)));
+                case HashMapPalette<Holder<Biome>> hashMap -> {
+                    CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>> map = field$HashMapPalette$values.getUntyped(hashMap);
+                    int size = hashMap.getSize();
+                    buf.writeVarInt(size);
+                    for (int i = 0; i < size; i++) {
+                        buf.writeVarInt(getModifiedId(map.byId(i)));
+                    }
                 }
+                default -> throw new IllegalStateException("Unknown value: " + palette);
             }
             buf.writeFixedSizeLongArray(storage.getRaw());
         }
