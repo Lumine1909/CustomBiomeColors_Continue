@@ -10,15 +10,15 @@ import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 
-import static io.github.lumine1909.custombiomecolors.nms.ServerDataHandler_1_21_11.COLOR_ATTRIBUTE;
+import static io.github.lumine1909.custombiomecolors.nms.ServerDataHandler_26_1.COLOR_ATTRIBUTE;
 
-public class BiomeAccessor_1_21_11 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
+public class BiomeAccessor_26_1 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    public BiomeAccessor_1_21_11(Holder<Biome> biomeHolder) {
+    public BiomeAccessor_26_1(Holder<Biome> biomeHolder) {
         this(biomeHolder, fetchNmsBiomeData(biomeHolder));
     }
 
-    public BiomeAccessor_1_21_11(Holder<Biome> biomeHolder, BiomeData cachedData) {
+    public BiomeAccessor_26_1(Holder<Biome> biomeHolder, BiomeData cachedData) {
         super(biomeHolder, biomeHolder.value(), cachedData);
     }
 

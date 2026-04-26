@@ -16,11 +16,9 @@ public class VersionUtil {
     public static int obtainVersion(String version) {
         try {
             String[] versions = version.split("\\.");
-            if (versions.length == 2) {
-                return Integer.parseInt(versions[1]) * 100;
-            } else if (versions.length == 3) {
-                return Integer.parseInt(versions[1]) * 100 + Integer.parseInt(versions[2]);
-            }
+            return Integer.parseInt(versions[0]) * 10000
+                + (versions.length > 1 ? Integer.parseInt(versions[1]) : 0) * 100
+                + (versions.length > 2 ? Integer.parseInt(versions[2]) : 0);
         } catch (Exception ignored) {
         }
         return -1;

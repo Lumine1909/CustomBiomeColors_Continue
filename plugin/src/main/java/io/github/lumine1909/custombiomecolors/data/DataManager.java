@@ -29,14 +29,17 @@ import java.util.function.Supplier;
 @SuppressWarnings("rawtypes")
 public class DataManager {
 
-    private final CustomBiomeColors plugin = CustomBiomeColors.getInstance();
-    private final File file;
-    private final ExecutorService saveExecutor = Executors.newSingleThreadExecutor();
-    private final Gson gson = new GsonBuilder()
+    private static final Type TYPE_TOKEN = new TypeToken<Map<BiomeKey, BiomeData>>() {
+    }.getType();
+    private static final Gson gson = new GsonBuilder()
         .setPrettyPrinting()
         .registerTypeAdapter(BiomeKey.class, new BiomeKeyAdapter())
         .registerTypeAdapter(BiomeData.class, new BiomeDataAdapter())
         .create();
+
+    private final CustomBiomeColors plugin = CustomBiomeColors.getInstance();
+    private final ExecutorService saveExecutor = Executors.newSingleThreadExecutor();
+    private final File file;
 
     private Map<BiomeKey, BiomeData> biomeDataMap;
 
@@ -46,9 +49,7 @@ public class DataManager {
             this.plugin.saveResource(fileName, false);
         }
         try (FileReader reader = new FileReader(this.file)) {
-            Type typeToken = new TypeToken<Map<BiomeKey, BiomeData>>() {
-            }.getType();
-            this.biomeDataMap = gson.fromJson(reader, typeToken);
+            this.biomeDataMap = gson.fromJson(reader, TYPE_TOKEN);
         } catch (Exception e) {
             plugin.getSLF4JLogger().warn("It seems you are using an legacy data format, start converting...");
             DataConverter converter = new DataConverter(this.file);
@@ -62,7 +63,7 @@ public class DataManager {
 
     private void save0() throws IOException {
         final String json = gson.toJson(biomeDataMap);
-        Files.write(this.file.toPath(), json.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.write(file.toPath(), json.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     public void saveBiome(BiomeKey biomeKey, BiomeData biomeData) {

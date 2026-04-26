@@ -84,7 +84,7 @@ public interface PacketHandler {
                 List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
                 chunkBiomeData.forEach(c -> {
                     FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
-                    modifyBiomeData(writeBuf, c.getReadBuffer(), level.getSectionsCount());
+                    modifyBiomeData(c.getReadBuffer(), writeBuf, level.getSectionsCount());
                     ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), ByteBufUtil.getBytes(writeBuf));
                     dataList.add(data);
                 });

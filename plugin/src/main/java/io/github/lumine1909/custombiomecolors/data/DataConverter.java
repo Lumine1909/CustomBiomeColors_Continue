@@ -18,20 +18,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DataConverter {
 
+    private static final Type TYPE_TOKEN = new TypeToken<Map<String, int[]>>() {
+    }.getType();
+
     private final Map<String, int[]> rawMap = new ConcurrentHashMap<>();
 
     public DataConverter(File file) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Type typeToken = new TypeToken<Map<String, int[]>>() {
-        }.getType();
-
         if (!file.exists()) {
             CustomBiomeColors.getInstance().getSLF4JLogger().warn("Data file {} does not exist, skipping conversion.", file.getAbsolutePath());
             return;
         }
 
         try (FileReader reader = new FileReader(file)) {
-            Map<String, int[]> loaded = gson.fromJson(reader, typeToken);
+            Map<String, int[]> loaded = gson.fromJson(reader, TYPE_TOKEN);
             if (loaded != null) {
                 rawMap.putAll(loaded);
             }
@@ -55,20 +55,17 @@ public class DataConverter {
 
             BiomeKey biomeKey = BiomeKey.fromString(keyStr);
             ColorData colorData = new ColorData.Builder()
-                .set(ColorType.GRASS, color[0] != 0 ? color[0] : ColorType.GRASS.mask())
-                .set(ColorType.FOLIAGE, color[1] != 0 ? color[1] : ColorType.FOLIAGE.mask())
+                // They use 0 for both black and null previously.
+                // I assume that null happens more frequently than totally dark for grass and foliage.
+                .set(ColorType.GRASS, color[0] != 0 ? color[0] : null)
+                .set(ColorType.FOLIAGE, color[1] != 0 ? color[1] : null)
                 .set(ColorType.WATER, color[2])
                 .set(ColorType.WATER_FOG, color[3])
                 .set(ColorType.SKY, color[4])
                 .set(ColorType.FOG, color[5])
                 .build();
 
-            BiomeData biomeData = new BiomeData(
-                biomeKey,
-                fallbackPlains,
-                colorData
-            );
-
+            BiomeData biomeData = new BiomeData(biomeKey, fallbackPlains, colorData);
             biomeDataMap.put(biomeKey, biomeData);
         }
 

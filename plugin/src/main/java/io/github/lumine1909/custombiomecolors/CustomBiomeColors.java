@@ -63,25 +63,28 @@ public final class CustomBiomeColors extends JavaPlugin {
 
         int version = VersionUtil.obtainVersion();
         ColorType.CURRENT_VERSION = version;
-        if (version >= 2111) {
+        if (version >= 260000) {
+            serverDataHandler = new ServerDataHandler_26_1();
+            packetHandler = new PacketHandler_26_1();
+        } else if (version >= 12111) {
             serverDataHandler = new ServerDataHandler_1_21_11();
             packetHandler = new PacketHandler_1_21_11();
-        } else if (version >= 2109) {
+        } else if (version >= 12109) {
             serverDataHandler = new ServerDataHandler_1_21_9();
             packetHandler = new PacketHandler_1_21_9();
-        } else if (version >= 2105) {
+        } else if (version >= 12105) {
             serverDataHandler = new ServerDataHandler_1_21_5();
             packetHandler = new PacketHandler_1_21_5();
-        } else if (version >= 2104) {
+        } else if (version >= 12104) {
             serverDataHandler = new ServerDataHandler_1_21_4();
             packetHandler = new PacketHandler_1_21_4();
-        } else if (version >= 2103) {
+        } else if (version >= 12103) {
             serverDataHandler = new ServerDataHandler_1_21_3();
             packetHandler = new PacketHandler_1_21_3();
-        } else if (version >= 2100) {
+        } else if (version >= 12100) {
             serverDataHandler = new ServerDataHandler_1_21();
             packetHandler = new PacketHandler_1_21();
-        } else if (version >= 2005) {
+        } else if (version >= 12005) {
             serverDataHandler = new ServerDataHandler_1_20_5();
             packetHandler = new PacketHandler_1_20_5();
         } else {
@@ -100,8 +103,8 @@ public final class CustomBiomeColors extends JavaPlugin {
         this.worldEditHandler = new WorldEditHandler();
         BiomeColorUtil.loadColorMaps();
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        //Bukkit.getPluginManager().registerEvents(new WorldListener(), this);
         registerCommands();
-
 
         getPacketHandler().inject();
         new UpdateChecker(this);
@@ -110,7 +113,6 @@ public final class CustomBiomeColors extends JavaPlugin {
     private void registerCommands() {
         new ReloadCommand();
         Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
-
         for (ColorType type : ColorType.values()) {
             type.apply(
                 colorType -> SetBiomeColorCommand.register(getPluginCommand(colorType), type),

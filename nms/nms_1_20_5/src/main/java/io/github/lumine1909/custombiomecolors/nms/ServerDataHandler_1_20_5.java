@@ -17,8 +17,8 @@ import java.util.Collection;
 
 public class ServerDataHandler_1_20_5 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
-    private final MappedRegistry<Biome> biomeRegistry = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
-    private final Holder.Reference<Biome> plains = biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft", "plains"))).orElseThrow();
+    private static final MappedRegistry<Biome> BIOME_REGISTRY = (MappedRegistry<Biome>) MinecraftServer.getServer().registryAccess().registry(Registries.BIOME).orElseThrow();
+    private static final Holder.Reference<Biome> PLAINS = BIOME_REGISTRY.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation("minecraft", "plains"))).orElseThrow();
 
     @SuppressWarnings("unchecked")
     public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> getBiomeFromKey(BiomeKey biomeKey) {
@@ -26,7 +26,7 @@ public class ServerDataHandler_1_20_5 implements ServerDataHandler<Biome, Holder
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new BiomeAccessor_1_20_5(this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new BiomeAccessor_1_20_5(BIOME_REGISTRY.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
@@ -39,14 +39,14 @@ public class ServerDataHandler_1_20_5 implements ServerDataHandler<Biome, Holder
     }
 
     public boolean hasBiome(BiomeKey biomeKey) {
-        return this.biomeRegistry.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).isPresent();
+        return BIOME_REGISTRY.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).isPresent();
     }
 
     public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
-        Holder<Biome> holder = this.biomeRegistry.getHolder(ResourceKey.create(
+        Holder<Biome> holder = BIOME_REGISTRY.getHolder(ResourceKey.create(
             Registries.BIOME,
             new ResourceLocation(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
-        )).orElse(plains);
+        )).orElse(PLAINS);
 
         Biome biome = holder.value();
         ColorData colorData = biomeData.colorData();
@@ -77,7 +77,7 @@ public class ServerDataHandler_1_20_5 implements ServerDataHandler<Biome, Holder
 
     @Override
     public MappedRegistry<Biome> getRegistry() {
-        return biomeRegistry;
+        return BIOME_REGISTRY;
     }
 
     @Override
