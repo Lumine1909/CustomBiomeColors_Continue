@@ -23,9 +23,17 @@ public record ColorData(Map<ColorType, Integer> data) {
         data.forEach(consumer);
     }
 
-    public void applyNonNull(ColorType type, Consumer<Integer> consumer) {
-        if (data.containsKey(type)) {
-            consumer.accept(data.get(type));
+    public void apply(ColorType type, Consumer<Integer> consumer) {
+        apply(type, consumer, null);
+    }
+
+    public void apply(ColorType type, Consumer<Integer> consumer, Integer defaultValue) {
+        Integer value = data.get(type);
+
+        if (value != null) {
+            consumer.accept(value);
+        } else if (defaultValue != null) {
+            consumer.accept(defaultValue);
         }
     }
 

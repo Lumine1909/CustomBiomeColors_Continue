@@ -81,12 +81,17 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
 
         BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder();
         builder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE).waterColor(colorData.get(ColorType.WATER));
-        colorData.applyNonNull(ColorType.GRASS, builder::grassColorOverride);
-        colorData.applyNonNull(ColorType.FOLIAGE, builder::foliageColorOverride);
-        colorData.applyNonNull(ColorType.DRY_FOLIAGE, builder::dryFoliageColorOverride);
+        colorData.apply(ColorType.GRASS, builder::grassColorOverride);
+        colorData.apply(ColorType.FOLIAGE, builder::foliageColorOverride);
+        colorData.apply(ColorType.DRY_FOLIAGE, builder::dryFoliageColorOverride);
         biomeBuilder.specialEffects(builder.build());
         EnvironmentAttributeMap.Builder attributesBuilder = EnvironmentAttributeMap.builder().putAll(biome.getAttributes());
-        COLOR_ATTRIBUTE.forEach((color, attribute) -> colorData.applyNonNull(color, v -> attributesBuilder.set(attribute, v)));
+        COLOR_ATTRIBUTE.forEach((color, attribute) -> {
+            EnvironmentAttributeMap.Entry<Integer, ?> entry = biome.getAttributes().get(attribute);
+            Integer defaultValue = entry == null ? null : entry.applyModifier(0);
+            colorData.apply(color, v -> attributesBuilder.set(attribute, v), defaultValue);
+        });
+        biomeBuilder.putAttributes(attributesBuilder);
         Biome customBiome = biomeBuilder.build();
 
         return new BiomeAccessor_1_21_11(this.registerBiome(holder, customBiome, resourceKey), biomeData);
@@ -108,7 +113,7 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
         EnvironmentAttributeSystem attributes = level.environmentAttributes();
         Vec3 vec3 = new Vec3(location.x(), location.y(), location.z());
         ColorData.Builder builder = new ColorData.Builder();
-        COLOR_ATTRIBUTE.forEach((color, attribute) -> builder.set(color, (Integer) attributes.getValue(attribute, vec3)));
+        COLOR_ATTRIBUTE.forEach((color, attribute) -> builder.set(color, attributes.getValue(attribute, vec3)));
         return builder.build();
     }
 
