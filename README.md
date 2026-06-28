@@ -3,9 +3,9 @@
 
 Building tool to change the color of grass, leaves, water or the sky in a region using custom biomes.
 
-Requires [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit) or [FAWE for folia](https://github.com/FreshSMP/FastAsyncWorldEdit).
+Requires [WorldEdit](https://github.com/EngineHub/WorldEdit), or [FAWE](https://github.com/IntellectualSites/FastAsyncWorldEdit), or [FAWE for folia](https://github.com/FreshSMP/FastAsyncWorldEdit).
 
-Supported version: 1.20.5 - 1.21.11
+Supported version: 1.20.5 - 26.2
 
 
 ![](https://i.imgur.com/tja8o5j.png)
@@ -23,6 +23,7 @@ Supported version: 1.20.5 - 1.21.11
 
 # Commands
 `//getbiomecolors` - get the colors of the biome you're in<br>
+`//batchsetbiomecolors <start|commit|abort>` - batch modification related command<br>
 `//setgrasscolor #hexcode [namespace:biomename]` - change the color of grass, ferns and sugarcane<br>
 `//setfoliagecolor #hexcode [namespace:biomename]` - change the color of leaves and vines<br>
 `//setdryfoliagecolor #hexcode [namespace:biomename]` - change the color of dry foliage<br>
@@ -40,6 +41,7 @@ namespace:biomename - (Optional) the biome name that shows up when you press F3<
 # Permissions
 `custombiomecolors.all`<br>
 `custombiomecolors.get`<br>
+`custombiomecolors.batchset`<br>
 `custombiomecolors.grass`<br>
 `custombiomecolors.foliage`<br>
 `custombiomecolors.dryfoliage`<br>

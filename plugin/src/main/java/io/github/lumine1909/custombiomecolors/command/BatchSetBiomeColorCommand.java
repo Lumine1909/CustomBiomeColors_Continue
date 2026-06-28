@@ -33,6 +33,7 @@ public class BatchSetBiomeColorCommand implements TabExecutor {
             return true;
         }
         if (args.length < 1) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] You can use \"//batchsetbiomecolors start\" to create a batch modification task", NamedTextColor.YELLOW));
             return true;
         }
         switch (args[0].toLowerCase()) {
