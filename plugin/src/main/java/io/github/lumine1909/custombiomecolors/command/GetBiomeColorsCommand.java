@@ -11,7 +11,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -35,7 +34,7 @@ public class GetBiomeColorsCommand implements TabExecutor {
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            sender.sendMessage(Component.text("Only players can use this command.").color(NamedTextColor.RED));
             return true;
         }
         BiomeAccessor biome = BIOME_DATA_HANDLER.wrapToAccessor(BIOME_DATA_HANDLER.getBiomeAt(player.getLocation()));

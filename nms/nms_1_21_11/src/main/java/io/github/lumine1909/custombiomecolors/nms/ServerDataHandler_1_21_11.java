@@ -24,7 +24,6 @@ import org.bukkit.craftbukkit.CraftWorld;
 import java.util.Collection;
 import java.util.Map;
 
-
 public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
     static final Map<ColorType, EnvironmentAttribute<Integer>> COLOR_ATTRIBUTE = Map.of(

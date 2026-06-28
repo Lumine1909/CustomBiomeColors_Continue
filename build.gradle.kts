@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.lumine1909"
-version = "2.5.1"
+version = "2.6.0"
 
 repositories {
     mavenCentral()
@@ -34,7 +34,7 @@ java {
 tasks {
     shadowJar {
         archiveVersion.set(version.toString())
-        archiveFileName.set("CustomBiomeColors-${version}+1.20.5-26.1.2.jar")
+        archiveFileName.set("CustomBiomeColors-${version}+1.20.5-26.2.jar")
         archiveClassifier.set("")
         mergeServiceFiles()
 
@@ -72,6 +72,7 @@ modrinth {
     gameVersions.addAll(generateVersions("1.20", 5, 6))
     gameVersions.addAll(generateVersions("1.21", 0, 11))
     gameVersions.addAll(generateVersions("26.1", 0, 2))
+    gameVersions.addAll(generateVersions("26.2", 0, 0))
 }
 
 fun generateVersions(mm: String, start: Int, end: Int): List<String> = (start..end).map { if (it == 0) mm else "$mm.$it" }
@@ -86,7 +87,7 @@ subprojects {
     }
 
     dependencies {
-        implementation("io.github.lumine1909:reflexion:0.4.1")
+        implementation("io.github.lumine1909:reflexion:0.5.1")
     }
 
     java {

@@ -1,9 +1,6 @@
 package io.github.lumine1909.custombiomecolors;
 
-import io.github.lumine1909.custombiomecolors.command.GetBiomeColorsCommand;
-import io.github.lumine1909.custombiomecolors.command.ReloadCommand;
-import io.github.lumine1909.custombiomecolors.command.SetBiomeColorCommand;
-import io.github.lumine1909.custombiomecolors.command.UnsupportedCommand;
+import io.github.lumine1909.custombiomecolors.command.*;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.listener.PlayerListener;
@@ -19,8 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Objects;
 
 @SuppressWarnings("rawtypes")
 public final class CustomBiomeColors extends JavaPlugin {
@@ -112,7 +107,8 @@ public final class CustomBiomeColors extends JavaPlugin {
 
     private void registerCommands() {
         new ReloadCommand();
-        Objects.requireNonNull(this.getCommand("/getbiomecolors")).setExecutor(new GetBiomeColorsCommand());
+        new BatchSetBiomeColorCommand();
+        new GetBiomeColorsCommand();
         for (ColorType type : ColorType.values()) {
             type.apply(
                 colorType -> SetBiomeColorCommand.register(getPluginCommand(colorType), type),

@@ -78,16 +78,16 @@ public interface PacketHandler {
 
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             if (msg instanceof ClientboundChunksBiomesPacket(
-                List<ClientboundChunksBiomesPacket.ChunkBiomeData> chunkBiomeData
+                List<ClientboundChunksBiomesPacket.ChunkBiomeData> chunkBiomeDatas
             )) {
                 ServerLevel level = player.level().getMinecraftWorld();
-                List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeData.size());
-                chunkBiomeData.forEach(c -> {
+                List<ClientboundChunksBiomesPacket.ChunkBiomeData> dataList = new ArrayList<>(chunkBiomeDatas.size());
+                for (ClientboundChunksBiomesPacket.ChunkBiomeData c : chunkBiomeDatas) {
                     FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
                     modifyBiomeData(c.getReadBuffer(), writeBuf, level.getSectionsCount());
                     ClientboundChunksBiomesPacket.ChunkBiomeData data = new ClientboundChunksBiomesPacket.ChunkBiomeData(c.pos(), ByteBufUtil.getBytes(writeBuf));
                     dataList.add(data);
-                });
+                }
                 msg = new ClientboundChunksBiomesPacket(dataList);
             } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
                 ServerLevel level = (ServerLevel) player.level();

@@ -75,6 +75,11 @@ commands:
     permission: custombiomecolors.get
     permission-message: You do not have access to that command.
     usage: "Usage: /<command>"
+  /batchsetbiomecolors:
+      description: Batch set the colors of the biome you're in
+      permission: custombiomecolors.batchset
+      permission-message: You do not have access to that command.
+      usage: "Usage: /<command>"
 
 permissions:
   custombiomecolors.all:
@@ -91,6 +96,7 @@ permissions:
       custombiomecolors.could: true
       custombiomecolors.skylight: true
       custombiomecolors.get: true
+      custombiomecolors.batchset: true
   custombiomecolors.grass:
     description: Gives access to //setgrasscolor
     default: op
@@ -123,4 +129,7 @@ permissions:
     default: op
   custombiomecolors.get:
     description: Gives access to //getbiomecolors
+    default: op
+  custombiomecolors.batchset:
+    description: Gives access to //batchsetbiomecolors
     default: op

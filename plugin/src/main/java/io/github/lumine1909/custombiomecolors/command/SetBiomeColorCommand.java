@@ -39,45 +39,40 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
             sender.sendMessage(Component.text("[CustomBiomeColors] Only players can use this command!", NamedTextColor.RED));
             return true;
         }
-        if (args.length > 0) {
-            Region selectedRegion = worldEditHandler.getSelectedRegion(sender.getName());
-            if (selectedRegion == null) {
-                sender.sendMessage(Component.text("[CustomBiomeColors] Make a region selection first!", NamedTextColor.RED));
-                return true;
-            }
-
-            Integer color;
-            try {
-                color = args[0].equals("default") ? null : Integer.parseUnsignedInt(args[0].replace("#", ""), 16);
-            } catch (NumberFormatException e) {
-                sender.sendMessage(Component.text("[CustomBiomeColors] Invalid color, please use a valid hex color code!", NamedTextColor.RED));
-                return true;
-            }
-
-            long time = System.currentTimeMillis();
-            Runnable runWhenDone = () -> sender.sendMessage(Component.text("[CustomBiomeColors] Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)", NamedTextColor.GREEN));
-
-            if (args.length > 1) {
-                if (!args[1].contains(":")) {
-                    sender.sendMessage(Component.text("[CustomBiomeColors] The biome name must contain a colon! ( : )", NamedTextColor.RED));
-                    return true;
-                }
-                BiomeKey biomeKey = BiomeKey.fromString(args[1]);
-                if (BIOME_DATA_HANDLER.hasBiome(biomeKey)) {
-                    sender.sendMessage(Component.text("[CustomBiomeColors] There is already exists a biome with that name, please use another one!", NamedTextColor.RED));
-                    return true;
-                }
-                CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, biomeKey, true, runWhenDone);
-            } else {
-                CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, runWhenDone);
-            }
-
-            sender.sendMessage(Component.text("[CustomBiomeColors] Changing the biome of " + selectedRegion.getVolume() + " blocks...", NamedTextColor.AQUA));
-            if (selectedRegion.getVolume() > 200000) {
-                sender.sendMessage(Component.text("[CustomBiomeColors] This might take a while.", NamedTextColor.AQUA));
-            }
+        if (args.length == 0) {
             return true;
         }
+        Region selectedRegion = worldEditHandler.getSelectedRegion(sender.getName());
+        if (selectedRegion == null) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] Make a region selection first!", NamedTextColor.RED));
+            return true;
+        }
+
+        Integer color;
+        try {
+            color = args[0].equals("default") ? null : Integer.parseUnsignedInt(args[0].replace("#", ""), 16);
+        } catch (NumberFormatException e) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] Invalid color, please use a valid hex color code!", NamedTextColor.RED));
+            return true;
+        }
+
+        long time = System.currentTimeMillis();
+        Runnable runWhenDone = () -> sender.sendMessage(Component.text("[CustomBiomeColors] Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)", NamedTextColor.GREEN));
+
+        if (args.length == 1) {
+            CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, runWhenDone);
+            return true;
+        }
+        if (!args[1].contains(":")) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] The biome name must contain a colon! ( : )", NamedTextColor.RED));
+            return true;
+        }
+        BiomeKey biomeKey = BiomeKey.fromString(args[1]);
+        if (BIOME_DATA_HANDLER.hasBiome(biomeKey)) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] There is already exists a biome with that name, please use another one!", NamedTextColor.RED));
+            return true;
+        }
+        CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, biomeKey, true, runWhenDone);
         return true;
     }
 
