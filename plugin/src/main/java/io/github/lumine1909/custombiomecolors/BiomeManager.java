@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,22 @@ public class BiomeManager {
 
     public void changeBiomeColor(Player player, Region region, ColorType colorType, Integer color, Runnable runWhenDone) {
         this.changeBiomeColor(player, region, colorType, color, new BiomeKey("cbc", StringUtil.randomString(10)), false, runWhenDone);
+    }
+
+    /**
+     * Recolors an already-existing named biome in place (instead of registering a brand-new
+     * biome). If a region is given it's also assigned that biome, extending where it's used;
+     * a null region just updates the biome definition itself, with no selection required.
+     */
+    public void updateBiomeColor(Player player, @Nullable Region region, ColorType colorType, Integer color, BiomeKey biomeKey, Runnable runWhenDone) {
+        UnaryOperator<ColorData.Builder> colorChanger = builder -> builder.set(colorType, color);
+        BiomeAccessor updated = serverDataHandler.updateBiomeColor(biomeKey, colorChanger);
+        dataManager.saveBiome(biomeKey, updated.getBiomeData());
+        if (region == null) {
+            runWhenDone.run();
+            return;
+        }
+        CustomBiomeColors.getInstance().getWorldEditHandler().applyChange(player, region, loc -> updated, runWhenDone);
     }
 
     @SuppressWarnings("unchecked")
