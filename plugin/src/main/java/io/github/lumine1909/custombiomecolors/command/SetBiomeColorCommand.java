@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,11 +43,6 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
         if (args.length == 0) {
             return true;
         }
-        Region selectedRegion = worldEditHandler.getSelectedRegion(sender.getName());
-        if (selectedRegion == null) {
-            sender.sendMessage(Component.text("[CustomBiomeColors] Make a region selection first!", NamedTextColor.RED));
-            return true;
-        }
 
         Integer color;
         try {
@@ -57,22 +53,46 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
         }
 
         long time = System.currentTimeMillis();
-        Runnable runWhenDone = () -> sender.sendMessage(Component.text("[CustomBiomeColors] Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)", NamedTextColor.GREEN));
 
-        if (args.length == 1) {
-            CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, runWhenDone);
+        if (args.length >= 2) {
+            if (!args[1].contains(":")) {
+                sender.sendMessage(Component.text("[CustomBiomeColors] The biome name must contain a colon! ( : )", NamedTextColor.RED));
+                return true;
+            }
+            BiomeKey biomeKey = BiomeKey.fromString(args[1]);
+            if (CustomBiomeColors.getInstance().getDataManager().hasBiome(biomeKey)) {
+                // Recoloring an already-existing named biome doesn't need a selection:
+                // it updates the biome definition itself. If a selection happens to be
+                // active it's also painted with it, extending where the biome is used.
+                Region selectedRegion = worldEditHandler.getSelectedRegion(sender.getName());
+                Runnable runWhenDone = selectedRegion == null
+                    ? () -> sender.sendMessage(Component.text("[CustomBiomeColors] Biome '" + biomeKey + "' color was updated. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)", NamedTextColor.GREEN))
+                    : () -> sender.sendMessage(Component.text("[CustomBiomeColors] Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)", NamedTextColor.GREEN));
+                CustomBiomeColors.getInstance().getBiomeManager().updateBiomeColor(player, selectedRegion, this.colorType, color, biomeKey, runWhenDone);
+                return true;
+            }
+
+            Region selectedRegion = worldEditHandler.getSelectedRegion(sender.getName());
+            if (selectedRegion == null) {
+                sender.sendMessage(Component.text("[CustomBiomeColors] Make a region selection first!", NamedTextColor.RED));
+                return true;
+            }
+            if (BIOME_DATA_HANDLER.hasBiome(biomeKey)) {
+                sender.sendMessage(Component.text("[CustomBiomeColors] There is already exists a biome with that name, please use another one!", NamedTextColor.RED));
+                return true;
+            }
+            Runnable runWhenDone = () -> sender.sendMessage(Component.text("[CustomBiomeColors] Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)", NamedTextColor.GREEN));
+            CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, biomeKey, true, runWhenDone);
             return true;
         }
-        if (!args[1].contains(":")) {
-            sender.sendMessage(Component.text("[CustomBiomeColors] The biome name must contain a colon! ( : )", NamedTextColor.RED));
+
+        Region selectedRegion = worldEditHandler.getSelectedRegion(sender.getName());
+        if (selectedRegion == null) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] Make a region selection first!", NamedTextColor.RED));
             return true;
         }
-        BiomeKey biomeKey = BiomeKey.fromString(args[1]);
-        if (BIOME_DATA_HANDLER.hasBiome(biomeKey)) {
-            sender.sendMessage(Component.text("[CustomBiomeColors] There is already exists a biome with that name, please use another one!", NamedTextColor.RED));
-            return true;
-        }
-        CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, biomeKey, true, runWhenDone);
+        Runnable runWhenDone = () -> sender.sendMessage(Component.text("[CustomBiomeColors] Biome color was changed for approximately " + selectedRegion.getVolume() + " blocks. (" + (System.currentTimeMillis() - time) / 1000.0f + "s)", NamedTextColor.GREEN));
+        CustomBiomeColors.getInstance().getBiomeManager().changeBiomeColor(player, selectedRegion, this.colorType, color, runWhenDone);
         return true;
     }
 
@@ -81,7 +101,21 @@ public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
         if (args.length == 1) {
             return List.of("#HEXCODE", "default");
         } else if (args.length == 2) {
-            return List.of("namespace:biomename");
+            List<String> suggestions = new ArrayList<>();
+            for (BiomeKey biomeKey : CustomBiomeColors.getInstance().getDataManager().getBiomeKeys()) {
+                suggestions.add(biomeKey.toString());
+            }
+            if (suggestions.isEmpty()) {
+                suggestions.add("namespace:biomename");
+            }
+            String partial = args[1].toLowerCase();
+            List<String> matches = new ArrayList<>();
+            for (String suggestion : suggestions) {
+                if (suggestion.toLowerCase().startsWith(partial)) {
+                    matches.add(suggestion);
+                }
+            }
+            return matches;
         }
         return Collections.emptyList();
     }

@@ -61,6 +61,13 @@ public class ServerDataHandler_1_21 implements ServerDataHandler<Biome, Holder<B
             .downfall(biome.climateSettings.downfall())
             .temperatureAdjustment(biome.climateSettings.temperatureModifier());
 
+        biomeBuilder.specialEffects(buildSpecialEffects(colorData));
+        Biome customBiome = biomeBuilder.build();
+        return new BiomeAccessor_1_21(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+    }
+
+    @Override
+    public BiomeSpecialEffects buildSpecialEffects(ColorData colorData) {
         BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder();
         builder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE)
             .waterColor(colorData.get(ColorType.WATER))
@@ -69,10 +76,12 @@ public class ServerDataHandler_1_21 implements ServerDataHandler<Biome, Holder<B
             .fogColor(colorData.get(ColorType.FOG));
         colorData.apply(ColorType.GRASS, builder::grassColorOverride);
         colorData.apply(ColorType.FOLIAGE, builder::foliageColorOverride);
+        return builder.build();
+    }
 
-        biomeBuilder.specialEffects(builder.build());
-        Biome customBiome = biomeBuilder.build();
-        return new BiomeAccessor_1_21(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+    @Override
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> rewrapAccessor(Holder<Biome> biomeBase, BiomeData data) {
+        return new BiomeAccessor_1_21(biomeBase, data);
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -69,6 +70,14 @@ public class DataManager {
     public void saveBiome(BiomeKey biomeKey, BiomeData biomeData) {
         this.biomeDataMap.put(biomeKey, biomeData);
         scheduleSave();
+    }
+
+    public boolean hasBiome(BiomeKey biomeKey) {
+        return this.biomeDataMap.containsKey(biomeKey);
+    }
+
+    public Set<BiomeKey> getBiomeKeys() {
+        return this.biomeDataMap.keySet();
     }
 
     private Future<?> scheduleSave() {

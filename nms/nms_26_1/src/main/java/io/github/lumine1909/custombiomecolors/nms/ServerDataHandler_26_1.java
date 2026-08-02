@@ -24,6 +24,8 @@ import org.bukkit.craftbukkit.CraftWorld;
 import java.util.Collection;
 import java.util.Map;
 
+import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
+
 public class ServerDataHandler_26_1 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 
     static final Map<ColorType, EnvironmentAttribute<Integer>> COLOR_ATTRIBUTE = Map.of(
@@ -78,23 +80,42 @@ public class ServerDataHandler_26_1 implements ServerDataHandler<Biome, Holder<B
             .downfall(biome.climateSettings.downfall())
             .temperatureAdjustment(biome.climateSettings.temperatureModifier());
 
+        biomeBuilder.specialEffects(buildSpecialEffects(colorData));
+        EnvironmentAttributeMap.Builder attributesBuilder = buildAttributesBuilder(biome, colorData);
+        biomeBuilder.putAttributes(attributesBuilder);
+        Biome customBiome = biomeBuilder.build();
+
+        return new BiomeAccessor_26_1(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+    }
+
+    @Override
+    public BiomeSpecialEffects buildSpecialEffects(ColorData colorData) {
         BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder();
         builder.grassColorModifier(BiomeSpecialEffects.GrassColorModifier.NONE).waterColor(colorData.get(ColorType.WATER));
         colorData.apply(ColorType.GRASS, builder::grassColorOverride);
         colorData.apply(ColorType.FOLIAGE, builder::foliageColorOverride);
         colorData.apply(ColorType.DRY_FOLIAGE, builder::dryFoliageColorOverride);
-        biomeBuilder.specialEffects(builder.build());
-        biomeBuilder.specialEffects(builder.build());
+        return builder.build();
+    }
+
+    private EnvironmentAttributeMap.Builder buildAttributesBuilder(Biome biome, ColorData colorData) {
         EnvironmentAttributeMap.Builder attributesBuilder = EnvironmentAttributeMap.builder().putAll(biome.getAttributes());
         COLOR_ATTRIBUTE.forEach((color, attribute) -> {
             EnvironmentAttributeMap.Entry<Integer, ?> entry = biome.getAttributes().get(attribute);
             Integer defaultValue = entry == null ? null : entry.applyModifier(0);
             colorData.apply(color, v -> attributesBuilder.set(attribute, v), defaultValue);
         });
-        biomeBuilder.putAttributes(attributesBuilder);
-        Biome customBiome = biomeBuilder.build();
+        return attributesBuilder;
+    }
 
-        return new BiomeAccessor_26_1(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+    @Override
+    public void applyAttributeColors(Biome biome, ColorData colorData) {
+        field$Biome$attributes.set(biome, buildAttributesBuilder(biome, colorData).build());
+    }
+
+    @Override
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> rewrapAccessor(Holder<Biome> biomeBase, BiomeData data) {
+        return new BiomeAccessor_26_1(biomeBase, data);
     }
 
     @Override
