@@ -22,11 +22,17 @@ import java.util.*;
 public class EditBiomeColorCommand implements TabExecutor {
 
     private static final ServerDataHandler<?, ?, ?> BIOME_DATA_HANDLER = CustomBiomeColors.getInstance().getServerDataHandler();
-    private static final Map<String, ColorType> SUPPORTED_COLORS = new HashMap<>(ColorType.BY_SERIALIZED_NAME);
+
+    private final Map<String, ColorType> supportedColors = new HashMap<>();
 
     public EditBiomeColorCommand() {
         Objects.requireNonNull(Bukkit.getPluginCommand("/editbiomecolor")).setExecutor(this);
         Objects.requireNonNull(Bukkit.getPluginCommand("/editbiomecolor")).setTabCompleter(this);
+        for (Map.Entry<String, ColorType> entry : ColorType.BY_SERIALIZED_NAME.entrySet()) {
+            if (entry.getValue().isSupported()) {
+                supportedColors.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
@@ -45,7 +51,7 @@ public class EditBiomeColorCommand implements TabExecutor {
         try {
             for (int i = 1; i < args.length; i++) {
                 String[] currentArg = args[i].split("=");
-                ColorType colorType = SUPPORTED_COLORS.get(currentArg[0]);
+                ColorType colorType = supportedColors.get(currentArg[0]);
                 Integer color = args[0].equals("default") ? null : Integer.parseUnsignedInt(currentArg[1].replace("#", ""), 16);
                 dataBuilder.set(colorType, color);
             }
@@ -72,12 +78,12 @@ public class EditBiomeColorCommand implements TabExecutor {
             Set<String> existingColors = new HashSet<>();
             for (int i = 1; i < args.length; i++) {
                 String color = args[i].split("=")[0];
-                if (SUPPORTED_COLORS.containsKey(color)) {
+                if (supportedColors.containsKey(color)) {
                     existingColors.add(color);
                 }
             }
             List<String> suggestion = new ArrayList<>();
-            for (Map.Entry<String, ColorType> entry : SUPPORTED_COLORS.entrySet()) {
+            for (Map.Entry<String, ColorType> entry : supportedColors.entrySet()) {
                 if (!existingColors.contains(entry.getKey())) {
                     suggestion.add(entry.getKey() + "=");
                 }
