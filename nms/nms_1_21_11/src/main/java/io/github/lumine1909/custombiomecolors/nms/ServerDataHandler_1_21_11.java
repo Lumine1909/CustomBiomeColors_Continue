@@ -95,7 +95,8 @@ public class ServerDataHandler_1_21_11 implements ServerDataHandler<Biome, Holde
 
         return register
             ? new BiomeAccessor_1_21_11(this.registerBiome(holder, customBiome, resourceKey), biomeData)
-            : new BiomeAccessor_1_21_11(customBiome, biomeData);}
+            : new BiomeAccessor_1_21_11(customBiome, biomeData);
+    }
 
     @Override
     public MappedRegistry<Biome> getRegistry() {

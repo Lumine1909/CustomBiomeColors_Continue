@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("rawtypes")
 public class DataManager {
 
-    private static final Type TYPE_TOKEN = new TypeToken<Map<BiomeKey, BiomeData>>() {
-    }.getType();
+    private static final Type TYPE_TOKEN = new TypeToken<Map<BiomeKey, BiomeData>>() {}.getType();
     private static final Gson gson = new GsonBuilder()
         .setPrettyPrinting()
         .registerTypeAdapter(BiomeKey.class, new BiomeKeyAdapter())
