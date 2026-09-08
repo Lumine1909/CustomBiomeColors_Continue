@@ -109,6 +109,7 @@ public final class CustomBiomeColors extends JavaPlugin {
         new ReloadCommand();
         new BatchSetBiomeColorCommand();
         new GetBiomeColorsCommand();
+        new EditBiomeColorCommand();
         for (ColorType type : ColorType.values()) {
             type.apply(
                 colorType -> SetBiomeColorCommand.register(getPluginCommand(colorType), type),

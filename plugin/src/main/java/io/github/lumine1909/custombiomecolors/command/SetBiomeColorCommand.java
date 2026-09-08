@@ -19,11 +19,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("rawtypes")
 public record SetBiomeColorCommand(ColorType colorType) implements TabExecutor {
 
     private static final WorldEditHandler worldEditHandler = CustomBiomeColors.getInstance().getWorldEditHandler();
-    private static final ServerDataHandler BIOME_DATA_HANDLER = CustomBiomeColors.getInstance().getServerDataHandler();
+    private static final ServerDataHandler<?, ?, ?> BIOME_DATA_HANDLER = CustomBiomeColors.getInstance().getServerDataHandler();
 
     public static void register(@Nullable PluginCommand command, ColorType type) {
         if (command == null) {
