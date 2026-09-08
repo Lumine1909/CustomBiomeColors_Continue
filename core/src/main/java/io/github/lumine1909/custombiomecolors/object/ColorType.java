@@ -23,7 +23,9 @@ public enum ColorType {
 
     static {
         for (ColorType colorType : ColorType.values()) {
-            BY_SERIALIZED_NAME.put(colorType.serializedName, colorType);
+            if (colorType.isSupported()) {
+                BY_SERIALIZED_NAME.put(colorType.serializedName, colorType);
+            }
         }
     }
 

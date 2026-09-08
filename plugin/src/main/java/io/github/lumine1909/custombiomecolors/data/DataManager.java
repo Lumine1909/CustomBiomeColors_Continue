@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,6 +70,7 @@ public class DataManager {
 
     public void saveBiome(BiomeKey biomeKey, BiomeData biomeData) {
         this.biomeDataMap.put(biomeKey, biomeData);
+        plugin.getPacketHandler().updateCache(biomeKey.toString(), System.currentTimeMillis() + 1000);
         scheduleSave();
     }
 
@@ -87,15 +90,22 @@ public class DataManager {
         if (forceKey || (biome = BiomeData.getBiome(colorData)) == null || !biome.getBiomeData().biomeKey().toString().startsWith("cbc:")) {
             biome = orElse.get();
             saveBiome(biome.getBiomeData().biomeKey(), biome.getBiomeData());
-            plugin.getPacketHandler().updateCache(biome.getBiomeData().biomeKey().toString(), System.currentTimeMillis() + 1000);
         }
         return biome;
     }
 
     public void loadBiomes() {
-        for (var entry : this.biomeDataMap.entrySet()) {
-            plugin.getServerDataHandler().createCustomBiome(entry.getValue());
+        for (Map.Entry<BiomeKey, BiomeData> entry : this.biomeDataMap.entrySet()) {
+            plugin.getServerDataHandler().createCustomBiome(entry.getValue(), true);
         }
+    }
+
+    public boolean hasBiome(BiomeKey biomeKey) {
+        return biomeDataMap.containsKey(biomeKey);
+    }
+
+    public List<String> getAllBiomeId() {
+        return biomeDataMap.keySet().stream().map(BiomeKey::toString).toList();
     }
 
     public void saveOnClose() {

@@ -24,6 +24,12 @@ public record BiomeData(BiomeKey biomeKey, BiomeKey baseBiomeKey, ColorData colo
         return holderCache.get(holder);
     }
 
+    public static void clearBiome(BiomeAccessor biomeAccessor) {
+        colorCache.remove(biomeAccessor.getBiomeData().colorData());
+        keyCache.remove(biomeAccessor.getBiomeData().biomeKey());
+        holderCache.remove(biomeAccessor.getBiomeHolder());
+    }
+
     public static void updateBiome(ColorData colorData, BiomeAccessor biomeAccessor) {
         if (!colorCache.containsKey(colorData) || biomeAccessor.getBiomeData().biomeKey().toString().startsWith("cbc:")) {
             colorCache.put(colorData, biomeAccessor);

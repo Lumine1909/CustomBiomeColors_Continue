@@ -3,6 +3,7 @@ package io.github.lumine1909.custombiomecolors.util;
 import io.github.lumine1909.reflexion.Field;
 import io.github.lumine1909.reflexion.Method;
 
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 
@@ -37,6 +38,19 @@ public class Reflection {
             return Class.forName(name);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> void shallowCopy(T dest, T src) {
+        for (java.lang.reflect.Field field : dest.getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            try {
+                field.set(dest, field.get(src));
+            } catch (ReflectiveOperationException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

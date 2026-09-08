@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class GetBiomeColorsCommand implements TabExecutor {
 
     private static final ServerDataHandler BIOME_DATA_HANDLER = CustomBiomeColors.getInstance().getServerDataHandler();
@@ -42,21 +42,20 @@ public class GetBiomeColorsCommand implements TabExecutor {
         player.sendMessage(Component.text("Colors of the biome you are in (" + biomeData.biomeKey() + "): ", NamedTextColor.GREEN).decorate(TextDecoration.BOLD));
         ColorData biomeColor = biomeData.colorData();
         ColorData dimensionColor = CustomBiomeColors.getInstance().getServerDataHandler().getDimensionColor(player.getLocation());
+
         for (ColorType colorType : ColorType.values()) {
             Component message = Component.text(" - " + colorType.messageName() + ": ", NamedTextColor.GRAY);
             boolean shouldSend = false;
             Integer color = null;
             if (biomeColor != null && (color = biomeColor.get(colorType)) != null || colorType.isSpecial()) {
-                message = message.append(
-                        MessageUtil.getColorMessage(colorType, color, biome.getTemperature(), biome.getHumidity())
-                            .decorate(TextDecoration.BOLD))
+                message = message
+                    .append(MessageUtil.getColorMessage(colorType, color, biome.getTemperature(), biome.getHumidity()).decorate(TextDecoration.BOLD))
                     .append(Component.text(" (Biome)    ", NamedTextColor.GRAY));
                 shouldSend = true;
             }
             if (dimensionColor != null && (color = dimensionColor.get(colorType)) != null) {
-                message = message.append(
-                        MessageUtil.getColorMessage(colorType, color, 0, 0)
-                            .decorate(TextDecoration.BOLD))
+                message = message
+                    .append(MessageUtil.getColorMessage(colorType, color, 0, 0).decorate(TextDecoration.BOLD))
                     .append(Component.text(" (Dimension)    ", NamedTextColor.GRAY));
                 shouldSend = true;
             }

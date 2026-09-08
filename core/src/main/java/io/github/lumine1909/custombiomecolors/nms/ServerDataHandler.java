@@ -22,7 +22,7 @@ public interface ServerDataHandler<Biome, Holder, ResourceKey> extends ExtraData
 
     boolean hasBiome(BiomeKey biomeKey);
 
-    BiomeAccessor<Biome, Holder, ResourceKey> createCustomBiome(BiomeData biomeData);
+    BiomeAccessor<Biome, Holder, ResourceKey> createCustomBiome(BiomeData biomeData, boolean register);
 
     @SuppressWarnings("unchecked")
     default void setBiomeAt(Location location, BiomeAccessor<Biome, Holder, ResourceKey> biomeAccessor) {
