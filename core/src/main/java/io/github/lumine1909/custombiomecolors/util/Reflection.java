@@ -47,6 +47,7 @@ public class Reflection {
                 continue;
             }
             try {
+                field.setAccessible(true);
                 field.set(dest, field.get(src));
             } catch (ReflectiveOperationException e) {
                 e.printStackTrace();

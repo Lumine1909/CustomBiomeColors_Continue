@@ -14,7 +14,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -52,7 +51,7 @@ public class EditBiomeColorCommand implements TabExecutor {
             for (int i = 1; i < args.length; i++) {
                 String[] currentArg = args[i].split("=");
                 ColorType colorType = supportedColors.get(currentArg[0]);
-                Integer color = args[0].equals("default") ? null : Integer.parseUnsignedInt(currentArg[1].replace("#", ""), 16);
+                Integer color = currentArg[1].equals("default") ? null : Integer.parseUnsignedInt(currentArg[1].replace("#", ""), 16);
                 dataBuilder.set(colorType, color);
             }
         } catch (Exception e) {
@@ -61,35 +60,38 @@ public class EditBiomeColorCommand implements TabExecutor {
         }
         BiomeData.clearBiome(oldBiome);
         BiomeData newData = new BiomeData(oldBiome.getBiomeData().biomeKey(), oldBiome.getBiomeData().baseBiomeKey(), dataBuilder.build());
-        BiomeAccessor<?, ?, ?> newBiome = BIOME_DATA_HANDLER.createCustomBiome(newData, false);Reflection.shallowCopy(oldBiome.getBiome(), newBiome.getBiome());
+        BiomeAccessor<?, ?, ?> newBiome = BIOME_DATA_HANDLER.createCustomBiome(newData, false);
+        Reflection.shallowCopy(oldBiome.getBiome(), newBiome.getBiome());
         BiomeData.updateBiome(newData.colorData(), newBiome);
         CustomBiomeColors.getInstance().getDataManager().saveBiome(newData.biomeKey(), newData);
+        sender.sendMessage(Component.text("[CustomBiomeColors] The color of biome " + key + " is updated, you may need to re-join to get the changed color.", NamedTextColor.GREEN));
         return true;
     }
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
-        if (!(sender instanceof Player)) {
-            return Collections.emptyList();
-        }
         if (args.length == 1) {
             return CustomBiomeColors.getInstance().getDataManager().getAllBiomeId();
-        } else if (args.length >= 2) {
-            Set<String> existingColors = new HashSet<>();
-            for (int i = 1; i < args.length; i++) {
-                String color = args[i].split("=")[0];
-                if (supportedColors.containsKey(color)) {
-                    existingColors.add(color);
-                }
-            }
-            List<String> suggestion = new ArrayList<>();
-            for (Map.Entry<String, ColorType> entry : supportedColors.entrySet()) {
-                if (!existingColors.contains(entry.getKey())) {
-                    suggestion.add(entry.getKey() + "=");
-                }
-            }
-            return suggestion;
         }
-        return Collections.emptyList();
+        String lastArg;
+        int index;
+        if ((index = (lastArg = args[args.length - 1]).indexOf('=')) != -1) {
+            String beforeEqu = lastArg.substring(0, index + 1);
+            return List.of(beforeEqu + "#HEXCODE", beforeEqu + "default");
+        }
+        Set<String> existingColors = new HashSet<>();
+        for (int i = 1; i < args.length; i++) {
+            String color = args[i].split("=")[0];
+            if (supportedColors.containsKey(color)) {
+                existingColors.add(color);
+            }
+        }
+        List<String> suggestion = new ArrayList<>();
+        for (Map.Entry<String, ColorType> entry : supportedColors.entrySet()) {
+            if (!existingColors.contains(entry.getKey()) && entry.getKey().startsWith(lastArg)) {
+                suggestion.add(entry.getKey() + "=");
+            }
+        }
+        return suggestion;
     }
 }
