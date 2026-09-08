@@ -44,8 +44,8 @@ public class EditBiomeColorCommand implements TabExecutor {
             sender.sendMessage(Component.text("[CustomBiomeColors] Invalid biome, it does not exist or is not a CBC generated biome!", NamedTextColor.RED));
             return true;
         }
-        BiomeAccessor<?, ?, ?> oldBiome = BIOME_DATA_HANDLER.getBiomeFromKey(key);
-        ColorData.Builder dataBuilder = oldBiome.getBiomeData().colorData().mutable();
+        BiomeAccessor<?, ?, ?> targetBiome = BIOME_DATA_HANDLER.getBiomeFromKey(key);
+        ColorData.Builder dataBuilder = targetBiome.getBiomeData().colorData().mutable();
 
         try {
             for (int i = 1; i < args.length; i++) {
@@ -58,13 +58,14 @@ public class EditBiomeColorCommand implements TabExecutor {
             sender.sendMessage(Component.text("[CustomBiomeColors] Invalid color, please use valid color types and hex color codes!", NamedTextColor.RED));
             return true;
         }
-        BiomeData.clearBiome(oldBiome);
-        BiomeData newData = new BiomeData(oldBiome.getBiomeData().biomeKey(), oldBiome.getBiomeData().baseBiomeKey(), dataBuilder.build());
+        BiomeData.clearBiome(targetBiome);
+        BiomeData newData = new BiomeData(targetBiome.getBiomeData().biomeKey(), targetBiome.getBiomeData().baseBiomeKey(), dataBuilder.build());
         BiomeAccessor<?, ?, ?> newBiome = BIOME_DATA_HANDLER.createCustomBiome(newData, false);
-        Reflection.shallowCopy(oldBiome.getBiome(), newBiome.getBiome());
-        BiomeData.updateBiome(newData.colorData(), newBiome);
+        Reflection.shallowCopy(targetBiome.getBiome(), newBiome.getBiome());
+        BiomeData.updateBiome(newData.colorData(), targetBiome);
         CustomBiomeColors.getInstance().getDataManager().saveBiome(newData.biomeKey(), newData);
-        sender.sendMessage(Component.text("[CustomBiomeColors] The color of biome " + key + " is updated, you may need to re-join to get the changed color.", NamedTextColor.GREEN));
+        sender.sendMessage(Component.text("[CustomBiomeColors] The color of biome " + key + " is updated.", NamedTextColor.GREEN));
+        sender.sendMessage(Component.text("[CustomBiomeColors] You may need to re-join to get the changed color.", NamedTextColor.RED));
         return true;
     }
 
