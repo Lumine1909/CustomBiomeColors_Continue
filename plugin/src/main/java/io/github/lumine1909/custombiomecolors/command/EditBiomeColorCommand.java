@@ -88,6 +88,7 @@ public class EditBiomeColorCommand implements TabExecutor {
                     suggestion.add(entry.getKey() + "=");
                 }
             }
+            return suggestion;
         }
         return Collections.emptyList();
     }
