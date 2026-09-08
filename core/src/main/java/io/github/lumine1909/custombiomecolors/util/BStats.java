@@ -740,7 +740,7 @@ public class BStats {
         /**
          * Appends a null field to the JSON.
          *
-         * @param key The namespace of the field.
+         * @param key The key of the field.
          * @return A reference to this object.
          */
         public JsonObjectBuilder appendNull(String key) {
@@ -751,7 +751,7 @@ public class BStats {
         /**
          * Appends a string field to the JSON.
          *
-         * @param key   The namespace of the field.
+         * @param key   The key of the field.
          * @param value The value of the field.
          * @return A reference to this object.
          */
@@ -766,7 +766,7 @@ public class BStats {
         /**
          * Appends an integer field to the JSON.
          *
-         * @param key   The namespace of the field.
+         * @param key   The key of the field.
          * @param value The value of the field.
          * @return A reference to this object.
          */
@@ -778,7 +778,7 @@ public class BStats {
         /**
          * Appends an object to the JSON.
          *
-         * @param key    The namespace of the field.
+         * @param key    The key of the field.
          * @param object The object.
          * @return A reference to this object.
          */
@@ -793,7 +793,7 @@ public class BStats {
         /**
          * Appends a string array to the JSON.
          *
-         * @param key    The namespace of the field.
+         * @param key    The key of the field.
          * @param values The string array.
          * @return A reference to this object.
          */
@@ -812,7 +812,7 @@ public class BStats {
         /**
          * Appends an integer array to the JSON.
          *
-         * @param key    The namespace of the field.
+         * @param key    The key of the field.
          * @param values The integer array.
          * @return A reference to this object.
          */
@@ -829,7 +829,7 @@ public class BStats {
         /**
          * Appends an object array to the JSON.
          *
-         * @param key    The namespace of the field.
+         * @param key    The key of the field.
          * @param values The integer array.
          * @return A reference to this object.
          */
@@ -846,7 +846,7 @@ public class BStats {
         /**
          * Appends a field to the object.
          *
-         * @param key          The namespace of the field.
+         * @param key          The key of the field.
          * @param escapedValue The escaped value of the field.
          */
         private void appendFieldUnescaped(String key, String escapedValue) {
