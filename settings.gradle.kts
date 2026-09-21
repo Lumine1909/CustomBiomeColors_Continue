@@ -11,6 +11,7 @@ include("nms:nms_1_21_5")
 include("nms:nms_1_21_9")
 include("nms:nms_1_21_11")
 include("nms:nms_26_1")
+include("nms:nms_26_3")
 
 pluginManagement {
     repositories {
