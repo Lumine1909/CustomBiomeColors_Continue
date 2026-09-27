@@ -6,23 +6,29 @@ import io.github.lumine1909.custombiomecolors.object.ColorData;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
-import static io.github.lumine1909.custombiomecolors.nms.ServerDataHandler_26_1.COLOR_ATTRIBUTE;
+import java.util.function.ToIntFunction;
 
-public class BiomeAccessor_26_1 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
+import static io.github.lumine1909.custombiomecolors.nms.ServerDataHandler_26_3.COLOR_ATTRIBUTE_VEC3;
+import static io.github.lumine1909.custombiomecolors.nms.ServerDataHandler_26_3.COLOR_ATTRIBUTE_VEC4;
 
-    public BiomeAccessor_26_1(Holder<Biome> biomeHolder) {
+public class BiomeAccessor_26_3 extends BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> {
+
+    public BiomeAccessor_26_3(Holder<Biome> biomeHolder) {
         this(biomeHolder, fetchNmsBiomeData(biomeHolder));
     }
 
-    public BiomeAccessor_26_1(Holder<Biome> biomeHolder, BiomeData cachedData) {
+    public BiomeAccessor_26_3(Holder<Biome> biomeHolder, BiomeData cachedData) {
         super(biomeHolder, biomeHolder.value(), cachedData);
     }
 
-    public BiomeAccessor_26_1(Biome biome, BiomeData cachedData) {
+    public BiomeAccessor_26_3(Biome biome, BiomeData cachedData) {
         super(biome, cachedData);
     }
 
@@ -34,13 +40,14 @@ public class BiomeAccessor_26_1 extends BiomeAccessor<Biome, Holder<Biome>, Reso
             .set(ColorType.FOLIAGE, specialEffects.foliageColorOverride().orElse(null))
             .set(ColorType.DRY_FOLIAGE, specialEffects.dryFoliageColorOverride().orElse(null))
             .set(ColorType.WATER, specialEffects.waterColor());
-        COLOR_ATTRIBUTE.forEach((color, attribute) -> builder.set(color, getData(attributes.get(attribute))));
+        COLOR_ATTRIBUTE_VEC3.forEach((color, attribute) -> builder.set(color, getData(attributes.get(attribute), new Vector3f(), ARGB::colorFromVector3f)));
+        COLOR_ATTRIBUTE_VEC4.forEach((color, attribute) -> builder.set(color, getData(attributes.get(attribute), new Vector4f(), ARGB::colorFromVector4f)));
         BiomeKey biomeKey = BiomeKey.fromString(nmsBiome.getRegisteredName());
         return new BiomeData(biomeKey, biomeKey, builder.build());
     }
 
-    private static Integer getData(EnvironmentAttributeMap.Entry<Integer, ?> entry) {
-        return entry == null ? null : entry.applyModifier(0);
+    private static <T> Integer getData(EnvironmentAttributeMap.Entry<T, ?> entry, T defaultValue, ToIntFunction<T> function) {
+        return entry == null ? null : function.applyAsInt(entry.applyModifier(defaultValue));
     }
 
     @Override

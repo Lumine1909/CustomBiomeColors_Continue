@@ -854,7 +854,7 @@ public class BStats {
                 throw new IllegalStateException("JSON has already been built");
             }
             if (key == null) {
-                throw new IllegalArgumentException("JSON key must not be null");
+                throw new IllegalArgumentException("JSON namespace must not be null");
             }
             if (hasAtLeastOneField) {
                 builder.append(",");

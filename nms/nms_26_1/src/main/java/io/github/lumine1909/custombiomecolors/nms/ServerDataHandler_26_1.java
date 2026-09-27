@@ -43,7 +43,7 @@ public class ServerDataHandler_26_1 implements ServerDataHandler<Biome, Holder<B
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new BiomeAccessor_26_1(BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new BiomeAccessor_26_1(BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.namespace(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
@@ -56,20 +56,20 @@ public class ServerDataHandler_26_1 implements ServerDataHandler<Biome, Holder<B
     }
 
     public boolean hasBiome(BiomeKey biomeKey) {
-        return BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()))).isPresent();
+        return BIOME_REGISTRY.get(ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.namespace(), biomeKey.value()))).isPresent();
     }
 
-    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData, boolean register) {
         Holder<Biome> holder = BIOME_REGISTRY.get(ResourceKey.create(
             Registries.BIOME,
-            Identifier.fromNamespaceAndPath(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
+            Identifier.fromNamespaceAndPath(biomeData.baseBiomeKey().namespace(), biomeData.baseBiomeKey().value())
         )).orElse(PLAINS);
 
         Biome biome = holder.value();
         ColorData colorData = biomeData.colorData();
         BiomeKey biomeKey = biomeData.biomeKey();
 
-        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.key(), biomeKey.value()));
+        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(biomeKey.namespace(), biomeKey.value()));
         Biome.BiomeBuilder biomeBuilder = new Biome.BiomeBuilder()
             .generationSettings(biome.getGenerationSettings())
             .mobSpawnSettings(biome.getMobSettings())
@@ -94,7 +94,9 @@ public class ServerDataHandler_26_1 implements ServerDataHandler<Biome, Holder<B
         biomeBuilder.putAttributes(attributesBuilder);
         Biome customBiome = biomeBuilder.build();
 
-        return new BiomeAccessor_26_1(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+        return register
+            ? new BiomeAccessor_26_1(this.registerBiome(holder, customBiome, resourceKey), biomeData)
+            : new BiomeAccessor_26_1(customBiome, biomeData);
     }
 
     @Override

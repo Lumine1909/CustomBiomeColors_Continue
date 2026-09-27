@@ -20,6 +20,11 @@ commands:
       - cbc
     description: CustomBiomeColors admin command
     permission: custombiomecolors.admin
+  /editbiomecolor:
+    description: Change the color of the given biome
+    permission: custombiomecolors.admin
+    permission-message: You do not have access to that command.
+    usage: "Usage: /<command> <biome:name> <color>"
   /setgrasscolor:
     description: Change the color of the grass in a region
     permission: custombiomecolors.grass
@@ -82,6 +87,9 @@ commands:
       usage: "Usage: /<command>"
 
 permissions:
+  custumbiomecolors.admin:
+    description: Gives access to admin commands
+    default: op
   custombiomecolors.all:
     description: Gives access to all commands
     default: op

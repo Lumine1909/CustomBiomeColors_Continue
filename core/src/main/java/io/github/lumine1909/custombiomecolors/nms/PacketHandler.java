@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.field$ClientboundLevelChunkPacketData$buffer;
+import static io.github.lumine1909.custombiomecolors.util.Reflection.field$ClientboundLevelChunkWithLightPacket$chunkData;
 
 public interface PacketHandler {
 
@@ -91,7 +92,7 @@ public interface PacketHandler {
                 msg = new ClientboundChunksBiomesPacket(dataList);
             } else if (msg instanceof ClientboundLevelChunkWithLightPacket packet) {
                 ServerLevel level = (ServerLevel) player.level();
-                ClientboundLevelChunkPacketData data = packet.getChunkData();
+                ClientboundLevelChunkPacketData data = field$ClientboundLevelChunkWithLightPacket$chunkData.getUntyped(packet);
                 FriendlyByteBuf writeBuf = new FriendlyByteBuf(Unpooled.buffer());
                 modifyChunkData(data.getReadBuffer(), writeBuf, level.getSectionsCount());
                 field$ClientboundLevelChunkPacketData$buffer.set(data, ByteBufUtil.getBytes(writeBuf));

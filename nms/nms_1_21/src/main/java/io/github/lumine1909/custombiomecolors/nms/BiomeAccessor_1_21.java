@@ -19,6 +19,10 @@ public class BiomeAccessor_1_21 extends BiomeAccessor<Biome, Holder<Biome>, Reso
         super(biomeHolder, biomeHolder.value(), cachedData);
     }
 
+    public BiomeAccessor_1_21(Biome biome, BiomeData cachedData) {
+        super(biome, cachedData);
+    }
+
     private static BiomeData fetchNmsBiomeData(Holder<Biome> nmsBiome) {
         BiomeSpecialEffects specialEffects = nmsBiome.value().getSpecialEffects();
         ColorData colorData = new ColorData.Builder()
@@ -35,11 +39,11 @@ public class BiomeAccessor_1_21 extends BiomeAccessor<Biome, Holder<Biome>, Reso
 
     @Override
     public float getTemperature() {
-        return biomeBase.climateSettings.temperature();
+        return biome.climateSettings.temperature();
     }
 
     @Override
     public float getHumidity() {
-        return biomeBase.climateSettings.downfall();
+        return biome.climateSettings.downfall();
     }
 }

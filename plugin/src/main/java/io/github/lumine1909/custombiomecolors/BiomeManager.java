@@ -67,7 +67,7 @@ public class BiomeManager {
         }
 
         public void add(BiomeKey key, boolean forceCreateNew, UnaryOperator<ColorData.Builder> colorChanger, Runnable whenDone) {
-            this.key = (this.key == null || !key.key().equals("cbc")) ? key : this.key;
+            this.key = (this.key == null || !key.namespace().equals("cbc")) ? key : this.key;
             this.forceCreateNew |= forceCreateNew;
             this.colorChanger = this.colorChanger.andThen(colorChanger);
             this.whenDone = whenDone;

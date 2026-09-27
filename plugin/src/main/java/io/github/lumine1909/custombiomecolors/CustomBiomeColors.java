@@ -6,10 +6,7 @@ import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.listener.PlayerListener;
 import io.github.lumine1909.custombiomecolors.nms.*;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
-import io.github.lumine1909.custombiomecolors.util.BStats;
-import io.github.lumine1909.custombiomecolors.util.BiomeColorUtil;
-import io.github.lumine1909.custombiomecolors.util.UpdateChecker;
-import io.github.lumine1909.custombiomecolors.util.VersionUtil;
+import io.github.lumine1909.custombiomecolors.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -58,33 +55,8 @@ public final class CustomBiomeColors extends JavaPlugin {
 
         int version = VersionUtil.obtainVersion();
         ColorType.CURRENT_VERSION = version;
-        if (version >= 260000) {
-            serverDataHandler = new ServerDataHandler_26_1();
-            packetHandler = new PacketHandler_26_1();
-        } else if (version >= 12111) {
-            serverDataHandler = new ServerDataHandler_1_21_11();
-            packetHandler = new PacketHandler_1_21_11();
-        } else if (version >= 12109) {
-            serverDataHandler = new ServerDataHandler_1_21_9();
-            packetHandler = new PacketHandler_1_21_9();
-        } else if (version >= 12105) {
-            serverDataHandler = new ServerDataHandler_1_21_5();
-            packetHandler = new PacketHandler_1_21_5();
-        } else if (version >= 12104) {
-            serverDataHandler = new ServerDataHandler_1_21_4();
-            packetHandler = new PacketHandler_1_21_4();
-        } else if (version >= 12103) {
-            serverDataHandler = new ServerDataHandler_1_21_3();
-            packetHandler = new PacketHandler_1_21_3();
-        } else if (version >= 12100) {
-            serverDataHandler = new ServerDataHandler_1_21();
-            packetHandler = new PacketHandler_1_21();
-        } else if (version >= 12005) {
-            serverDataHandler = new ServerDataHandler_1_20_5();
-            packetHandler = new PacketHandler_1_20_5();
-        } else {
-            throw new IllegalStateException("This plugin only support MC 1.20.5 - 1.21.11, for other versions, please contact author at https://github.com/Lumine1909/CustomBiomeColors_Continue/issues");
-        }
+        serverDataHandler = NmsLoader.loadDataHandler(version);
+        packetHandler = NmsLoader.loadPacketHandler(version);
 
         this.dataManager = new DataManager("data.json");
         this.dataManager.loadBiomes();
@@ -109,6 +81,7 @@ public final class CustomBiomeColors extends JavaPlugin {
         new ReloadCommand();
         new BatchSetBiomeColorCommand();
         new GetBiomeColorsCommand();
+        new EditBiomeColorCommand();
         for (ColorType type : ColorType.values()) {
             type.apply(
                 colorType -> SetBiomeColorCommand.register(getPluginCommand(colorType), type),

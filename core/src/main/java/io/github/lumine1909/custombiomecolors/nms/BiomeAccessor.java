@@ -8,14 +8,20 @@ import io.github.lumine1909.custombiomecolors.object.ColorData;
 public abstract class BiomeAccessor<Biome, Holder, ResourceKey> {
 
     protected final Holder biomeHolder;
-    protected final Biome biomeBase;
+    protected final Biome biome;
     protected final BiomeData cachedData;
 
     public BiomeAccessor(Holder biomeHolder, Biome biome, BiomeData cachedData) {
         this.biomeHolder = biomeHolder;
-        this.biomeBase = biome;
+        this.biome = biome;
         this.cachedData = cachedData;
         BiomeData.updateBiome(cachedData.colorData(), this);
+    }
+
+    public BiomeAccessor(Biome tempBiome, BiomeData cachedData) {
+        this.biomeHolder = null;
+        this.biome = tempBiome;
+        this.cachedData = cachedData;
     }
 
     public Holder getBiomeHolder() {
@@ -23,7 +29,7 @@ public abstract class BiomeAccessor<Biome, Holder, ResourceKey> {
     }
 
     public Biome getBiome() {
-        return biomeBase;
+        return biome;
     }
 
     @Override
@@ -39,7 +45,7 @@ public abstract class BiomeAccessor<Biome, Holder, ResourceKey> {
     }
 
     public BiomeAccessor<Biome, Holder, ResourceKey> cloneWithDifferentColor(ServerDataHandler<Biome, Holder, ResourceKey> serverDataHandler, BiomeKey newBiomeKey, ColorData newColor) {
-        return serverDataHandler.createCustomBiome(new BiomeData(newBiomeKey, cachedData.baseBiomeKey(), newColor));
+        return serverDataHandler.createCustomBiome(new BiomeData(newBiomeKey, cachedData.baseBiomeKey(), newColor), true);
     }
 
     public abstract float getTemperature();

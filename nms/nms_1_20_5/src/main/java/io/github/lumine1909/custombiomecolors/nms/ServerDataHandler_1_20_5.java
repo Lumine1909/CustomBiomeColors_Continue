@@ -26,7 +26,7 @@ public class ServerDataHandler_1_20_5 implements ServerDataHandler<Biome, Holder
         if ((biome = BiomeData.getBiome(biomeKey)) != null) {
             return biome;
         }
-        return new BiomeAccessor_1_20_5(BIOME_REGISTRY.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).orElseThrow());
+        return new BiomeAccessor_1_20_5(BIOME_REGISTRY.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.namespace(), biomeKey.value()))).orElseThrow());
     }
 
     @SuppressWarnings("unchecked")
@@ -39,20 +39,20 @@ public class ServerDataHandler_1_20_5 implements ServerDataHandler<Biome, Holder
     }
 
     public boolean hasBiome(BiomeKey biomeKey) {
-        return BIOME_REGISTRY.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()))).isPresent();
+        return BIOME_REGISTRY.getHolder(ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.namespace(), biomeKey.value()))).isPresent();
     }
 
-    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData) {
+    public BiomeAccessor<Biome, Holder<Biome>, ResourceKey<Biome>> createCustomBiome(BiomeData biomeData, boolean register) {
         Holder<Biome> holder = BIOME_REGISTRY.getHolder(ResourceKey.create(
             Registries.BIOME,
-            new ResourceLocation(biomeData.baseBiomeKey().key(), biomeData.baseBiomeKey().value())
+            new ResourceLocation(biomeData.baseBiomeKey().namespace(), biomeData.baseBiomeKey().value())
         )).orElse(PLAINS);
 
         Biome biome = holder.value();
         ColorData colorData = biomeData.colorData();
         BiomeKey biomeKey = biomeData.biomeKey();
 
-        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.key(), biomeKey.value()));
+        ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, new ResourceLocation(biomeKey.namespace(), biomeKey.value()));
         Biome.BiomeBuilder biomeBuilder = new Biome.BiomeBuilder()
             .generationSettings(biome.getGenerationSettings())
             .mobSpawnSettings(biome.getMobSettings())
@@ -72,7 +72,10 @@ public class ServerDataHandler_1_20_5 implements ServerDataHandler<Biome, Holder
 
         biomeBuilder.specialEffects(builder.build());
         Biome customBiome = biomeBuilder.build();
-        return new BiomeAccessor_1_20_5(this.registerBiome(holder, customBiome, resourceKey), biomeData);
+
+        return register
+            ? new BiomeAccessor_1_20_5(this.registerBiome(holder, customBiome, resourceKey), biomeData)
+            : new BiomeAccessor_1_20_5(customBiome, biomeData);
     }
 
     @Override

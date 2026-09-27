@@ -3,7 +3,7 @@ package io.github.lumine1909.custombiomecolors.object;
 import net.kyori.adventure.key.Key;
 import org.jetbrains.annotations.NotNull;
 
-public record BiomeKey(String key, String value) {
+public record BiomeKey(String namespace, String value) {
 
     public static BiomeKey fromString(String biomeKeyString) {
         String[] split = biomeKeyString.split(":", 2);
@@ -15,15 +15,11 @@ public record BiomeKey(String key, String value) {
     }
 
     public Key toKey() {
-        return Key.key(this.key, this.value);
-    }
-
-    public BiomeKey createSuffix(String valueSuffix) {
-        return fromString(this.key + ":" + this.value + valueSuffix);
+        return Key.key(this.namespace, this.value);
     }
 
     @Override
     public @NotNull String toString() {
-        return key + ":" + value;
+        return namespace + ":" + value;
     }
 }
