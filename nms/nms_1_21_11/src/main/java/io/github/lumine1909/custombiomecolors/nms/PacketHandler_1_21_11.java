@@ -75,7 +75,8 @@ public class PacketHandler_1_21_11 implements PacketHandler {
                         buf.writeVarInt(getModifiedId(map.byId(i)));
                     }
                 }
-                case GlobalPalette<Holder<Biome>> global -> {}
+                case GlobalPalette<Holder<Biome>> global -> {
+                }
                 default -> throw new IllegalStateException("Unknown value: " + palette);
             }
             buf.writeFixedSizeLongArray(storage.getRaw());

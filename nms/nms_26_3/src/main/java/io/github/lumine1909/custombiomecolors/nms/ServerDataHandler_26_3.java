@@ -29,8 +29,6 @@ import org.joml.Vector4fc;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 public class ServerDataHandler_26_3 implements ServerDataHandler<Biome, Holder<Biome>, ResourceKey<Biome>> {
 

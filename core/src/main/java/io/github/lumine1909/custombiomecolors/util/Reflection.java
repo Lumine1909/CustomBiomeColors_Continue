@@ -15,9 +15,11 @@ public class Reflection {
     public static final Class<?> class$SingleValuePalette = clazz("net.minecraft.world.level.chunk.SingleValuePalette");
     public static final Class<?> class$LinearPalette = clazz("net.minecraft.world.level.chunk.LinearPalette");
     public static final Class<?> class$HashMapPalette = clazz("net.minecraft.world.level.chunk.HashMapPalette");
+    public static final Class<?> class$ClientboundLevelChunkWithLightPacket = clazz("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket");
     public static final Class<?> class$ClientboundLevelChunkPacketData = clazz("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData");
     public static final Class<?> class$LevelChunkSection = clazz("net.minecraft.world.level.chunk.LevelChunkSection");
     public static final Class<?> class$Holder$Reference = clazz("net.minecraft.core.Holder$Reference");
+    public static final Field<?> field$ClientboundLevelChunkWithLightPacket$chunkData = Field.of(class$ClientboundLevelChunkWithLightPacket, "chunkData");
     public static final Field<Boolean> field$MappedRegistry$frozen = Field.of(class$MappedRegistry, "frozen");
     public static final Field<Map<?, ?>> field$MappedRegistry$unregisteredIntrusiveHolders = Field.of(class$MappedRegistry, "unregisteredIntrusiveHolders");
     public static final Field<?> field$PalettedContainer$data = Field.of(class$PalettedContainer, "data");

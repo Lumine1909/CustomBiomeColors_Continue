@@ -30,7 +30,8 @@ import java.util.function.Supplier;
 @SuppressWarnings("rawtypes")
 public class DataManager {
 
-    private static final Type TYPE_TOKEN = new TypeToken<Map<BiomeKey, BiomeData>>() {}.getType();
+    private static final Type TYPE_TOKEN = new TypeToken<Map<BiomeKey, BiomeData>>() {
+    }.getType();
     private static final Gson gson = new GsonBuilder()
         .setPrettyPrinting()
         .registerTypeAdapter(BiomeKey.class, new BiomeKeyAdapter())
