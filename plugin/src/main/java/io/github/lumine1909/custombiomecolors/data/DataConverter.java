@@ -18,8 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DataConverter {
 
-    private static final Type TYPE_TOKEN = new TypeToken<Map<String, int[]>>() {
-    }.getType();
+    private static final Type TYPE_TOKEN = new TypeToken<Map<String, int[]>>() {}.getType();
 
     private final Map<String, int[]> rawMap = new ConcurrentHashMap<>();
 

@@ -1,5 +1,6 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
+import ca.spottedleaf.moonrise.patches.fast_palette.FastHashMapPalette;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.registries.Registries;
@@ -7,7 +8,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BitStorage;
-import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.*;
 import org.bukkit.entity.Player;
@@ -31,6 +31,16 @@ public class PacketHandler_26_3 implements PacketHandler {
             super(player);
         }
 
+        @Override
+        protected MappedRegistry<Biome> registry() {
+            return REGISTRY;
+        }
+
+        @Override
+        protected int plainsId() {
+            return PLAINS_ID;
+        }
+
         protected void modifyBiomeData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
             for (int index = 0; index < size; index++) {
                 LevelChunkSection section = new LevelChunkSection(CONTAINER_FACTORY.createForBlockStates(), CONTAINER_FACTORY.createForBiomes());
@@ -50,46 +60,37 @@ public class PacketHandler_26_3 implements PacketHandler {
             }
         }
 
-        @SuppressWarnings({"DataFlowIssue", "unchecked"})
-        private void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
+        protected void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
             PalettedContainer<Holder<Biome>> container = (PalettedContainer<Holder<Biome>>) levelChunkSection.getBiomes();
             BitStorage storage = field$PalettedContainer$Data$storage.getUntyped(field$PalettedContainer$data.get(container));
-            Object containerData = field$PalettedContainer$data.get(container);
+            PalettedContainer.Data<Holder<Biome>> containerData = field$PalettedContainer$data.getUntyped(container);
             Palette<Holder<Biome>> palette = field$PalettedContainer$Data$palette.getUntyped(containerData);
 
             buf.writeByte(storage.getBits());
             switch (palette) {
-                case SingleValuePalette<Holder<Biome>> single -> buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.getUntyped(single)));
-                case LinearPalette<Holder<Biome>> linear -> {
-                    Object[] array = field$LinearPalette$values.getUntyped(linear);
-                    int size = linear.getSize();
-                    buf.writeVarInt(size);
-                    for (int i = 0; i < size; i++) {
-                        buf.writeVarInt(getModifiedId((Holder<Biome>) array[i]));
+                case SingleValuePalette<Holder<Biome>> single -> buf.writeVarInt(getModifiedId(single.valueFor(0)));
+                case GlobalPalette<Holder<Biome>> global -> {}
+                case FastHashMapPalette<Holder<Biome>> fastHashMap -> {
+                    Holder<Biome>[] idToValue = field$FastHashmapPalette$idToValue.getUntyped(fastHashMap);
+                    int bits = field$FastHashmapPalette$bits.getInt(fastHashMap);
+                    if (bits == 0) {
+                        buf.writeVarInt(getModifiedId(idToValue[0]));
+                    } else {
+                        buf.writeVarInt(idToValue.length);
+                        for (Holder<Biome> biomeHolder : idToValue) {
+                            buf.writeVarInt(getModifiedId(biomeHolder));
+                        }
                     }
                 }
-                case HashMapPalette<Holder<Biome>> hashMap -> {
-                    CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>> map = field$HashMapPalette$values.getUntyped(hashMap);
-                    int size = hashMap.getSize();
+                default -> {
+                    int size = palette.getSize();
                     buf.writeVarInt(size);
                     for (int i = 0; i < size; i++) {
-                        buf.writeVarInt(getModifiedId(map.byId(i)));
+                        buf.writeVarInt(getModifiedId(palette.valueFor(i)));
                     }
                 }
-                case GlobalPalette<Holder<Biome>> global -> {
-                }
-                default -> throw new IllegalStateException("Unknown value: " + palette);
             }
             buf.writeFixedSizeLongArray(storage.getRaw());
-        }
-
-        private int getModifiedId(Holder<Biome> origin) {
-            long createTime = createTimeCache.getOrDefault(origin.getRegisteredName(), 0L);
-            if (createTime > joinTime) {
-                warn();
-                return PLAINS_ID;
-            }
-            return REGISTRY.getId(origin.value());
         }
     }
 }

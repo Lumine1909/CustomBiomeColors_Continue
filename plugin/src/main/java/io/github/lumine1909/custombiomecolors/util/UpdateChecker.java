@@ -27,7 +27,7 @@ public class UpdateChecker implements Listener {
     private final Component message;
     private final JavaPlugin plugin;
 
-    public boolean needUpdate;
+    public boolean needUpdate = false;
 
     public UpdateChecker(JavaPlugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -38,7 +38,6 @@ public class UpdateChecker implements Listener {
             .text("[CustomBiomeColors] There is an update available! Download it from: ", NamedTextColor.GREEN)
             .append(Component.text("https://github.com/Lumine1909/CustomBiomeColors_Continue/releases/latest", NamedTextColor.GRAY)
                 .clickEvent(ClickEvent.openUrl("https://github.com/Lumine1909/CustomBiomeColors_Continue/releases/latest")));
-        this.checkUpdates();
     }
 
     private static String cleanVersion(String version) {
@@ -48,6 +47,9 @@ public class UpdateChecker implements Listener {
     }
 
     public void checkUpdates() {
+        if (!Configs.checkUpdate || needUpdate) {
+            return;
+        }
         CompletableFuture.runAsync(() -> {
             try (HttpClient client = HttpClient.newHttpClient()) {
 
@@ -83,7 +85,7 @@ public class UpdateChecker implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (p.isOp() && needUpdate) {
+        if (Configs.notifyUpdateOnJoin && needUpdate && p.isOp()) {
             p.sendMessage(this.message);
         }
     }
