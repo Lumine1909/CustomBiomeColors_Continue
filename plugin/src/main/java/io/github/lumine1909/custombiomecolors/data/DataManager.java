@@ -69,7 +69,6 @@ public class DataManager {
 
     public void saveBiome(BiomeKey biomeKey, BiomeData biomeData) {
         this.biomeDataMap.put(biomeKey, biomeData);
-        plugin.getPacketHandler().updateCache(biomeKey.toString(), System.currentTimeMillis() + 1000);
         scheduleSave();
     }
 

@@ -1,5 +1,6 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -24,15 +25,12 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
 public interface PacketHandler {
 
-    Map<String, Long> createTimeCache = new HashMap<>();
     String HANDLER_NAME = "cbc-handler";
 
     default void inject() {
@@ -62,10 +60,6 @@ public interface PacketHandler {
         if (channel.pipeline().get(HANDLER_NAME) != null) {
             channel.pipeline().remove(HANDLER_NAME);
         }
-    }
-
-    default void updateCache(String id, long time) {
-        createTimeCache.put(id, time);
     }
 
     Interceptor getInterceptor(Player player);
@@ -139,7 +133,7 @@ public interface PacketHandler {
         protected abstract void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection);
 
         protected int getModifiedId(Holder<Biome> origin) {
-            long createTime = createTimeCache.getOrDefault(origin.getRegisteredName(), 0L);
+            long createTime = BiomeData.getCreatedTime(origin.getRegisteredName());
             if (createTime > joinTime) {
                 warn();
                 return plainsId();

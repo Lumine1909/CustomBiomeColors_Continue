@@ -77,9 +77,9 @@ public class PacketHandler_26_3 implements PacketHandler {
                     if (bits == 0) {
                         buf.writeVarInt(getModifiedId((Holder<Biome>) idToValue[0]));
                     } else {
-                        buf.writeVarInt(idToValue.length);
-                        for (Object biomeHolder : idToValue) {
-                            buf.writeVarInt(getModifiedId((Holder<Biome>) biomeHolder));
+                        buf.writeVarInt(fastHashMap.getSize());
+                        for (int i = 0; i < fastHashMap.getSize(); i++) {
+                            buf.writeVarInt(getModifiedId((Holder<Biome>) idToValue[i]));
                         }
                     }
                 }

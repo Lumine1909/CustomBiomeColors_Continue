@@ -11,6 +11,7 @@ public record BiomeData(BiomeKey biomeKey, BiomeKey baseBiomeKey, ColorData colo
     private static final Map<ColorData, BiomeAccessor> colorCache = new HashMap<>();
     private static final Map<BiomeKey, BiomeAccessor> keyCache = new HashMap<>();
     private static final Map<Object, BiomeAccessor> holderCache = new HashMap<>();
+    private static final Map<String, Long> createdTimeCache = new HashMap<>();
 
     public static BiomeAccessor getBiome(ColorData colorData) {
         return colorCache.get(colorData);
@@ -22,6 +23,10 @@ public record BiomeData(BiomeKey biomeKey, BiomeKey baseBiomeKey, ColorData colo
 
     public static BiomeAccessor getBiomeFromHolder(Object holder) {
         return holderCache.get(holder);
+    }
+
+    public static long getCreatedTime(String name) {
+        return createdTimeCache.getOrDefault(name, 0L);
     }
 
     public static void clearBiome(BiomeAccessor biomeAccessor) {
@@ -36,5 +41,6 @@ public record BiomeData(BiomeKey biomeKey, BiomeKey baseBiomeKey, ColorData colo
         }
         keyCache.put(biomeAccessor.getBiomeData().biomeKey(), biomeAccessor);
         holderCache.put(biomeAccessor.getBiomeHolder(), biomeAccessor);
+        createdTimeCache.put(biomeAccessor.getBiomeData().biomeKey().toString(), System.currentTimeMillis());
     }
 }
