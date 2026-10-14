@@ -60,6 +60,7 @@ public class PacketHandler_26_3 implements PacketHandler {
             }
         }
 
+        @SuppressWarnings("unchecked")
         protected void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
             PalettedContainer<Holder<Biome>> container = (PalettedContainer<Holder<Biome>>) levelChunkSection.getBiomes();
             BitStorage storage = field$PalettedContainer$Data$storage.getUntyped(field$PalettedContainer$data.get(container));
@@ -71,7 +72,7 @@ public class PacketHandler_26_3 implements PacketHandler {
                 case SingleValuePalette<Holder<Biome>> single -> buf.writeVarInt(getModifiedId(single.valueFor(0)));
                 case GlobalPalette<Holder<Biome>> global -> {}
                 case FastHashMapPalette<Holder<Biome>> fastHashMap -> {
-                    Holder<Biome>[] idToValue = field$FastHashmapPalette$idToValue.getUntyped(fastHashMap);
+                    Holder<Biome>[] idToValue = (Holder<Biome>[]) field$FastHashmapPalette$idToValue.get(fastHashMap);
                     int bits = field$FastHashmapPalette$bits.getInt(fastHashMap);
                     if (bits == 0) {
                         buf.writeVarInt(getModifiedId(idToValue[0]));
