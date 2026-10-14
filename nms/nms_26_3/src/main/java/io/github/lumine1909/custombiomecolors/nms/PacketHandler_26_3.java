@@ -72,14 +72,14 @@ public class PacketHandler_26_3 implements PacketHandler {
                 case SingleValuePalette<Holder<Biome>> single -> buf.writeVarInt(getModifiedId(single.valueFor(0)));
                 case GlobalPalette<Holder<Biome>> global -> {}
                 case FastHashMapPalette<Holder<Biome>> fastHashMap -> {
-                    Holder<Biome>[] idToValue = (Holder<Biome>[]) field$FastHashmapPalette$idToValue.get(fastHashMap);
+                    Object[] idToValue = field$FastHashmapPalette$idToValue.get(fastHashMap);
                     int bits = field$FastHashmapPalette$bits.getInt(fastHashMap);
                     if (bits == 0) {
-                        buf.writeVarInt(getModifiedId(idToValue[0]));
+                        buf.writeVarInt(getModifiedId((Holder<Biome>) idToValue[0]));
                     } else {
                         buf.writeVarInt(idToValue.length);
-                        for (Holder<Biome> biomeHolder : idToValue) {
-                            buf.writeVarInt(getModifiedId(biomeHolder));
+                        for (Object biomeHolder : idToValue) {
+                            buf.writeVarInt(getModifiedId((Holder<Biome>) biomeHolder));
                         }
                     }
                 }

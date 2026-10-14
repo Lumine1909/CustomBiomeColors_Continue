@@ -28,7 +28,7 @@ public class Reflection {
 
     // Optional value for higher version
     public static final Field<Short> field$LevelChunkSection$fluidCount = Field.of(class$LevelChunkSection, "fluidCount", 1);
-    public static final Field<?> field$FastHashmapPalette$idToValue = Field.of("ca.spottedleaf.moonrise.patches.fast_palette.FastHashMapPalette", "idToValue", 1);
+    public static final Field<Object[]> field$FastHashmapPalette$idToValue = Field.of("ca.spottedleaf.moonrise.patches.fast_palette.FastHashMapPalette", "idToValue", 1);
     public static final Field<Integer> field$FastHashmapPalette$bits = Field.of("ca.spottedleaf.moonrise.patches.fast_palette.FastHashMapPalette", "bits", 1);
 
     public static Class<?> clazz(String name) {
