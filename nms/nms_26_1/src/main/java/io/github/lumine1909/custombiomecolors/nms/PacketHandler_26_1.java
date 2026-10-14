@@ -60,7 +60,7 @@ public class PacketHandler_26_1 implements PacketHandler {
         }
 
         protected void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
-            buf.writeLongArray(getStorageAndWritePalette(buf, levelChunkSection).getRaw());
+            buf.writeFixedSizeLongArray(getStorageAndWritePalette(buf, levelChunkSection).getRaw());
         }
 
     }
