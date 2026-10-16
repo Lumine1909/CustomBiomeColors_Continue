@@ -12,9 +12,6 @@ public class Reflection {
     public static final Class<?> class$MappedRegistry = clazz("net.minecraft.core.MappedRegistry");
     public static final Class<?> class$PalettedContainer = clazz("net.minecraft.world.level.chunk.PalettedContainer");
     public static final Class<?> class$PalettedContainer$Data = clazz("net.minecraft.world.level.chunk.PalettedContainer$Data");
-    public static final Class<?> class$SingleValuePalette = clazz("net.minecraft.world.level.chunk.SingleValuePalette");
-    public static final Class<?> class$LinearPalette = clazz("net.minecraft.world.level.chunk.LinearPalette");
-    public static final Class<?> class$HashMapPalette = clazz("net.minecraft.world.level.chunk.HashMapPalette");
     public static final Class<?> class$ClientboundLevelChunkWithLightPacket = clazz("net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket");
     public static final Class<?> class$ClientboundLevelChunkPacketData = clazz("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData");
     public static final Class<?> class$LevelChunkSection = clazz("net.minecraft.world.level.chunk.LevelChunkSection");
@@ -27,13 +24,12 @@ public class Reflection {
     public static final Field<?> field$PalettedContainer$Data$palette = Field.of(class$PalettedContainer$Data, "palette");
     public static final Field<byte[]> field$ClientboundLevelChunkPacketData$buffer = Field.of(class$ClientboundLevelChunkPacketData, "buffer");
     public static final Field<Short> field$LevelChunkSection$nonEmptyBlockCount = Field.of(class$LevelChunkSection, "nonEmptyBlockCount");
-    public static final Field<?> field$SingleValuePalette$value = Field.of(class$SingleValuePalette, "value");
-    public static final Field<?> field$LinearPalette$values = Field.of(class$LinearPalette, "values");
-    public static final Field<?> field$HashMapPalette$values = Field.of(class$HashMapPalette, "values");
     public static final Method<Void> method$Holder$bindTags = Method.of(class$Holder$Reference, "bindTags", void.class, Collection.class);
 
     // Optional value for higher version
     public static final Field<Short> field$LevelChunkSection$fluidCount = Field.of(class$LevelChunkSection, "fluidCount", 1);
+    public static final Field<Object[]> field$FastHashmapPalette$idToValue = Field.of("ca.spottedleaf.moonrise.patches.fast_palette.FastHashMapPalette", "idToValue", 1);
+    public static final Field<Integer> field$FastHashmapPalette$bits = Field.of("ca.spottedleaf.moonrise.patches.fast_palette.FastHashMapPalette", "bits", 1);
 
     public static Class<?> clazz(String name) {
         try {

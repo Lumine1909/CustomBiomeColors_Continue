@@ -1,5 +1,6 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
+import io.github.lumine1909.custombiomecolors.object.BiomeData;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -8,27 +9,28 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.BitStorage;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static io.github.lumine1909.custombiomecolors.util.Reflection.field$ClientboundLevelChunkPacketData$buffer;
-import static io.github.lumine1909.custombiomecolors.util.Reflection.field$ClientboundLevelChunkWithLightPacket$chunkData;
+import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
 
 public interface PacketHandler {
 
-    Map<String, Long> createTimeCache = new HashMap<>();
     String HANDLER_NAME = "cbc-handler";
 
     default void inject() {
@@ -58,10 +60,6 @@ public interface PacketHandler {
         if (channel.pipeline().get(HANDLER_NAME) != null) {
             channel.pipeline().remove(HANDLER_NAME);
         }
-    }
-
-    default void updateCache(String id, long time) {
-        createTimeCache.put(id, time);
     }
 
     Interceptor getInterceptor(Player player);
@@ -105,6 +103,42 @@ public interface PacketHandler {
                 warnTime = System.currentTimeMillis();
                 player.getBukkitEntity().sendMessage(Component.text("[CustomBiomeColors] You are loading a chunk with un-synchronized biome, it will be default to plains, please re-join to get the real color!", NamedTextColor.RED));
             }
+        }
+
+        protected abstract MappedRegistry<Biome> registry();
+
+        protected abstract int plainsId();
+
+        protected BitStorage getStorageAndWritePalette(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
+            PalettedContainer<Holder<Biome>> container = (PalettedContainer<Holder<Biome>>) levelChunkSection.getBiomes();
+            BitStorage storage = field$PalettedContainer$Data$storage.getUntyped(field$PalettedContainer$data.get(container));
+            Object containerData = field$PalettedContainer$data.getUntyped(container);
+            Palette<Holder<Biome>> palette = field$PalettedContainer$Data$palette.getUntyped(containerData);
+
+            buf.writeByte(storage.getBits());
+            switch (palette) {
+                case SingleValuePalette<Holder<Biome>> single -> buf.writeVarInt(getModifiedId(single.valueFor(0)));
+                case GlobalPalette<Holder<Biome>> global -> {}
+                default -> {
+                    int size = palette.getSize();
+                    buf.writeVarInt(size);
+                    for (int i = 0; i < size; i++) {
+                        buf.writeVarInt(getModifiedId(palette.valueFor(i)));
+                    }
+                }
+            }
+            return storage;
+        }
+
+        protected abstract void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection);
+
+        protected int getModifiedId(Holder<Biome> origin) {
+            long createTime = BiomeData.getCreatedTime(origin.getRegisteredName());
+            if (createTime > joinTime) {
+                warn();
+                return plainsId();
+            }
+            return registry().getId(origin.value());
         }
 
         protected abstract void modifyBiomeData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size);

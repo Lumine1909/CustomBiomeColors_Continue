@@ -4,7 +4,8 @@ import io.github.lumine1909.custombiomecolors.command.*;
 import io.github.lumine1909.custombiomecolors.data.DataManager;
 import io.github.lumine1909.custombiomecolors.integration.WorldEditHandler;
 import io.github.lumine1909.custombiomecolors.listener.PlayerListener;
-import io.github.lumine1909.custombiomecolors.nms.*;
+import io.github.lumine1909.custombiomecolors.nms.PacketHandler;
+import io.github.lumine1909.custombiomecolors.nms.ServerDataHandler;
 import io.github.lumine1909.custombiomecolors.object.ColorType;
 import io.github.lumine1909.custombiomecolors.util.*;
 import net.kyori.adventure.text.Component;
@@ -23,6 +24,7 @@ public final class CustomBiomeColors extends JavaPlugin {
     private WorldEditHandler worldEditHandler;
     private DataManager dataManager;
     private PacketHandler packetHandler;
+    private UpdateChecker updateChecker;
     private BStats bStats;
 
     public static CustomBiomeColors getInstance() {
@@ -74,7 +76,8 @@ public final class CustomBiomeColors extends JavaPlugin {
         registerCommands();
 
         getPacketHandler().inject();
-        new UpdateChecker(this);
+        this.updateChecker = new UpdateChecker(this);
+        callReload(null);
     }
 
     private void registerCommands() {
@@ -95,7 +98,11 @@ public final class CustomBiomeColors extends JavaPlugin {
     }
 
     public void callReload(CommandSender sender) {
-        sender.sendMessage(Component.text("[CustomBiomeColors] Reload complete", NamedTextColor.GREEN));
+        Configs.reload(this);
+        if (sender != null) {
+            sender.sendMessage(Component.text("[CustomBiomeColors] Reload complete", NamedTextColor.GREEN));
+        }
+        updateChecker.checkUpdates();
     }
 
     @Override

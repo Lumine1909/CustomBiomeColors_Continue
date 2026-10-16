@@ -1,18 +1,16 @@
 package io.github.lumine1909.custombiomecolors.nms;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BitStorage;
-import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import org.bukkit.entity.Player;
 
-import static io.github.lumine1909.custombiomecolors.util.Reflection.*;
+import static io.github.lumine1909.custombiomecolors.util.Reflection.field$LevelChunkSection$nonEmptyBlockCount;
 
 public class PacketHandler_1_21_11 implements PacketHandler {
 
@@ -29,6 +27,16 @@ public class PacketHandler_1_21_11 implements PacketHandler {
 
         public PacketInterceptor(Player player) {
             super(player);
+        }
+
+        @Override
+        protected MappedRegistry<Biome> registry() {
+            return REGISTRY;
+        }
+
+        @Override
+        protected int plainsId() {
+            return PLAINS_ID;
         }
 
         protected void modifyBiomeData(FriendlyByteBuf readBuf, FriendlyByteBuf writeBuf, int size) {
@@ -49,46 +57,8 @@ public class PacketHandler_1_21_11 implements PacketHandler {
             }
         }
 
-        @SuppressWarnings({"DataFlowIssue", "unchecked"})
-        private void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
-            PalettedContainer<Holder<Biome>> container = (PalettedContainer<Holder<Biome>>) levelChunkSection.getBiomes();
-            BitStorage storage = field$PalettedContainer$Data$storage.getUntyped(field$PalettedContainer$data.get(container));
-            Object containerData = field$PalettedContainer$data.get(container);
-            Palette<Holder<Biome>> palette = field$PalettedContainer$Data$palette.getUntyped(containerData);
-
-            buf.writeByte(storage.getBits());
-            switch (palette) {
-                case SingleValuePalette<Holder<Biome>> single -> buf.writeVarInt(getModifiedId(field$SingleValuePalette$value.getUntyped(single)));
-                case LinearPalette<Holder<Biome>> linear -> {
-                    Object[] array = field$LinearPalette$values.getUntyped(linear);
-                    int size = linear.getSize();
-                    buf.writeVarInt(size);
-                    for (int i = 0; i < size; i++) {
-                        buf.writeVarInt(getModifiedId((Holder<Biome>) array[i]));
-                    }
-                }
-                case HashMapPalette<Holder<Biome>> hashMap -> {
-                    CrudeIncrementalIntIdentityHashBiMap<Holder<Biome>> map = field$HashMapPalette$values.getUntyped(hashMap);
-                    int size = hashMap.getSize();
-                    buf.writeVarInt(size);
-                    for (int i = 0; i < size; i++) {
-                        buf.writeVarInt(getModifiedId(map.byId(i)));
-                    }
-                }
-                case GlobalPalette<Holder<Biome>> global -> {
-                }
-                default -> throw new IllegalStateException("Unknown value: " + palette);
-            }
-            buf.writeFixedSizeLongArray(storage.getRaw());
-        }
-
-        private int getModifiedId(Holder<Biome> origin) {
-            long createTime = createTimeCache.getOrDefault(origin.getRegisteredName(), 0L);
-            if (createTime > joinTime) {
-                warn();
-                return PLAINS_ID;
-            }
-            return REGISTRY.getId(origin.value());
+        protected void writeBiomes(FriendlyByteBuf buf, LevelChunkSection levelChunkSection) {
+            buf.writeFixedSizeLongArray(getStorageAndWritePalette(buf, levelChunkSection).getRaw());
         }
     }
 }
